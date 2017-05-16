@@ -1,0 +1,6 @@
+node_modules
+npm-debug.log*
+dist
+
+# OS or Editor folders
+.DS_Store
