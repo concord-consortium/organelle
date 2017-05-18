@@ -6,9 +6,21 @@
     <svg id="model" viewBox="0 0 1280 800" width="1152px" height="720px"></svg>
 
     <script>
-      var o = new Organelle({
+      window.model = Organelle.createModel({
         element: "model",
-        background: "assets/melanocyte.svg"
+        background: "assets/melanocyte.svg",
+        species: [
+          {
+            name: "melanosome",
+            image: "assets/melanosome.svg",
+            selector: "#melanosome",
+            spawnElement: "#golgi_x5F_apparatus path",
+            spawnPeriod: 60,
+            follow: "#microtubules_x5F_grouped path",
+            speed: 1
+          }
+        ],
+        autoplay: false
       });
     </script>
   </body>

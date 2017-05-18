@@ -4,7 +4,7 @@
   "description": "An agent-based modeling library based on SVG and declarative rules.",
   "license": "MIT",
   "scripts": {
-    "start": "webpack -d --watch",
+    "start": "webpack --watch",
     "build": "webpack -p"
   },
   "dependencies": {

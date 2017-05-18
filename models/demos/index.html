@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <script type="text/javascript" src="../../organelle.js" charset="utf-8"></script>
+  </head>
+  <body>
+    <h1>Organelle demos</h1>
+    <fieldset style="float: left; padding: 10px">
+      <legend>Spawning on element</legend>
+      <svg id="spawn-model" viewBox="-20 -20 300 300" width="300px" height="300px" style="display: inline-block;"></svg>
+    </fieldset>
+    <fieldset style="float: left; padding: 10px">
+      <legend>Following paths</legend>
+      <svg id="follow-model" viewBox="-20 -20 600 300" width="600px" height="300px" style="display: inline-block;"></svg>
+    </fieldset>
+
+    <script>
+      var o1 = new Organelle({
+        element: "spawn-model",
+        background: "assets/golgi.svg",
+        species: [
+          {
+            name: "melanosome",
+            image: "assets/melanosome.svg",
+            selector: "#melanosome",
+            spawnElement: "#golgi_x5F_apparatus path",
+            spawnPeriod: 600
+          }
+        ]
+      });
+
+      var o2 = new Organelle({
+        element: "follow-model",
+        background: "assets/golgi-and-microtubules.svg",
+        species: [
+          {
+            name: "melanosome",
+            image: "assets/melanosome.svg",
+            selector: "#melanosome",
+            spawnElement: "#golgi_x5F_apparatus path",
+            spawnPeriod: 600,
+            follow: "#microtubules_x5F_grouped path",
+            speed: 1
+          }
+        ]
+      });
+    </script>
+  </body>
+</html>
