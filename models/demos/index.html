@@ -14,33 +14,76 @@
     </fieldset>
 
     <script>
-      var o1 = new Organelle({
+      var melanosome = {
+        name: "melanosome",
+        image: "assets/melanosome.svg",
+        selector: "#melanosome",
+        spawn: {
+          every: 90,
+          on: "#golgi_x5F_apparatus path"
+        },
+        rules: {
+          birth: [
+            {
+              set: {
+                size: 0.1
+              },
+              switch_state: "growing"
+            }
+          ],
+          growing: [
+            {
+              grow: {
+                by: 0.01,
+                until: 1,
+                finally: {
+                  switch_state: "seeking_microtuble"
+                }
+              }
+            }
+          ],
+          // growing: [
+          //   {
+          //     if: {
+          //       fact: "size",
+          //       lessThan: 1
+          //     },
+          //     then: {
+          //       grow: 0.01
+          //     },
+          //     else: {
+          //       switchState: "seeking_microtuble"
+          //     }
+          //   }
+          // ],
+          seeking_microtuble: [
+            {
+              change: {
+                prop: "x",
+                by: 0.5
+              }
+              // move_to: {
+              //   x: 200
+              // }
+            }
+          ]
+        }
+      }
+    </script>
+    <script>
+      Organelle.createModel({
         element: "spawn-model",
         background: "assets/golgi.svg",
         species: [
-          {
-            name: "melanosome",
-            image: "assets/melanosome.svg",
-            selector: "#melanosome",
-            spawnElement: "#golgi_x5F_apparatus path",
-            spawnPeriod: 600
-          }
+          melanosome
         ]
       });
 
-      var o2 = new Organelle({
+      Organelle.createModel({
         element: "follow-model",
         background: "assets/golgi-and-microtubules.svg",
         species: [
-          {
-            name: "melanosome",
-            image: "assets/melanosome.svg",
-            selector: "#melanosome",
-            spawnElement: "#golgi_x5F_apparatus path",
-            spawnPeriod: 600,
-            follow: "#microtubules_x5F_grouped path",
-            speed: 1
-          }
+          melanosome
         ]
       });
     </script>

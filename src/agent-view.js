@@ -2,6 +2,8 @@ export default class AgentView {
   constructor(agent, snap) {
     this.agent = agent
 
+    this.lastScale = 1
+
     Snap.load(agent.species.image, (img) => {
       if (!this.agent.dead) {
         this.el = img.select(agent.species.selector)
@@ -13,14 +15,17 @@ export default class AgentView {
 
   render() {
     if (this.el) {
-      let a = this.agent,
+      let a = this.agent.props,
           bb = this.el.getBBox(),
-          matrix = new Snap.Matrix()
+          matrix = new Snap.Matrix(),
+          dSize = a.size / this.lastScale
 
-      matrix.translate((a.x-bb.w/2), (a.y-bb.h/2))
+      matrix.translate((a.x-(bb.w*dSize)/2), (a.y-(bb.h*dSize)/2))
       matrix.scale(a.size)
 
       this.el.nativeAttrs({transform: matrix})
+
+      this.lastScale = a.size
     }
   }
 

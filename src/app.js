@@ -50,7 +50,8 @@ class Model {
 
         this.step(steps)
 
-        this.totalSteps += steps;
+        // assume we caught up, even if we only ran maxCatchUpSteps
+        this.totalSteps = targetTotalSteps;
       }
       keepRunning()
     }
@@ -64,8 +65,8 @@ class Model {
 
 module.exports = {
 
-  createModel({element, background, species, autoplay}) {
-    return new Model({element, background, species, autoplay})
+  createModel({element, background, species, stepsPerSecond, autoplay}) {
+    return new Model({element, background, species, stepsPerSecond, autoplay})
   }
 
 }
