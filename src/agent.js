@@ -11,24 +11,25 @@ export default class Agent {
     this.props = {}
     this.world = world
 
+    this.references = {}
+
     // default true for now
     this.dieWhenExitingWorld = true
 
-    let spawnEl = this.world.snap.select(species.spawn.on)
-    if (spawnEl) {
-      let relPos = Math.random() * spawnEl.node.getTotalLength(),
-          pos = spawnEl.node.getPointAtLength(relPos)
-
-      this.props.x = pos.x
-      this.props.y = pos.y
-      this.props.size = 1
-
-      this.state = "birth"
-
-      this.step()
-
-      this.view = new AgentView(this, this.world.snap)
+    let [x, y] = [0, 0]
+    if (species.spawn.on) {
+      ({x, y} = this.world.getLocation(species.spawn.on, this.props))
     }
+
+    this.props.x = x
+    this.props.y = y
+    this.props.size = 1
+
+    this.state = "initialization"
+
+    this.step()
+
+    this.view = new AgentView(this, this.world.snap)
   }
 
   step() {
@@ -73,13 +74,83 @@ export default class Agent {
 
   task_change(val) {
     if (typeof val.until === "number") {
-      if (this.props[val.prop] < val.until) {
-        this.props[val.prop] = Math.min(this.props[val.prop] + val.by, val.until)
+      let complete = val.by > 0 ? this.props[val.prop] >= val.until : this.props[val.prop] <= val.until
+      if (!complete) {
+        let bounds = val.by > 0 ? Math.min : Math.max
+        this.props[val.prop] = bounds(this.props[val.prop] + val.by, val.until)
       } else {
         return true
       }
     } else {
       this.props[val.prop] += val.by
+    }
+  }
+
+  task_move_to(val) {
+    let key = JSON.stringify(val),
+        x, y;
+    if (this.references[key]) {
+      ({x, y} = this.references[key])
+    } else {
+      ({x, y} = this.world.getLocation(val, this.props))
+      this.references[key] = {x, y}
+    }
+
+    let arrived = this.travelTo({x, y})
+
+    if (arrived) {
+      this.references[key] = null
+    }
+    return arrived
+  }
+
+  task_follow(val) {
+    let key = JSON.stringify(val),
+        speed = (typeof this.props.speed === "number") ? this.props.speed : 1,
+        path;
+    if (this.references[key]) {
+      path = this.references[key].path
+    } else {
+      path = this.world.getPath(val, this.props)
+      this.references[key] = {path: path, distance: 0}
+    }
+
+    this.references[key].distance += speed
+
+    let {x, y, arrived} = this.world.getPointAlongPath(path, this.references[key].distance)
+
+    this.props.x = x
+    this.props.y = y
+
+    if (arrived) {
+      this.references[key] = null
+    }
+
+    return arrived
+  }
+
+  travelTo({x, y}) {
+    let dx = x - this.props.x,
+        dy = y - this.props.y,
+        distSq = (dx * dx) + (dy * dy),
+        speed = (typeof this.props.speed === "number") ? this.props.speed : 1,
+        speedSq = speed * speed,
+        direction = Math.atan2(dy, dx);
+
+    speed = (distSq > speedSq) ? speed : Math.sqrt(distSq)
+
+    let vx = Math.cos(direction) * speed,
+        vy = Math.sin(direction) * speed
+
+    this.props.x += vx
+    this.props.y += vy
+
+    return (this.props.x === x && this.props.y === y)
+  }
+
+  task_die(val) {
+    if (val) {
+      this.dead = true
     }
   }
 

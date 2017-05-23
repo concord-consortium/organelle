@@ -68,4 +68,57 @@ module.exports = class World {
     return x >= this.left && x <= this.right &&
         y >= this.top && y <= this.bottom
   }
+
+  getPath(props, {x: agent_x, y: agent_y}) {
+    let matches = this.snap.selectAll(props.selector),
+        selection;
+    if (props.which === "random") {
+      selection = matches[Math.floor(Math.random() * matches.length)]
+    } else if (props.which === "nearest") {
+      let leastSqDistance = Infinity
+      matches.forEach( m => {
+        let {x, y} = this.getPercentAlongPath(m.node, props.at)
+        let dx = agent_x - x,
+            dy = agent_y - y,
+            sqDistance = dx * dx + dy * dy
+        if (sqDistance < leastSqDistance) {
+          leastSqDistance = sqDistance
+          selection = m
+        }
+      })
+    } else {
+      selection = matches[0]
+    }
+    return selection
+  }
+
+  getLocation(props, {x, y}) {
+    let loc = {}
+    if (props.selector) {
+      let path = this.getPath(props, {x, y})
+      loc = this.getPercentAlongPath(path.node, props.at)
+    }
+    if (typeof props.x === "number") {
+      loc.x = props.x
+    }
+    if (typeof props.y === "number") {
+      loc.y = props.y
+    }
+    return loc
+  }
+
+  getPercentAlongPath(path, perc) {
+    if (perc === "random") {
+      perc = Math.random()
+    } else if (typeof perc !== "number") {
+      perc = 0
+    }
+    let distanceAlong = perc ? path.getTotalLength() * perc : 0
+    return path.getPointAtLength(distanceAlong)
+  }
+
+  getPointAlongPath(path, dist) {
+    let arrived = dist >= path.getTotalLength()
+    return {...path.getPointAtLength(dist), arrived}
+  }
 }

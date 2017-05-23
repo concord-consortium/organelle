@@ -19,14 +19,18 @@
         image: "assets/melanosome.svg",
         selector: "#melanosome",
         spawn: {
-          every: 90,
-          on: "#golgi_x5F_apparatus path"
+          on: {
+            selector: "#golgi_x5F_apparatus path",
+            at: "random"
+          },
+          every: 90
         },
         rules: {
-          birth: [
+          initialization: [
             {
               set: {
-                size: 0.1
+                size: 0.1,
+                speed: 1
               },
               switch_state: "growing"
             }
@@ -58,26 +62,54 @@
           // ],
           seeking_microtuble: [
             {
-              change: {
-                prop: "x",
-                by: 0.5
+              move_to: {
+                selector: "#microtubules_x5F_grouped path",
+                which: "random",
+                finally: {
+                  switch_state: "following_microtuble"
+                }
+                // x: 0,
+                // y: 0
               }
-              // move_to: {
-              //   x: 200
+              // change: {
+              //   prop: "x",
+              //   by: 0.5
               // }
+            }
+          ],
+          following_microtuble: [
+            {
+              follow: {
+                selector: "#microtubules_x5F_grouped path",
+                which: "nearest",
+                finally: {
+                  switch_state: "dying"
+                }
+              }
+            }
+          ],
+          dying: [
+            {
+              grow: {
+                by: -0.03,
+                until: 0,
+                finally: {
+                  die: true
+                }
+              }
             }
           ]
         }
       }
     </script>
     <script>
-      Organelle.createModel({
-        element: "spawn-model",
-        background: "assets/golgi.svg",
-        species: [
-          melanosome
-        ]
-      });
+      // Organelle.createModel({
+      //   element: "spawn-model",
+      //   background: "assets/golgi.svg",
+      //   species: [
+      //     melanosome
+      //   ]
+      // });
 
       Organelle.createModel({
         element: "follow-model",

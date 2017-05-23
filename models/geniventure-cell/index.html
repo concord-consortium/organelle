@@ -11,43 +11,92 @@
         background: "assets/melanocyte.svg",
         species: [
           {
-            name: "melanosome",
-            image: "assets/melanosome.svg",
-            selector: "#melanosome",
-            spawn: {
-              every: 90,
-              on: "#golgi_x5F_apparatus path"
-            },
-            rules: {
-              birth: [
-                {
-                  set: {
-                    size: 0.1
-                  },
-                  switch_state: "growing"
-                }
-              ],
-              growing: [
-                {
-                  grow: {
-                    by: 0.01,
-                    until: 1,
-                    finally: {
-                      switch_state: "seeking_microtuble"
-                    }
-                  }
-                }
-              ],
-              seeking_microtuble: [
-                {
-                  change: {
-                    prop: "x",
-                    by: 0.5
-                  }
-                }
-              ]
+        name: "melanosome",
+        image: "assets/melanosome.svg",
+        selector: "#melanosome",
+        spawn: {
+          on: {
+            selector: "#golgi_x5F_apparatus path",
+            at: "random"
+          },
+          every: 90
+        },
+        rules: {
+          initialization: [
+            {
+              set: {
+                size: 0.1,
+                speed: 1
+              },
+              switch_state: "growing"
             }
-          }
+          ],
+          growing: [
+            {
+              grow: {
+                by: 0.01,
+                until: 1,
+                finally: {
+                  switch_state: "seeking_microtuble"
+                }
+              }
+            }
+          ],
+          // growing: [
+          //   {
+          //     if: {
+          //       fact: "size",
+          //       lessThan: 1
+          //     },
+          //     then: {
+          //       grow: 0.01
+          //     },
+          //     else: {
+          //       switchState: "seeking_microtuble"
+          //     }
+          //   }
+          // ],
+          seeking_microtuble: [
+            {
+              move_to: {
+                selector: "#microtubules_x5F_grouped path",
+                which: "random",
+                finally: {
+                  switch_state: "following_microtuble"
+                }
+                // x: 0,
+                // y: 0
+              }
+              // change: {
+              //   prop: "x",
+              //   by: 0.5
+              // }
+            }
+          ],
+          following_microtuble: [
+            {
+              follow: {
+                selector: "#microtubules_x5F_grouped path",
+                which: "nearest",
+                finally: {
+                  switch_state: "dying"
+                }
+              }
+            }
+          ],
+          dying: [
+            {
+              grow: {
+                by: -0.03,
+                until: 0,
+                finally: {
+                  die: true
+                }
+              }
+            }
+          ]
+        }
+      }
         ]
       });
     </script>
