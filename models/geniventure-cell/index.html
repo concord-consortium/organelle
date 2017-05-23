@@ -3,100 +3,147 @@
     <script type="text/javascript" src="../../organelle.js" charset="utf-8"></script>
   </head>
   <body>
-    <svg id="model" viewBox="0 0 1280 800" width="1152px" height="720px"></svg>
+    <svg id="model" viewBox="0 0 1280 800" height="95vh"></svg>
 
     <script>
       window.model = Organelle.createModel({
         element: "model",
         background: "assets/melanocyte.svg",
+        properties: {
+          working_tyr1: true
+        },
         species: [
           {
-        name: "melanosome",
-        image: "assets/melanosome.svg",
-        selector: "#melanosome",
-        spawn: {
-          on: {
-            selector: "#golgi_x5F_apparatus path",
-            at: "random"
-          },
-          every: 90
-        },
-        rules: {
-          initialization: [
-            {
-              set: {
-                size: 0.1,
-                speed: 1
+            name: "melanosome",
+            image: "assets/melanosome.svg",
+            selector: "#melanosome",
+            spawn: {
+              on: {
+                selector: "#golgi_x5F_apparatus path",
+                at: "random"
               },
-              switch_state: "growing"
-            }
-          ],
-          growing: [
-            {
-              grow: {
-                by: 0.01,
-                until: 1,
-                finally: {
-                  switch_state: "seeking_microtuble"
+              every: 90
+            },
+            rules: {
+              initialization: [
+                {
+                  set: {
+                    size: 0.1,
+                    speed: 1
+                  },
+                  switch_state: "growing"
                 }
-              }
-            }
-          ],
-          // growing: [
-          //   {
-          //     if: {
-          //       fact: "size",
-          //       lessThan: 1
-          //     },
-          //     then: {
-          //       grow: 0.01
-          //     },
-          //     else: {
-          //       switchState: "seeking_microtuble"
-          //     }
-          //   }
-          // ],
-          seeking_microtuble: [
-            {
-              move_to: {
-                selector: "#microtubules_x5F_grouped path",
-                which: "random",
-                finally: {
-                  switch_state: "following_microtuble"
+              ],
+              growing: [
+                {
+                  if: {
+                    fact: "world.working_tyr1",
+                  },
+                  then: [
+                    {
+                      grow: {
+                        by: 0.005,
+                        until: 1,
+                        finally: {
+                          switch_state: "seeking_microtuble"
+                        }
+                      }
+                    },
+                    {
+                      if: {
+                        fact: "size",
+                        between: [0.5, 0.7]
+                      },
+                      then: {
+                        set_attr: {
+                          selector: "#Layer1_0_FILL",
+                          set: {
+                            fill: "url(#_Radial2)"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      if: {
+                        fact: "size",
+                        between: [0.7, 0.9]
+                      },
+                      then: {
+                        set_attr: {
+                          selector: "#Layer1_0_FILL",
+                          set: {
+                            fill: "url(#_Radial3)"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      if: {
+                        fact: "size",
+                        greaterThan: 0.9
+                      },
+                      then: {
+                        set_attr: {
+                          selector: "#Layer1_0_FILL",
+                          set: {
+                            fill: "url(#_Radial4)"
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  else: {
+                    grow: {
+                      by: 0.005,
+                      until: 0.6,
+                      finally: {
+                        switch_state: "seeking_microtuble"
+                      }
+                    }
+                  }
                 }
-                // x: 0,
-                // y: 0
-              }
-              // change: {
-              //   prop: "x",
-              //   by: 0.5
-              // }
-            }
-          ],
-          following_microtuble: [
-            {
-              follow: {
-                selector: "#microtubules_x5F_grouped path",
-                which: "nearest",
-                finally: {
-                  switch_state: "dying"
+              ],
+              seeking_microtuble: [
+                {
+                  move_to: {
+                    selector: "#microtubules_x5F_grouped path",
+                    which: "random",
+                    finally: {
+                      switch_state: "following_microtuble"
+                    }
+                    // x: 0,
+                    // y: 0
+                  }
+                  // change: {
+                  //   prop: "x",
+                  //   by: 0.5
+                  // }
                 }
-              }
-            }
-          ],
-          dying: [
-            {
-              grow: {
-                by: -0.03,
-                until: 0,
-                finally: {
-                  die: true
+              ],
+              following_microtuble: [
+                {
+                  follow: {
+                    selector: "#microtubules_x5F_grouped path",
+                    which: "nearest",
+                    finally: {
+                      switch_state: "dying"
+                    }
+                  }
                 }
-              }
+              ],
+              dying: [
+                {
+                  grow: {
+                    by: -0.03,
+                    until: 0,
+                    finally: {
+                      die: true
+                    }
+                  }
+                }
+              ]
             }
-          ]
-        }
-      }
+          }
         ]
       });
     </script>

@@ -3,7 +3,7 @@ require("./lib/snap-plugins")
 import Agent from "./agent"
 
 module.exports = class World {
-  constructor({element, background, species}) {
+  constructor({element, background, properties, species}) {
     this.snap = Snap("#"+element)
 
     let vb = this.snap.node.viewBox.baseVal
@@ -15,6 +15,12 @@ module.exports = class World {
     this.tick = 0
     this.species = species
     this.agents = []
+
+    this.props = {}
+
+    for (let prop in properties) {
+      this.setProperty(prop, properties[prop])
+    }
 
     this.creationTimes = {}
 
@@ -62,6 +68,14 @@ module.exports = class World {
     for (let agent of this.agents) {
       agent.view.render()
     }
+  }
+
+  setProperty(prop, value) {
+    this.props[prop] = value
+  }
+
+  getProperty(prop) {
+    return this.props[prop]
   }
 
   isInWorld({x, y}) {

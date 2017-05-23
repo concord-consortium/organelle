@@ -1,15 +1,19 @@
 function checkFact(antecedent, agent, world) {
   let fact = antecedent.fact,
       splitFact = fact.split("."),
-      entity = splitFact.length > 1 ? splitFact[0] : agent,
+      entities = {world, agent},
+      entity = splitFact.length > 1 ? entities[splitFact[0]] : agent,
       property = splitFact.length > 1 ? splitFact[1] : splitFact[0],
       val = entity.props[property]
+
   if (antecedent.equals) {
     return val == antecedent.equals
   } else if (antecedent.lessThan) {
     return val < antecedent.lessThan
   } else if (antecedent.greaterThan) {
     return val > antecedent.greaterThan
+  } else if (antecedent.between) {
+    return val >= antecedent.between[0] && val < antecedent.between[1]
   } else {
     return val
   }
@@ -64,8 +68,20 @@ export default function runRules (agent, world) {
         consequences.push(rule.then || rule)
       }
     } else if (rule.else) {
-      consequences.push(rule.else)
+      if (Array.isArray(rule.else)) {
+        consequences = consequences.concat(rule.else)
+      } else {
+        consequences.push(rule.else)
+      }
     }
+    // some consequences may be rules
+    consequences = consequences.filter( c => {
+      if (c.if) {
+        rules.push(c)
+        return false
+      }
+      return true
+    })
   }
   return consequences
 }

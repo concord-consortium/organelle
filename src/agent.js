@@ -148,6 +148,11 @@ export default class Agent {
     return (this.props.x === x && this.props.y === y)
   }
 
+  task_set_attr(val) {
+    // FIXME
+    this.view.setAttr(val)
+  }
+
   task_die(val) {
     if (val) {
       this.dead = true

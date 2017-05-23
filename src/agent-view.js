@@ -2,6 +2,8 @@ export default class AgentView {
   constructor(agent, snap) {
     this.agent = agent
 
+    this.changeQueue = []
+    this.lastAttrChange = null
     this.lastScale = 1
 
     Snap.load(agent.species.image, (img) => {
@@ -26,6 +28,24 @@ export default class AgentView {
       this.el.nativeAttrs({transform: matrix})
 
       this.lastScale = a.size
+
+      while (this.changeQueue.length) {
+        this.setAttr(this.changeQueue.shift())
+      }
+    }
+  }
+
+  setAttr({selector, set}) {
+    let changeSet = JSON.stringify({selector, set})
+    if (changeSet === this.lastAttrChange) {
+      return
+    }
+
+    if (this.el) {
+      this.el.select(selector).attr(set)
+      this.lastAttrChange = changeSet
+    } else {
+      this.changeQueue.push({selector, set})
     }
   }
 

@@ -37,29 +37,73 @@
           ],
           growing: [
             {
-              grow: {
-                by: 0.01,
-                until: 1,
-                finally: {
-                  switch_state: "seeking_microtuble"
+              if: {
+                fact: "world.working_tyr1",
+              },
+              then: [
+                {
+                  grow: {
+                    by: 0.005,
+                    until: 1,
+                    finally: {
+                      switch_state: "seeking_microtuble"
+                    }
+                  }
+                },
+                {
+                  if: {
+                    fact: "size",
+                    between: [0.5, 0.7]
+                  },
+                  then: {
+                    set_attr: {
+                      selector: "#Layer1_0_FILL",
+                      set: {
+                        fill: "url(#_Radial2)"
+                      }
+                    }
+                  }
+                },
+                {
+                  if: {
+                    fact: "size",
+                    between: [0.7, 0.9]
+                  },
+                  then: {
+                    set_attr: {
+                      selector: "#Layer1_0_FILL",
+                      set: {
+                        fill: "url(#_Radial3)"
+                      }
+                    }
+                  }
+                },
+                {
+                  if: {
+                    fact: "size",
+                    greaterThan: 0.9
+                  },
+                  then: {
+                    set_attr: {
+                      selector: "#Layer1_0_FILL",
+                      set: {
+                        fill: "url(#_Radial4)"
+                      }
+                    }
+                  }
+                }
+              ],
+              else: {
+                grow: {
+                  by: 0.005,
+                  until: 0.6,
+                  finally: {
+                    switch_state: "seeking_microtuble"
+                  }
                 }
               }
             }
           ],
-          // growing: [
-          //   {
-          //     if: {
-          //       fact: "size",
-          //       lessThan: 1
-          //     },
-          //     then: {
-          //       grow: 0.01
-          //     },
-          //     else: {
-          //       switchState: "seeking_microtuble"
-          //     }
-          //   }
-          // ],
           seeking_microtuble: [
             {
               move_to: {
@@ -111,9 +155,12 @@
       //   ]
       // });
 
-      Organelle.createModel({
+      var o = Organelle.createModel({
         element: "follow-model",
         background: "assets/golgi-and-microtubules.svg",
+        properties: {
+          working_tyr1: true
+        },
         species: [
           melanosome
         ]
