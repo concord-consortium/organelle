@@ -46,6 +46,9 @@ export default class Agent {
   }
 
   doTask(task) {
+    if (task.debugger) {
+      debugger
+    }
     if (task.set) {
       for (let prop of Object.keys(task.set)) {
         this.props[prop] = task.set[prop]
@@ -106,22 +109,29 @@ export default class Agent {
 
   task_follow(val) {
     let key = JSON.stringify(val),
-        speed = (typeof this.props.speed === "number") ? this.props.speed : 1,
-        path;
+        speed = this.getNumber(this.props.speed, 1),
+        direction = val.direction === "backward" ? -1 : 1,
+        pathInfo;
     if (this.references[key]) {
-      path = this.references[key].path
+      pathInfo = this.references[key].pathInfo
     } else {
-      path = this.world.getPath(val, this.props)
-      this.references[key] = {path: path, distance: 0}
+      pathInfo = this.world.getPath(val, this.props)
+      // for now, just assume we're at the ends
+      let initialPos = direction === 1 ? 0 : pathInfo.length,
+          untilPerc = this.getNumber(val.until, direction === 1 ? 1 : 0),
+          until = pathInfo.length * untilPerc
+
+      this.references[key] = {pathInfo: pathInfo, distance: initialPos, until: until}
     }
 
-    this.references[key].distance += speed
+    this.references[key].distance += (speed * direction)
 
-    let {x, y, arrived} = this.world.getPointAlongPath(path, this.references[key].distance)
+    let {x, y} = this.world.getPointAlongPath(pathInfo.path, this.references[key].distance)
 
     this.props.x = x
     this.props.y = y
 
+    let arrived = direction === 1 ? this.references[key].distance >= this.references[key].until : this.references[key].distance <= this.references[key].until
     if (arrived) {
       this.references[key] = null
     }
@@ -133,7 +143,7 @@ export default class Agent {
     let dx = x - this.props.x,
         dy = y - this.props.y,
         distSq = (dx * dx) + (dy * dy),
-        speed = (typeof this.props.speed === "number") ? this.props.speed : 1,
+        speed = this.getNumber(this.props.speed, 1),
         speedSq = speed * speed,
         direction = Math.atan2(dy, dx);
 
@@ -153,6 +163,23 @@ export default class Agent {
     this.view.setAttr(val)
   }
 
+  task_wait(val) {
+    let key = JSON.stringify(val),
+        waitTime
+    if (this.references[key]) {
+      waitTime = this.references[key]
+    } else {
+      let startTime = this.world.tick
+
+      waitTime = {start: startTime, duration: this.getNumber(val.for)}
+      this.references[key] =  waitTime
+    }
+    if (this.world.tick >= (waitTime.start + waitTime.duration)) {
+      this.references[key] = null
+      return true
+    }
+  }
+
   task_die(val) {
     if (val) {
       this.dead = true
@@ -161,5 +188,20 @@ export default class Agent {
 
   destroy() {
     this.view.destroy()
+  }
+
+  // utils, refactor
+  getNumber(val, defaultVal) {
+    let num
+    if (typeof val === "number") {
+      num = val
+    } else if (Array.isArray(val)) {
+      let range = val[1] - val[0],
+          floor = val[0]
+      num = floor + Math.random() * range
+    } else {
+      num = defaultVal
+    }
+    return num
   }
 }

@@ -10,7 +10,8 @@
         element: "model",
         background: "assets/melanocyte.svg",
         properties: {
-          working_tyr1: true
+          working_tyr1: true,
+          working_myosin_5a: true
         },
         species: [
           {
@@ -37,7 +38,7 @@
               growing: [
                 {
                   if: {
-                    fact: "world.working_tyr1",
+                    fact: "world.working_tyr1"
                   },
                   then: [
                     {
@@ -97,6 +98,12 @@
                       by: 0.005,
                       until: 0.6,
                       finally: {
+                        set_attr: {
+                          selector: "#Layer1_0_FILL",
+                          set: {
+                            fill: "url(#_Radial2)"
+                          }
+                        },
                         switch_state: "seeking_microtuble"
                       }
                     }
@@ -109,7 +116,7 @@
                     selector: "#microtubules_x5F_grouped path",
                     which: "random",
                     finally: {
-                      switch_state: "following_microtuble"
+                      switch_state: "following_microtuble_outwards"
                     }
                     // x: 0,
                     // y: 0
@@ -120,11 +127,99 @@
                   // }
                 }
               ],
-              following_microtuble: [
+              following_microtuble_outwards: [
+                {
+                  if: {
+                    fact: "world.working_myosin_5a"
+                  },
+                  then: {
+                    follow: {
+                      selector: "#microtubules_x5F_grouped path",
+                      which: "nearest",
+                      direction: "forward",
+                      until: [0.2, 0.9],
+                      finally: {
+                        // switch_state: "waiting_at_edge_of_cell"
+                        switch_state: "find_actin_terminal"
+                      }
+                    }
+                  },
+                  else: {
+                    follow: {
+                      selector: "#microtubules_x5F_grouped path",
+                      which: "nearest",
+                      direction: "forward",
+                      finally: {
+                        switch_state: "waiting_at_edge_of_cell"
+                        // switch_state: "find_actin_terminal"
+                      }
+                    }
+                  }
+                }
+              ],
+              waiting_at_edge_of_cell: [
+                {
+                  wait: {
+                    for: [0, 200],
+                    finally: {
+                      switch_state: "following_microtuble_inwards"
+                    }
+                  }
+                }
+              ],
+              following_microtuble_inwards: [
                 {
                   follow: {
                     selector: "#microtubules_x5F_grouped path",
                     which: "nearest",
+                    at: 1,
+                    direction: "backward",
+                    finally: {
+                      switch_state: "find_nuclear_actin_terminal"
+                    }
+                  }
+                }
+              ],
+              find_actin_terminal: [
+                {
+                  move_to: {
+                    selector: "#actin_terminals circle",
+                    which: {
+                      any_of_nearest: 6
+                    },
+                    finally: {
+                      switch_state: "waiting_on_actin_terminal"
+                    }
+                  }
+                }
+              ],
+              find_nuclear_actin_terminal: [
+                {
+                  move_to: {
+                    selector: "#nuclear_actin_terminals circle",
+                    which: {
+                      any_of_nearest: 5
+                    },
+                    finally: {
+                      switch_state: "waiting_on_nuclear_actin_terminal"
+                    }
+                  }
+                }
+              ],
+              waiting_on_actin_terminal: [
+                {
+                  wait: {
+                    for: 3000,
+                    finally: {
+                      switch_state: "dying"
+                    }
+                  }
+                }
+              ],
+              waiting_on_nuclear_actin_terminal: [
+                {
+                  wait: {
+                    for: 3000,
                     finally: {
                       switch_state: "dying"
                     }
@@ -134,10 +229,54 @@
               dying: [
                 {
                   grow: {
-                    by: -0.03,
+                    by: -0.02,
                     until: 0,
                     finally: {
                       die: true
+                    }
+                  }
+                }
+              ],
+              always: [
+                {
+                  if: {
+                    all: [
+                      {
+                        fact: "world.working_myosin_5a"
+                      },
+                      {
+                        state: "waiting_on_nuclear_actin_terminal"
+                      }
+                    ]
+                  },
+                  then: {
+                    wait: {
+                      for: [100, 700],
+                      finally: {
+                        switch_state: "dying"
+                      }
+                    }
+                  }
+                },
+                {
+                  if: {
+                    all: [
+                      {
+                        fact: {
+                          not: "world.working_myosin_5a"
+                        }
+                      },
+                      {
+                        state: "waiting_on_actin_terminal"
+                      }
+                    ]
+                  },
+                  then: {
+                    wait: {
+                      for: [100, 700],
+                      finally: {
+                        switch_state: "dying"
+                      }
                     }
                   }
                 }
