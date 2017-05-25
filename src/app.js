@@ -1,3 +1,4 @@
+import yaml from "js-yaml"
 import World from "./world"
 
 class Model {
@@ -62,11 +63,58 @@ class Model {
   }
 }
 
+// fixme
+function makeRequest (method, url) {
+  return new Promise(function (resolve, reject) {
+    var xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+    xhr.onload = function () {
+      if (this.status >= 200 && this.status < 300) {
+        resolve(xhr.response);
+      } else {
+        reject({
+          status: this.status,
+          statusText: xhr.statusText
+        });
+      }
+    };
+    xhr.onerror = function () {
+      reject({
+        status: this.status,
+        statusText: xhr.statusText
+      });
+    };
+    xhr.send();
+  });
+}
+
 
 module.exports = {
 
   createModel({element, background, properties, species, clickHandlers, stepsPerSecond, autoplay}) {
-    return new Model({element, background, properties, species, clickHandlers, stepsPerSecond, autoplay})
+    let speciesLoaderPromises = []
+    for (let kind of species) {
+      if (typeof kind === "string") {
+        yaml.safeLoad(kind);
+      }
+    }
+    species.forEach(function(kind, i) {
+      if (typeof kind === "string") {
+        if (kind.indexOf(".yml") > -1) {
+          speciesLoaderPromises.push(makeRequest('GET', kind)
+            .then(function (yml) {
+              species[i] = yaml.safeLoad(yml);
+            })
+          );
+        } else {
+          species[i] = yaml.safeLoad(kind);
+        }
+      }
+    });
+
+    return Promise.all(speciesLoaderPromises).then( () => {
+      return new Model({element, background, properties, species, clickHandlers, stepsPerSecond, autoplay})
+    });
   }
 
 }

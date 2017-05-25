@@ -8,8 +8,9 @@
     "build": "webpack -p"
   },
   "dependencies": {
-    "snapsvg": "^0.5.1",
-    "babel-polyfill": "^6.16.0"
+    "babel-polyfill": "^6.16.0",
+    "js-yaml": "^3.8.4",
+    "snapsvg": "^0.5.1"
   },
   "devDependencies": {
     "babel-core": "^6.24.1",
