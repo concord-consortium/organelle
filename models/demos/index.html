@@ -26,6 +26,10 @@
     </fieldset>
     <button id="reload" style="position: absolute; font-size: 1.1em; left: 459px; top: 580px;">Reload</button>
 
+
+    <button id="start-stop" style="position: absolute; font-size: 1.1em; left: 459px; top: 550px;">Pause</button>
+    <button id="fast" style="position: absolute; font-size: 1.1em; left: 531px; top: 550px;">Fast</button>
+
     <script>
       var agentYml =
 `---
@@ -107,6 +111,30 @@ rules:
       document.getElementById("reload").onclick = function() {
         var text = myCodeMirror.getValue();
         loadModel(text);
+      }
+
+      var running = true;
+      document.getElementById("start-stop").onclick = function() {
+        if (running) {
+          model.stop();
+          document.getElementById("start-stop").innerHTML = "Run";
+        } else {
+          model.run();
+          document.getElementById("start-stop").innerHTML = "Pause";
+        }
+        running = !running;
+      }
+
+      var slow = true;
+      document.getElementById("fast").onclick = function() {
+        if (slow) {
+          model.setSpeed(300);
+          document.getElementById("fast").innerHTML = "Slow";
+        } else {
+          model.setSpeed(100);
+          document.getElementById("fast").innerHTML = "Fast";
+        }
+        slow = !slow;
       }
 
       document.getElementById("working_tyr1").onclick = function() {
