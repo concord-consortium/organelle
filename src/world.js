@@ -3,7 +3,7 @@ require("./lib/snap-plugins")
 import Agent from "./agent"
 
 module.exports = class World {
-  constructor({element, background, properties, species}) {
+  constructor({element, background, properties, species, clickHandlers}) {
     this.snap = Snap("#"+element)
 
     let vb = this.snap.node.viewBox.baseVal
@@ -24,9 +24,9 @@ module.exports = class World {
 
     this.creationTimes = {}
 
-    if (background) {
-      Snap.load(background, (img) => {
-        this.snap.append(img)
+    if (background.file) {
+      Snap.load(background.file, (img) => {
+        this.snap.append(img.select(background.selector))
 
         // refactor this into a spawning helper
         for (let kind of species) {
@@ -36,6 +36,11 @@ module.exports = class World {
           }
         }
 
+        for (let handler of clickHandlers) {
+          this.snap.select(handler.selector).click( () => {
+            handler.action(Snap, this.snap)
+          })
+        }
       });
     }
   }

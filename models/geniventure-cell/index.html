@@ -1,14 +1,56 @@
 <html>
   <head>
     <script type="text/javascript" src="../../organelle.js" charset="utf-8"></script>
+    <style media="screen" type="text/css">
+      .model {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        width: 160vh;
+        opacity: 1;
+        -webkit-transition: opacity 5s;
+        transition: opacity 5s;
+      }
+
+      .hidden-iframe {
+        width: 0;
+        height: 0;
+        opacity: 0;
+      }
+
+      .temp-iframe {
+        opacity: 0;
+      }
+
+      iframe {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+
+      #close-protein-game {
+        position: absolute;
+        bottom: 2vh;
+        left: 140vh;
+      }
+    </style>
   </head>
   <body>
-    <svg id="model" viewBox="0 0 1280 800" height="95vh"></svg>
+    <svg id="model" viewBox="0 0 1280 800" class="model"></svg>
+    <div id="protein-game-wrapper" class="model hidden-iframe">
+      <iframe id="protein-game"></iframe>
+      <button id="close-protein-game">Zoom back to cell</button>
+    </div>
 
     <script>
       window.model = Organelle.createModel({
         element: "model",
-        background: "assets/melanocyte.svg",
+        background: {
+          file: "assets/melanocyte.svg",
+          selector: "#cell"
+        },
         properties: {
           working_tyr1: true,
           working_myosin_5a: true
@@ -283,8 +325,65 @@
               ]
             }
           }
+        ],
+        clickHandlers: [
+          {
+            selector: "#golgi_x5F_apparatus",
+            action: enterProteinGame
+          }
         ]
       });
+
+      function addClass(el, className) {
+        if (el.classList)
+          el.classList.add(className);
+        else
+          el.className += ' ' + className;
+      }
+
+      function removeClass(el, className) {
+        if (el.classList)
+          el.classList.remove(className);
+        else
+          el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+      }
+
+
+      var iframe = document.getElementById("protein-game"),
+          wrapper = document.getElementById("protein-game-wrapper"),
+          reverseZoom;
+
+      function enterProteinGame(Snap, el) {
+        Snap.animate(el.attr("viewBox").vb.split(" "), [370, 500, 110, 69],
+          function (vals) { el.attr("viewBox", vals.join(" ")); }, 1500,
+          function() {
+            model.stop();
+            iframe.src = "http://geniverse2.fablevision-dev.com/protein_game_2/";
+            removeClass(wrapper, "hidden-iframe");
+          }
+        );
+
+        reverseZoom = function() {
+          Snap.animate(el.attr("viewBox").vb.split(" "), [0, 0, 1280, 800],
+            function (vals) { el.attr("viewBox", vals.join(" ")); }, 1500
+          );
+        }
+      }
+
+      function exitProteinGame() {
+        addClass(wrapper, "temp-iframe");
+        setTimeout(function() {
+          model.run();
+          setTimeout(function() {
+            iframe.src = "";
+            reverseZoom();
+            addClass(wrapper, "hidden-iframe");
+            removeClass(wrapper, "temp-iframe");
+          }, 2000)
+        }, 1000)
+      }
+
+      document.getElementById("close-protein-game").onclick = exitProteinGame;
     </script>
   </body>
 </html>

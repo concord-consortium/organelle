@@ -1,8 +1,8 @@
 import World from "./world"
 
 class Model {
-  constructor({element, background, properties, species, stepsPerSecond=100, autoplay=true}) {
-    this.world = new World({element, background, properties, species})
+  constructor({element, background, properties, species, clickHandlers, stepsPerSecond=100, autoplay=true}) {
+    this.world = new World({element, background, properties, species, clickHandlers})
     this.running = false
     this.setSpeed(stepsPerSecond)
     if (autoplay) {
@@ -65,8 +65,8 @@ class Model {
 
 module.exports = {
 
-  createModel({element, background, properties, species, stepsPerSecond, autoplay}) {
-    return new Model({element, background, properties, species, stepsPerSecond, autoplay})
+  createModel({element, background, properties, species, clickHandlers, stepsPerSecond, autoplay}) {
+    return new Model({element, background, properties, species, clickHandlers, stepsPerSecond, autoplay})
   }
 
 }
