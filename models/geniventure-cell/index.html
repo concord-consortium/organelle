@@ -35,6 +35,12 @@
         bottom: 2vh;
         left: 140vh;
       }
+
+      #world-props {
+        position: absolute;
+        left: 161vh;
+        bottom: 1vh;
+      }
     </style>
   </head>
   <body>
@@ -43,6 +49,12 @@
       <iframe id="protein-game"></iframe>
       <button id="close-protein-game">Zoom back to cell</button>
     </div>
+
+    <fieldset id="world-props">
+      <legend>Cell props</legend>
+      <input id="working_tyr1" type="checkbox" checked="checked"/><label for="working_tyr1">working_tyr1</label><br/>
+      <input id="working_myosin_5a" type="checkbox" checked="checked"/><label for="working_tyr1">working_myosin_5a</label>
+    </fieldset>
 
     <script>
       var model;
@@ -120,6 +132,14 @@
       }
 
       document.getElementById("close-protein-game").onclick = exitProteinGame;
+
+      function observePropCheckbox(prop) {
+        document.getElementById(prop).onclick = function() {
+          model.world.setProperty(prop, document.getElementById(prop).checked)
+        }
+      }
+      observePropCheckbox("working_tyr1");
+      observePropCheckbox("working_myosin_5a");
     </script>
   </body>
 </html>
