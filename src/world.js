@@ -130,6 +130,10 @@ module.exports = class World {
     if (typeof props.y === "number") {
       loc.y = props.y
     }
+    if (props.random_offset) {
+      loc.x += (Math.random() * (props.random_offset * 2)) - props.random_offset
+      loc.y += (Math.random() * (props.random_offset * 2)) - props.random_offset
+    }
     return loc
   }
 

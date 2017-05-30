@@ -98,6 +98,7 @@ rules:
       selector: "#actin_terminals circle"
       which:
         any_of_nearest: 6
+      random_offset: 10
       finally:
         switch_state: waiting_on_actin_terminal
   find_nuclear_actin_terminal:
@@ -105,16 +106,17 @@ rules:
       selector: "#nuclear_actin_terminals circle"
       which:
         any_of_nearest: 5
+      random_offset: 3
       finally:
         switch_state: waiting_on_nuclear_actin_terminal
   waiting_on_actin_terminal:
   - wait:
-      for: 3000
+      for: 6000
       finally:
         switch_state: dying
   waiting_on_nuclear_actin_terminal:
   - wait:
-      for: 3000
+      for: 6000
       finally:
         switch_state: dying
   dying:
