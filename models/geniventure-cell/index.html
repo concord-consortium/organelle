@@ -102,14 +102,15 @@
           reverseZoom;
 
       function enterProteinGame(Snap, el) {
+        let delay = 1500    // use delay as Snap's onComplete action doesn't always fire
         Snap.animate(el.attr("viewBox").vb.split(" "), [370, 500, 110, 69],
-          function (vals) { el.attr("viewBox", vals.join(" ")); }, 1500,
-          function() {
-            model.stop();
-            iframe.src = "http://geniverse2.fablevision-dev.com/protein_game_2/";
-            removeClass(wrapper, "hidden-iframe");
-          }
+          function (vals) { el.attr("viewBox", vals.join(" ")); }, 1500
         );
+        setTimeout( () => {
+            model.stop();
+            iframe.src = "https://www.fablevision.com/geniverse_proteins/";
+            removeClass(wrapper, "hidden-iframe");
+          }, delay)
 
         reverseZoom = function() {
           Snap.animate(el.attr("viewBox").vb.split(" "), [0, 0, 1280, 800],
@@ -121,14 +122,12 @@
       function exitProteinGame() {
         addClass(wrapper, "temp-iframe");
         setTimeout(function() {
+          iframe.src = "";
+          reverseZoom();
           model.run();
-          setTimeout(function() {
-            iframe.src = "";
-            reverseZoom();
-            addClass(wrapper, "hidden-iframe");
-            removeClass(wrapper, "temp-iframe");
-          }, 2000)
-        }, 1000)
+          addClass(wrapper, "hidden-iframe");
+          removeClass(wrapper, "temp-iframe");
+        }, 2000)
       }
 
       document.getElementById("close-protein-game").onclick = exitProteinGame;
