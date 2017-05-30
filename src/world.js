@@ -26,7 +26,7 @@ module.exports = class World {
 
     if (background.file) {
       Snap.load(background.file, (img) => {
-        this.snap.append(img.select(background.selector))
+        window.snapAppend(this.snap, img, background.selector)
 
         // refactor this into a spawning helper
         for (let kind of species) {
@@ -73,6 +73,10 @@ module.exports = class World {
     for (let agent of this.agents) {
       agent.view.render()
     }
+  }
+
+  append(img, selector, fromCache) {
+    return window.snapAppend(this.snap, img, selector, fromCache)
   }
 
   setProperty(prop, value) {

@@ -1,15 +1,14 @@
 export default class AgentView {
-  constructor(agent, snap) {
+  constructor(agent, world) {
     this.agent = agent
 
     this.changeQueue = []
     this.lastAttrChange = null
     this.lastScale = 1
 
-    Snap.load(agent.species.image, (img) => {
+    window.snapLoad(agent.species.image, (img, fromCache) => {
       if (!this.agent.dead) {
-        this.el = img.select(agent.species.selector)
-        snap.append(this.el)
+        this.el = world.append(img, agent.species.selector, fromCache)
         this.render()
       }
     })

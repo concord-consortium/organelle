@@ -6,3 +6,54 @@ Snap.plugin( function( Snap, Element, Paper, global ) {
         return this;
     }
 });
+
+
+// Snap improvement functions
+// ...should be handled better
+
+window.snapAppend = function(snap, fragment, selector, fromCache) {
+  let el = fragment.select(selector)
+  snap.append(el)
+  if (!fromCache) {
+    snapAppendDefs(snap, fragment)
+  }
+  return el
+}
+
+window.snapAppendDefs = function(snap, fragment) {
+  let uncheckedNodes = []
+
+  function findDefs(node) {
+    let children = node.children
+    for (let i = 0; i < children.length; i++) {
+      if (children[i].tagName == "defs") {
+        return children[i]
+      } else {
+        uncheckedNodes.push(children[i])
+      }
+    }
+    while(uncheckedNodes.length > 0) {
+      let ret = findDefs(uncheckedNodes.pop())
+      if (ret) {
+        return ret
+      }
+    }
+  }
+  let defs = findDefs(fragment.node)
+
+  if (defs) {
+    Array.from(defs.children).forEach( d => snap.defs.append(d) )
+  }
+}
+
+window.snapCache = {}
+window.snapLoad = function(path, callback) {
+  if (snapCache[path]) {
+    callback(Snap(snapCache[path].node.cloneNode(true)), true)
+  } else {
+    Snap.load(path, (img) => {
+      snapCache[path] = Snap(img.node.cloneNode(true))
+      callback(img, false)
+    })
+  }
+}

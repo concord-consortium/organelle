@@ -29,7 +29,7 @@ export default class Agent {
 
     this.step()
 
-    this.view = new AgentView(this, this.world.snap)
+    this.view = new AgentView(this, this.world)
   }
 
   step() {
