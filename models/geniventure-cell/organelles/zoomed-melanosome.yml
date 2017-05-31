@@ -1,0 +1,54 @@
+---
+name: fake-melanosome
+image: assets/melanosome.svg
+selector: "#melanosome"
+spawn:
+  'on':
+    selector: "#golgi_x5F_apparatus path"
+    at: 0.588
+  never: true
+rules:
+  initialization:
+  - set:
+      size: 0.1
+    switch_state: growing
+  growing:
+  - if:
+      fact: world.working_tyr1
+    then:
+    - grow:
+        by: 0.004
+        until: 1
+    - if:
+        fact: size
+        between: [0.5, 0.7]
+      then:
+        set_attr:
+          selector: "#Layer1_0_FILL"
+          set:
+            fill: url(#_Radial2)
+    - if:
+        fact: size
+        between: [0.7, 0.9]
+      then:
+        set_attr:
+          selector: "#Layer1_0_FILL"
+          set:
+            fill: url(#_Radial3)
+    - if:
+        fact: size
+        greaterThan: 0.9
+      then:
+        set_attr:
+          selector: "#Layer1_0_FILL"
+          set:
+            fill: url(#_Radial4)
+    else:
+      grow:
+        by: 0.004
+        until: 0.6
+        finally:
+          set_attr:
+            selector: "#Layer1_0_FILL"
+            set:
+              fill: url(#_Radial2)

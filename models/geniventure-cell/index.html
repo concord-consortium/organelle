@@ -1,6 +1,7 @@
 <html>
   <head>
     <script type="text/javascript" src="../../organelle.js" charset="utf-8"></script>
+    <script type="text/javascript" src="lib/iframe-phone.js" charset="utf-8"></script>
     <style media="screen" type="text/css">
       .model {
         position: absolute;
@@ -71,7 +72,8 @@
           working_myosin_5a: true
         },
         species: [
-          "organelles/melanosome.yml"
+          "organelles/melanosome.yml",
+          "organelles/zoomed-melanosome.yml"
         ],
         clickHandlers: [
           {
@@ -97,37 +99,58 @@
           el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
       }
 
-
       var iframe = document.getElementById("protein-game"),
           wrapper = document.getElementById("protein-game-wrapper"),
+          entering = false,
+          createdAgent,
           reverseZoom;
 
       function enterProteinGame(Snap, el) {
-        let delay = 1500    // use delay as Snap's onComplete action doesn't always fire
-        Snap.animate(el.attr("viewBox").vb.split(" "), [370, 500, 110, 69],
-          function (vals) { el.attr("viewBox", vals.join(" ")); }, 1500
+        if (entering) {
+          return
+        }
+        entering = true
+        let delay = 1300
+        Snap.animate(el.attr("viewBox").vb.split(" "), [390, 518, 72, 45],
+          function (vals) { el.attr("viewBox", vals.join(" ")); }, delay
         );
-        setTimeout( () => {
-            model.stop();
-            iframe.src = "https://www.fablevision.com/geniverse_proteins/";
-            removeClass(wrapper, "hidden-iframe");
-          }, delay)
+
+        model.setTimeout( () => {
+          createdAgent = model.world.createAgent(model.world.species[1])
+        }, delay)
+        model.setTimeout( () => {
+          iframe.src = "https://www.fablevision.com/geniverse_proteins/?allele-shorthand=00111111&initial-state=size&target-color=albino"
+
+          var phone = new iframePhone.ParentEndpoint(iframe)
+          phone.addListener('activityExit', function (content) {
+            console.log("parent received response: ", content)
+            setTimeout(exitProteinGame, 1000)
+          });
+
+          removeClass(wrapper, "hidden-iframe")
+          model.stop()
+        }, delay * 2.6)
 
         reverseZoom = function() {
           Snap.animate(el.attr("viewBox").vb.split(" "), [0, 0, 1280, 800],
             function (vals) { el.attr("viewBox", vals.join(" ")); }, 1500
-          );
+          )
         }
       }
 
       function exitProteinGame() {
         addClass(wrapper, "temp-iframe");
         setTimeout(function() {
-          iframe.src = "";
-          reverseZoom();
-          model.run();
-          addClass(wrapper, "hidden-iframe");
-          removeClass(wrapper, "temp-iframe");
+          iframe.src = ""
+          reverseZoom()
+          addClass(wrapper, "hidden-iframe")
+          removeClass(wrapper, "temp-iframe")
+
+          model.setTimeout(function() {
+            createdAgent.species = model.world.species[0]
+            entering = false
+          }, 600)
+          model.run()
         }, 2000)
       }
 

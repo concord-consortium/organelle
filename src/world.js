@@ -51,8 +51,7 @@ module.exports = class World {
     for (let kind of this.species) {
       if (this.creationTimes[kind.name] && this.creationTimes[kind.name].nextCreation < this.tick) {
         this.creationTimes[kind.name].nextCreation = this.tick + kind.spawn.every
-        let agent = new Agent(kind, this)
-        this.agents.push(agent)
+        this.createAgent(kind)
       }
     }
 
@@ -62,6 +61,7 @@ module.exports = class World {
 
     for (let agent of this.agents) {
       if (agent.dead) {
+        console.log("dead!")
         agent.destroy()
       }
     }
@@ -73,6 +73,12 @@ module.exports = class World {
     for (let agent of this.agents) {
       agent.view.render()
     }
+  }
+
+  createAgent(kind) {
+    let agent = new Agent(kind, this)
+    this.agents.push(agent)
+    return agent
   }
 
   append(img, selector, fromCache) {
