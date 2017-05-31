@@ -390,4 +390,11 @@
             <circle cx="513" cy="708" r="2" style="fill:rgb(255,0,0);"/>
         </g>
     </g>
+    <defs>
+        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(36.2293,-24.1603,24.1603,36.2293,1060.13,173.308)"><stop offset="0" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="0.1" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(185,177,81);stop-opacity:0"/></linearGradient>
+        <linearGradient id="_Linear2" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-25.1361,-72.1116,72.1116,-25.1361,408.309,71.7374)"><stop offset="0" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="0.1" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(185,177,81);stop-opacity:0"/></linearGradient>
+        <linearGradient id="_Linear3" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-42.1529,-10.8963,10.8963,-42.1529,17.646,623.599)"><stop offset="0" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="0.1" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(185,177,81);stop-opacity:0"/></linearGradient>
+        <linearGradient id="_Linear4" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(60.1877,-46.9848,46.9848,60.1877,1173.93,518.302)"><stop offset="0" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="0.1" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(185,177,81);stop-opacity:0"/></linearGradient>
+        <radialGradient id="_Radial5" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1.707,0.165538,-0.160701,1.56159,673.325,230.223)"><stop offset="0" style="stop-color:rgb(204,51,102);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(207,126,167);stop-opacity:1"/></radialGradient>
+    </defs>
 </svg>

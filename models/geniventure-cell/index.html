@@ -45,17 +45,6 @@
   </head>
   <body>
     <svg id="model" viewBox="0 0 1280 800" class="model">
-      <defs>
-        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(36.2293,-24.1603,24.1603,36.2293,1060.13,173.308)"><stop offset="0" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="0.1" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(185,177,81);stop-opacity:0"/></linearGradient>
-        <linearGradient id="_Linear2" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-25.1361,-72.1116,72.1116,-25.1361,408.309,71.7374)"><stop offset="0" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="0.1" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(185,177,81);stop-opacity:0"/></linearGradient>
-        <linearGradient id="_Linear3" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-42.1529,-10.8963,10.8963,-42.1529,17.646,623.599)"><stop offset="0" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="0.1" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(185,177,81);stop-opacity:0"/></linearGradient>
-        <linearGradient id="_Linear4" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(60.1877,-46.9848,46.9848,60.1877,1173.93,518.302)"><stop offset="0" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="0.1" style="stop-color:rgb(178,166,97);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(185,177,81);stop-opacity:0"/></linearGradient>
-        <radialGradient id="_Radial5" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1.707,0.165538,-0.160701,1.56159,673.325,230.223)"><stop offset="0" style="stop-color:rgb(204,51,102);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(207,126,167);stop-opacity:1"/></radialGradient>
-        <radialGradient id="_Radial1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.4871,0,0,-16.4871,15.5554,16.1143)"><stop offset="0" style="stop-color:rgb(255,206,180);stop-opacity:0.105882"/><stop offset="0.53" style="stop-color:rgb(255,206,180);stop-opacity:0.2"/><stop offset="1" style="stop-color:rgb(251,192,162);stop-opacity:1"/></radialGradient>
-        <radialGradient id="_Radial2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.4871,0,0,-16.4871,15.5554,16.1143)"><stop offset="0" style="stop-color:rgb(255,206,180);stop-opacity:0.2"/><stop offset="0.45" style="stop-color:rgb(255,206,180);stop-opacity:0.3"/><stop offset="1" style="stop-color:rgb(237,107,42);stop-opacity:1"/></radialGradient>
-        <radialGradient id="_Radial3" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.4871,0,0,-16.4871,15.5554,16.1143)"><stop offset="0" style="stop-color:rgb(255,206,180);stop-opacity:0.3"/><stop offset="0.3" style="stop-color:rgb(255,206,180);stop-opacity:0.4"/><stop offset="1" style="stop-color:rgb(171,74,25);stop-opacity:1"/></radialGradient>
-        <radialGradient id="_Radial4" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.4871,0,0,-16.4871,15.5554,16.1143)"><stop offset="0" style="stop-color:rgb(255,206,180);stop-opacity:0.5"/><stop offset="0.1" style="stop-color:rgb(255,206,180);stop-opacity:0.8"/><stop offset="1" style="stop-color:rgb(53,28,16);stop-opacity:1"/></radialGradient>
-      </defs>
     </svg>
     <div id="protein-game-wrapper" class="model hidden-iframe">
       <iframe id="protein-game"></iframe>
@@ -82,7 +71,8 @@
           working_myosin_5a: true
         },
         species: [
-          "organelles/melanosome.yml"
+          "organelles/melanosome.yml",
+          "organelles/fake-melanosome.yml"
         ],
         clickHandlers: [
           {
@@ -111,18 +101,25 @@
 
       var iframe = document.getElementById("protein-game"),
           wrapper = document.getElementById("protein-game-wrapper"),
+          createdAgent,
           reverseZoom;
 
       function enterProteinGame(Snap, el) {
         let delay = 1500    // use delay as Snap's onComplete action doesn't always fire
-        Snap.animate(el.attr("viewBox").vb.split(" "), [370, 500, 110, 69],
+        Snap.animate(el.attr("viewBox").vb.split(" "), [390, 518, 72, 45],
           function (vals) { el.attr("viewBox", vals.join(" ")); }, 1500
         );
         setTimeout( () => {
-            model.stop();
+            createdAgent = model.world.createAgent(model.world.species[1])
+          }, delay)
+        setTimeout( () => {
             iframe.src = "https://www.fablevision.com/geniverse_proteins/";
             removeClass(wrapper, "hidden-iframe");
-          }, delay)
+          }, delay * 1.1)
+
+        setTimeout( () => {
+            model.stop();
+        }, delay * 2)
 
         reverseZoom = function() {
           Snap.animate(el.attr("viewBox").vb.split(" "), [0, 0, 1280, 800],
@@ -140,6 +137,10 @@
           addClass(wrapper, "hidden-iframe");
           removeClass(wrapper, "temp-iframe");
         }, 2000)
+        setTimeout(function() {
+          createdAgent.species = model.world.species[0]
+        }, 2600)
+
       }
 
       document.getElementById("close-protein-game").onclick = exitProteinGame;
