@@ -7,11 +7,10 @@ spawn:
     selector: "#golgi_x5F_apparatus path"
     at: 0.588
   never: true
+properties:
+  size: 0.1
+initialState: growing
 rules:
-  initialization:
-  - set:
-      size: 0.1
-    switch_state: growing
   growing:
   - if:
       fact: world.working_tyr1

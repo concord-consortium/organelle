@@ -1,14 +1,25 @@
+import PropertiesHolder from "./properties-holder";
 import AgentView from "./agent-view";
 import runRules from './rules'
 
-export default class Agent {
+export default class Agent extends PropertiesHolder {
   /**
    * image       image to load, if any
    * selector    selector in image
    */
   constructor(species, world) {
+    let properties = species.properties || {},
+
+        defaultProperties = {
+          x: 0,
+          y: 0,
+          size: 1,
+          speed: 1
+        }
+
+    super({ properties, defaultProperties })
+
     this.species = species
-    this.props = {}
     this.world = world
 
     this.references = {}
@@ -23,13 +34,12 @@ export default class Agent {
 
     this.props.x = x
     this.props.y = y
-    this.props.size = 1
 
-    this.state = "initialization"
-
-    this.step()
+    this.state = species.initialState || "initialization"
 
     this.view = new AgentView(this, this.world)
+
+    this.step()
   }
 
   step() {

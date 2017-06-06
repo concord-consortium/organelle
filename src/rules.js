@@ -4,7 +4,7 @@ function checkFact(antecedent, agent, world) {
       entities = {world, agent},
       entity = splitFact.length > 1 ? entities[splitFact[0]] : agent,
       property = splitFact.length > 1 ? splitFact[1] : splitFact[0],
-      val = entity.props[property],
+      val = entity.getProperty(property),
       truthfulness = antecedent.fact.not ? false : true,
       res
 

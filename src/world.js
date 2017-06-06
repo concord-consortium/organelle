@@ -1,9 +1,14 @@
 var Snap = require("snapsvg")
 require("./lib/snap-plugins")
+import PropertiesHolder from "./properties-holder"
 import Agent from "./agent"
 
-module.exports = class World {
-  constructor({element, background, properties, species, clickHandlers}) {
+module.exports = class World extends PropertiesHolder {
+  constructor(options) {
+    super(options)
+
+    let {element, background, properties, species, clickHandlers} = options
+
     this.snap = Snap("#"+element)
 
     let vb = this.snap.node.viewBox.baseVal
@@ -16,11 +21,7 @@ module.exports = class World {
     this.species = species
     this.agents = []
 
-    this.props = {}
 
-    for (let prop in properties) {
-      this.setProperty(prop, properties[prop])
-    }
 
     this.creationTimes = {}
 
@@ -61,7 +62,6 @@ module.exports = class World {
 
     for (let agent of this.agents) {
       if (agent.dead) {
-        console.log("dead!")
         agent.destroy()
       }
     }
@@ -83,14 +83,6 @@ module.exports = class World {
 
   append(img, selector, fromCache) {
     return window.snapAppend(this.snap, img, selector, fromCache)
-  }
-
-  setProperty(prop, value) {
-    this.props[prop] = value
-  }
-
-  getProperty(prop) {
-    return this.props[prop]
   }
 
   isInWorld({x, y}) {
