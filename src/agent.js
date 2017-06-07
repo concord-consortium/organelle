@@ -1,6 +1,7 @@
 import PropertiesHolder from "./properties-holder";
 import AgentView from "./agent-view";
-import runRules from './rules'
+import rules from './rules'
+const { runRules } = rules
 
 module.exports = class Agent extends PropertiesHolder {
   /**
@@ -42,7 +43,7 @@ module.exports = class Agent extends PropertiesHolder {
   }
 
   step() {
-    const tasks = runRules(this, this.world)
+    const tasks = runRules(this.world, this)
     for (let task of tasks) {
       this.doTask(task)
     }

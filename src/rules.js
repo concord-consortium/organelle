@@ -1,56 +1,81 @@
-function checkFact(antecedent, agent, world) {
-  let fact = antecedent.fact.not || antecedent.fact,
-      splitFact = fact.split("."),
+function getEntityAndProp(expression, world, agent) {
+  let split = expression.split("."),
       entities = {world, agent},
-      entity = splitFact.length > 1 ? entities[splitFact[0]] : agent,
-      property = splitFact.length > 1 ? splitFact[1] : splitFact[0],
-      val = entity.getProperty(property),
-      truthfulness = antecedent.fact.not ? false : true,
+      entity = split.length > 1 ? entities[split[0]] : agent,
+      prop = split.length > 1 ? split[1] : split[0]
+  return {entity, prop}
+}
+
+function getFactValue(fact, world, agent) {
+  let factName = fact.not || fact,
+      { entity, prop } = getEntityAndProp(factName, world, agent),
+      val = entity.getProperty(prop)
+  if (fact.not) {
+    // cast to bool and invert
+    val = !val
+  }
+  return val
+}
+
+function getValue(statement, world, agent) {
+  if (statement.fact) {
+    return getFactValue(statement.fact, world, agent)
+  } else if (statement.state) {
+    let { entity, prop } = getEntityAndProp(statement.state, world, agent),
+        state = entity.state
+    return state === prop
+  } else if (statement.count) {
+    return getAgentCount(statement, world)
+  }
+  return statement
+}
+
+function checkExpression(expression, world, agent) {
+  let val = getValue(expression, world, agent),
       res
 
-  if (antecedent.equals) {
-    res = val == antecedent.equals
-  } else if (antecedent.lessThan) {
-    res = val < antecedent.lessThan
-  } else if (antecedent.greaterThan) {
-    res = val > antecedent.greaterThan
-  } else if (antecedent.between) {
-    res = val >= antecedent.between[0] && val < antecedent.between[1]
+  if (expression.hasOwnProperty("equals")) {
+    res = val == expression.equals
+  } else if (expression.lessThan) {
+    res = val < expression.lessThan
+  } else if (expression.greaterThan) {
+    res = val > expression.greaterThan
+  } else if (expression.between) {
+    res = val >= expression.between[0] && val < expression.between[1]
   } else {
+    // cast to bool
     res = !!val
   }
 
-  return res === truthfulness
+  return res
 }
 
-function checkAntecedent(antecedent, agent, world) {
+function checkAntecedent(antecedent, world, agent) {
   if (antecedent == null) {
     // always true
     return true
-  } else if (antecedent.fact) {
-    return checkFact(antecedent, agent, world)
-  } else if (antecedent.state) {
-    return agent.state === antecedent.state
+  } else {
+    return checkExpression(antecedent, world, agent)
   }
 }
 
-function checkAntecedents(antecedents, agent, world) {
+function checkAntecedents(antecedents, world, agent) {
   if (antecedents && antecedents.all) {
     for (let antecedent of antecedents.all) {
-      if (!checkAntecedent(antecedent, agent, world)) {
+      if (!checkAntecedent(antecedent, world, agent)) {
         return false
       }
     }
     return true
   } else if (antecedents && antecedents.any) {
     for (let antecedent of antecedents.any) {
-      if (checkAntecedent(antecedent, agent, world)) {
+      if (checkAntecedent(antecedent, world, agent)) {
         return true
       }
     }
     return false
   } else {
-    return checkAntecedent(antecedents, agent, world)
+    return checkAntecedent(antecedents, world, agent)
   }
 }
 
@@ -58,16 +83,17 @@ function checkAntecedents(antecedents, agent, world) {
  * Gets the currently-applicable array of rules for this agent at this state.
  */
 function getRules(agent) {
+  if (!agent.species.rules) return []
   let state = agent.state,
       rules = [].concat(agent.species.rules["always"]).concat(agent.species.rules[state])
   return rules.filter(r => !!r)
 }
 
-export default function runRules (agent, world) {
+function runRules (world, agent) {
   let consequences = [],
       rules = getRules(agent)
   for (let rule of rules) {
-    if (checkAntecedents(rule.if, agent, world)) {
+    if (checkAntecedents(rule.if, world, agent)) {
       if (Array.isArray(rule.then)) {
         consequences = consequences.concat(rule.then)
       } else {
