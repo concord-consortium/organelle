@@ -25,7 +25,7 @@ module.exports = class World extends PropertiesHolder {
 
     this.creationTimes = {}
 
-    if (background.file) {
+    if (background && background.file) {
       Snap.load(background.file, (img) => {
         window.snapAppend(this.snap, img, background.selector)
 

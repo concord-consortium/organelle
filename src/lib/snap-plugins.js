@@ -1,3 +1,4 @@
+var Snap = require("snapsvg")
 
 Snap.plugin( function( Snap, Element, Paper, global ) {
     Element.prototype.nativeAttrs = function( attrs ) {
@@ -48,11 +49,11 @@ window.snapAppendDefs = function(snap, fragment) {
 
 window.snapCache = {}
 window.snapLoad = function(path, callback) {
-  if (snapCache[path]) {
-    callback(Snap(snapCache[path].node.cloneNode(true)), true)
+  if (window.snapCache[path]) {
+    callback(Snap(window.snapCache[path].node.cloneNode(true)), true)
   } else {
     Snap.load(path, (img) => {
-      snapCache[path] = Snap(img.node.cloneNode(true))
+      window.snapCache[path] = Snap(img.node.cloneNode(true))
       callback(img, false)
     })
   }

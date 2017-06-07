@@ -1,3 +1,5 @@
+require("./lib/snap-plugins")
+
 export default class AgentView {
   constructor(agent, world) {
     this.agent = agent
@@ -6,12 +8,14 @@ export default class AgentView {
     this.lastAttrChange = null
     this.lastScale = 1
 
-    window.snapLoad(agent.species.image, (img, fromCache) => {
-      if (!this.agent.dead) {
-        this.el = world.append(img, agent.species.selector, fromCache)
-        this.render()
-      }
-    })
+    if (agent.species.image) {
+      window.snapLoad(agent.species.image, (img, fromCache) => {
+        if (!this.agent.dead) {
+          this.el = world.append(img, agent.species.selector, fromCache)
+          this.render()
+        }
+      })
+    }
   }
 
   render() {

@@ -91,3 +91,9 @@ export default function runRules (agent, world) {
   }
   return consequences
 }
+
+module.exports = {
+  runRules,
+  getValue,
+  checkExpression
+}

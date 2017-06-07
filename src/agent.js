@@ -2,7 +2,7 @@ import PropertiesHolder from "./properties-holder";
 import AgentView from "./agent-view";
 import runRules from './rules'
 
-export default class Agent extends PropertiesHolder {
+module.exports = class Agent extends PropertiesHolder {
   /**
    * image       image to load, if any
    * selector    selector in image
@@ -27,13 +27,12 @@ export default class Agent extends PropertiesHolder {
     // default true for now
     this.dieWhenExitingWorld = true
 
-    let [x, y] = [0, 0]
-    if (species.spawn.on) {
-      ({x, y} = this.world.getLocation(species.spawn.on, this.props))
-    }
+    if (species.spawn && species.spawn.on) {
+      let {x, y} = this.world.getLocation(species.spawn.on, this.props)
 
-    this.props.x = x
-    this.props.y = y
+      this.props.x = x
+      this.props.y = y
+    }
 
     this.state = species.initialState || "initialization"
 
