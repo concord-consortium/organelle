@@ -33,6 +33,14 @@ describe('Rules', () => {
       it('should return false if we ask for a different state', () => {
         getValue({state: "other"}, world, agent).should.equal(false)
       })
+
+      it('should return true if we ask an existing state in an array', () => {
+        getValue({state: ["test", "other"]}, world, agent).should.equal(true)
+      })
+
+      it('should return false if we ask an state not in an array', () => {
+        getValue({state: ["other", "else"]}, world, agent).should.equal(false)
+      })
     })
 
     describe('fact', () => {
@@ -58,8 +66,19 @@ describe('Rules', () => {
       })
 
       describe('for world', () => {
-        it('should return world property value if we just request world.prop', () => {
+        it('should return world property value if we request world.prop', () => {
           getValue({fact: "world.test"}, world, agent).should.equal("value1")
+        })
+      })
+
+      describe('with default entity', () => {
+
+        it('should return agent property value if we request prop with default entity agent', () => {
+          getValue({fact: "test"}, world, agent, agent).should.equal("value2")
+        })
+
+        it('should return world property value if we request prop with default entity world', () => {
+          getValue({fact: "test"}, world, agent, world).should.equal("value1")
         })
       })
 

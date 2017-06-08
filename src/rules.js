@@ -1,14 +1,16 @@
-function getEntityAndProp(expression, world, agent) {
+function getEntityAndProp(expression, world, agent, defaultEntity) {
+  defaultEntity = defaultEntity || agent
+
   let split = expression.split("."),
       entities = {world, agent},
-      entity = split.length > 1 ? entities[split[0]] : agent,
+      entity = split.length > 1 ? entities[split[0]] : defaultEntity,
       prop = split.length > 1 ? split[1] : split[0]
   return {entity, prop}
 }
 
-function getFactValue(fact, world, agent) {
+function getFactValue(fact, world, agent, defaultEntity) {
   let factName = fact.not || fact,
-      { entity, prop } = getEntityAndProp(factName, world, agent),
+      { entity, prop } = getEntityAndProp(factName, world, agent, defaultEntity),
       val = entity.getProperty(prop)
   if (fact.not) {
     // cast to bool and invert
@@ -17,21 +19,24 @@ function getFactValue(fact, world, agent) {
   return val
 }
 
-function getValue(statement, world, agent) {
+function getValue(statement, world, agent, defaultEntity) {
   if (statement.fact) {
-    return getFactValue(statement.fact, world, agent)
+    return getFactValue(statement.fact, world, agent, defaultEntity)
   } else if (statement.state) {
-    let { entity, prop } = getEntityAndProp(statement.state, world, agent),
-        state = entity.state
-    return state === prop
+    let possibleStates = Array.isArray(statement.state) ? statement.state : [statement.state]
+    return possibleStates.some( (s) => {
+      let { entity, prop: desiredState } = getEntityAndProp(s, world, agent, defaultEntity),
+          entityState = entity.state
+      return entityState === desiredState
+    })
   } else if (statement.count) {
     return getAgentCount(statement, world)
   }
   return statement
 }
 
-function checkExpression(expression, world, agent) {
-  let val = getValue(expression, world, agent),
+function checkExpression(expression, world, agent, defaultEntity) {
+  let val = getValue(expression, world, agent, defaultEntity),
       res
 
   if (expression.hasOwnProperty("equals")) {
@@ -50,32 +55,32 @@ function checkExpression(expression, world, agent) {
   return res
 }
 
-function checkAntecedent(antecedent, world, agent) {
+function checkAntecedent(antecedent, world, agent, defaultEntity) {
   if (antecedent == null) {
     // always true
     return true
   } else {
-    return checkExpression(antecedent, world, agent)
+    return checkExpression(antecedent, world, agent, defaultEntity)
   }
 }
 
-function checkAntecedents(antecedents, world, agent) {
+function checkAntecedents(antecedents, world, agent, defaultEntity) {
   if (antecedents && antecedents.all) {
     for (let antecedent of antecedents.all) {
-      if (!checkAntecedent(antecedent, world, agent)) {
+      if (!checkAntecedent(antecedent, world, agent, defaultEntity)) {
         return false
       }
     }
     return true
   } else if (antecedents && antecedents.any) {
     for (let antecedent of antecedents.any) {
-      if (checkAntecedent(antecedent, world, agent)) {
+      if (checkAntecedent(antecedent, world, agent, defaultEntity)) {
         return true
       }
     }
     return false
   } else {
-    return checkAntecedent(antecedents, world, agent)
+    return checkAntecedent(antecedents, world, agent, defaultEntity)
   }
 }
 
@@ -93,7 +98,7 @@ function runRules (world, agent) {
   let consequences = [],
       rules = getRules(agent)
   for (let rule of rules) {
-    if (checkAntecedents(rule.if, world, agent)) {
+    if (checkAntecedents(rule.if, world, agent, agent)) {
       if (Array.isArray(rule.then)) {
         consequences = consequences.concat(rule.then)
       } else {
