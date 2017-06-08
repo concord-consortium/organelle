@@ -1,3 +1,5 @@
+import rules from './rules'
+const { getValue } = rules
 
 /**
  * Shallow merge of props and defaults:
@@ -39,12 +41,14 @@ module.exports = class PropertiesHolder {
   constructor(options) {
     this.props = {}
 
-    let { properties, defaultProperties } = options
+    let { properties, defaultProperties, calculatedProperties } = options
     properties = setDefaults(properties, defaultProperties)
 
     for (let prop in properties) {
       this.setProperty(prop, properties[prop])
     }
+
+    this.calcProps = calculatedProperties
   }
 
   setProperty(prop, value) {
@@ -59,5 +63,14 @@ module.exports = class PropertiesHolder {
 
   getProperty(prop) {
     return this.props[prop]
+  }
+
+  updateCalculatedProperties() {
+    let world = this.constructor.name === "World" ? this : this.world,
+        agent = this.constructor.name === "World" ? null : this
+
+    for (let prop in this.calcProps) {
+      this.setProperty(prop, getValue(this.calcProps[prop], world, agent, this))
+    }
   }
 }

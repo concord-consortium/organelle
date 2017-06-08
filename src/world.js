@@ -7,7 +7,7 @@ module.exports = class World extends PropertiesHolder {
   constructor(options) {
     super(options)
 
-    let {element, background, properties, species, clickHandlers} = options
+    let {element, background, species, clickHandlers} = options
 
     this.snap = Snap("#"+element)
 
@@ -64,6 +64,10 @@ module.exports = class World extends PropertiesHolder {
       if (agent.dead) {
         agent.destroy()
       }
+    }
+
+    if (this.tick % 10 === 0) {
+      this.updateCalculatedProperties()
     }
 
     this.agents = this.agents.filter( (a) => !a.dead)

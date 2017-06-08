@@ -94,6 +94,97 @@ describe('Rules', () => {
       })
 
     })
+
+    describe('count', () => {
+      var world, agent1, agent2, agent3
+
+      beforeEach( () => {
+        world = new World({})
+        agent1 = world.createAgent({name: "species1"})
+        agent2 = world.createAgent({name: "species1"})
+        agent3 = world.createAgent({name: "species2"})
+        agent1.state = "state1"
+        agent2.state = "state2"
+        agent3.state = "state2"
+        agent1.setProperties({test: "value1", number: 3})
+        agent2.setProperties({test: "value2", number: 5})
+        agent3.setProperties({test: "value1", number: 7})
+      })
+
+      it('should count all agents if we pass no filters', () => {
+        getValue({count: {}}, world).should.equal(3)
+      })
+
+      it('should count agents matching species', () => {
+        getValue({count: {species: "species1"}}, world).should.equal(2)
+      })
+
+      it('should count agents matching states', () => {
+        getValue({count: {state: "state2"}}, world).should.equal(2)
+      })
+
+      it('should count agents matching states array', () => {
+        getValue({count: {state: ["state1", "state2"]}}, world).should.equal(3)
+      })
+
+      it ('should count agents matching rules', () => {
+        getValue({count: {rules: {fact: "test", equals: "value1"}}}, world).should.equal(2)
+        getValue({count: {rules: {fact: "number", between: [4, 6]}}}, world).should.equal(1)
+      })
+
+      it('should count agents matching combinations of filters', () => {
+        getValue({count: {
+            species: "species1",
+            rules: {fact: "test", equals: "value1"}
+          }
+        }, world).should.equal(1)
+        getValue({count: {
+            state: "state2",
+            rules: {fact: "test", equals: "value2"}
+          }
+        }, world).should.equal(1)
+        getValue({count: {
+            species: "species1",
+            state: "state1",
+            rules: {fact: "test", equals: "value1"}
+          }
+        }, world).should.equal(1)
+      })
+    })
+
+    describe('ratio', () => {
+      var world, agent1
+
+      beforeEach( () => {
+        world = new World({})
+        agent1 = world.createAgent({name: "species1"})
+        world.createAgent({name: "species1"})
+        world.createAgent({name: "species2"})
+
+        world.setProperty("number", 10)
+        agent1.setProperty("number", 5)
+      })
+
+      it ('should return ratios of numbers', () => {
+        getValue({ratio: {numerator: 1, denominator: 2}}).should.equal(0.5)
+      })
+
+      it ('should return ratios of facts', () => {
+        getValue({ratio: {
+            numerator: {fact: "world.number"},
+            denominator: {fact: "number"}
+          }
+        }, world, agent1).should.equal(2)
+      })
+
+      it ('should return ratios of counts', () => {
+        getValue({ratio: {
+            numerator: {count: {species: "species1"}},
+            denominator: {count: {species: "species2"}}
+          }
+        }, world).should.equal(2)
+      })
+    })
   })
 
 

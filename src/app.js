@@ -2,8 +2,8 @@ import yaml from "js-yaml"
 import World from "./world"
 
 class Model {
-  constructor({element, background, properties, species, clickHandlers, stepsPerSecond=100, autoplay=true}) {
-    this.world = new World({element, background, properties, species, clickHandlers})
+  constructor({element, background, properties, calculatedProperties, species, clickHandlers, stepsPerSecond=100, autoplay=true}) {
+    this.world = new World({element, background, properties, calculatedProperties, species, clickHandlers})
     this.running = false
     this.setSpeed(stepsPerSecond)
     this.timeouts = []
@@ -105,8 +105,10 @@ function makeRequest (method, url) {
 
 module.exports = {
 
-  createModel({element, background, properties, species, clickHandlers, stepsPerSecond, autoplay}) {
-    let speciesLoaderPromises = []
+  createModel(options) {
+    let speciesLoaderPromises = [],
+        { species } = options
+
     for (let kind of species) {
       if (typeof kind === "string") {
         yaml.safeLoad(kind);
@@ -127,7 +129,7 @@ module.exports = {
     });
 
     return Promise.all(speciesLoaderPromises).then( () => {
-      return new Model({element, background, properties, species, clickHandlers, stepsPerSecond, autoplay})
+      return new Model(options)
     });
   }
 

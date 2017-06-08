@@ -1,16 +1,16 @@
-function getEntityAndProp(expression, world, agent, defaultEntity) {
-  defaultEntity = defaultEntity || agent
+function getEntityAndProp(expression, world, agent, baseEntity) {
+  baseEntity = baseEntity || agent
 
   let split = expression.split("."),
       entities = {world, agent},
-      entity = split.length > 1 ? entities[split[0]] : defaultEntity,
+      entity = split.length > 1 ? entities[split[0]] : baseEntity,
       prop = split.length > 1 ? split[1] : split[0]
   return {entity, prop}
 }
 
-function getFactValue(fact, world, agent, defaultEntity) {
+function getFactValue(fact, world, agent, baseEntity) {
   let factName = fact.not || fact,
-      { entity, prop } = getEntityAndProp(factName, world, agent, defaultEntity),
+      { entity, prop } = getEntityAndProp(factName, world, agent, baseEntity),
       val = entity.getProperty(prop)
   if (fact.not) {
     // cast to bool and invert
@@ -19,24 +19,49 @@ function getFactValue(fact, world, agent, defaultEntity) {
   return val
 }
 
-function getValue(statement, world, agent, defaultEntity) {
+function getAgentCount(statement, world) {
+  let count = 0
+  for (let agent of world.agents) {
+    let matchesSpecies = !statement.species || statement.species === agent.species.name
+    // only bother to check rules if we pass the above
+    if (matchesSpecies) {
+      let rules = Array.isArray(statement.rules) ? statement.rules : [statement.rules]
+      if (statement.state) {
+        rules.push({state: statement.state})  // make own rule for state
+      }
+      let matchesRules = rules.every( (rule) => {
+            return checkAntecedent(rule, world, agent)
+          })
+      if (matchesRules) {
+        count++
+      }
+    }
+  }
+  return count
+}
+
+function getValue(statement, world, agent, baseEntity) {
   if (statement.fact) {
-    return getFactValue(statement.fact, world, agent, defaultEntity)
+    return getFactValue(statement.fact, world, agent, baseEntity)
   } else if (statement.state) {
     let possibleStates = Array.isArray(statement.state) ? statement.state : [statement.state]
     return possibleStates.some( (s) => {
-      let { entity, prop: desiredState } = getEntityAndProp(s, world, agent, defaultEntity),
+      let { entity, prop: desiredState } = getEntityAndProp(s, world, agent, baseEntity),
           entityState = entity.state
       return entityState === desiredState
     })
   } else if (statement.count) {
-    return getAgentCount(statement, world)
+    return getAgentCount(statement.count, world)
+  } else if (statement.ratio) {
+    let num = getValue(statement.ratio.numerator, world, agent),
+        den = getValue(statement.ratio.denominator, world, agent)
+    return num / den
   }
   return statement
 }
 
-function checkExpression(expression, world, agent, defaultEntity) {
-  let val = getValue(expression, world, agent, defaultEntity),
+function checkExpression(expression, world, agent, baseEntity) {
+  let val = getValue(expression, world, agent, baseEntity),
       res
 
   if (expression.hasOwnProperty("equals")) {
@@ -55,32 +80,32 @@ function checkExpression(expression, world, agent, defaultEntity) {
   return res
 }
 
-function checkAntecedent(antecedent, world, agent, defaultEntity) {
+function checkAntecedent(antecedent, world, agent, baseEntity) {
   if (antecedent == null) {
     // always true
     return true
   } else {
-    return checkExpression(antecedent, world, agent, defaultEntity)
+    return checkExpression(antecedent, world, agent, baseEntity)
   }
 }
 
-function checkAntecedents(antecedents, world, agent, defaultEntity) {
+function checkAntecedents(antecedents, world, agent, baseEntity) {
   if (antecedents && antecedents.all) {
     for (let antecedent of antecedents.all) {
-      if (!checkAntecedent(antecedent, world, agent, defaultEntity)) {
+      if (!checkAntecedent(antecedent, world, agent, baseEntity)) {
         return false
       }
     }
     return true
   } else if (antecedents && antecedents.any) {
     for (let antecedent of antecedents.any) {
-      if (checkAntecedent(antecedent, world, agent, defaultEntity)) {
+      if (checkAntecedent(antecedent, world, agent, baseEntity)) {
         return true
       }
     }
     return false
   } else {
-    return checkAntecedent(antecedents, world, agent, defaultEntity)
+    return checkAntecedent(antecedents, world, agent, baseEntity)
   }
 }
 
