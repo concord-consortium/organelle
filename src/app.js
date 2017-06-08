@@ -7,6 +7,7 @@ class Model {
     this.running = false
     this.setSpeed(stepsPerSecond)
     this.timeouts = []
+    this.listeners = []
     if (autoplay) {
       this.run();
     }
@@ -30,6 +31,7 @@ class Model {
       this.world.step()
     }
     this.world.render()
+    this.notifyListeners()
   }
 
   run() {
@@ -74,6 +76,16 @@ class Model {
     let stepCount = delay / this.stepPeriodMs,
         step = this.totalSteps + stepCount
     this.timeouts.push({step, func})
+  }
+
+  addListener(listener) {
+    this.listeners.push(listener)
+  }
+
+  notifyListeners() {
+    for (let listener of this.listeners) {
+      listener()
+    }
   }
 }
 

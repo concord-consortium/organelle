@@ -71,6 +71,60 @@
           working_tyr1: true,
           working_myosin_5a: true
         },
+        calculatedProperties: {
+          saturation: {
+            ratio: {
+              numerator: {
+                count: {
+                  species: "melanosome",
+                  state: [
+                    "waiting_on_actin_terminal",
+                    "waiting_on_nuclear_actin_terminal"
+                  ],
+                }
+              },
+              denominator: 20
+            }
+          },
+          lightness: {
+            ratio: {
+              numerator: {
+                count: {
+                  species: "melanosome",
+                  state: "waiting_on_nuclear_actin_terminal"
+                }
+              },
+              denominator: 10
+            }
+          },
+          grayness: {
+            ratio: {
+              numerator: {
+                count: {
+                  species: "melanosome",
+                  state: [
+                    "waiting_on_actin_terminal",
+                    "waiting_on_nuclear_actin_terminal"
+                  ],
+                  rules: {
+                    fact: "size",
+                    greaterThan: 0.7
+                  }
+                }
+              },
+              denominator: {
+                count: {
+                  species: "melanosome",
+                  state: ["waiting_on_actin_terminal", "waiting_on_nuclear_actin_terminal"],
+                  rules: {
+                    fact: "size",
+                    lessThan: 0.7
+                  }
+                }
+              }
+            }
+          }
+        },
         species: [
           "organelles/melanosome.yml",
           "organelles/zoomed-melanosome.yml"
@@ -83,6 +137,27 @@
         ]
       }).then(function(m) {
         model = m;
+
+        model.addListener( () => {
+          let saturation = Math.min(model.world.getProperty("saturation"), 1) || 0,
+              lightness = Math.min(model.world.getProperty("lightness"), 1),
+              grayness = Math.min(model.world.getProperty("grayness"), 1)
+
+          if (isNaN(lightness)) {
+            lightness = 0
+          }
+          if (isNaN(grayness)) {
+            grayness = 1
+          }
+
+          let gray = [123,116,110],
+              orange = [200, 147, 107],
+              color = gray.map( (g, i) => Math.floor(((g * grayness) + (orange[i] * (1-grayness))) + lightness * 30) ),
+              colorStr = "rgb("+color.join()+")"
+          // rgb(123,116,110)
+          document.getElementById("cellshape_0_Layer0_0_FILL").style["fill-opacity"] = saturation
+          document.getElementById("cellshape_0_Layer0_0_FILL").style["fill"] = colorStr
+        })
       });
 
       function addClass(el, className) {

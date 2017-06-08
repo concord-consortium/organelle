@@ -9,7 +9,7 @@ spawn:
   every: 90
 properties:
   size: 0.1
-  speed: 1
+  speed: 1.5
 initialState: growing
 rules:
   growing:
@@ -131,7 +131,7 @@ rules:
       - state: waiting_on_nuclear_actin_terminal
     then:
       wait:
-        for: [100, 700]
+        for: [400, 900]
         finally:
           switch_state: dying
   - if:
@@ -141,6 +141,28 @@ rules:
       - state: waiting_on_actin_terminal
     then:
       wait:
-        for: [100, 700]
+        for: [500, 1100]
+        finally:
+          switch_state: dying
+  - if:
+      all:
+      - fact: world.working_tyr1
+      - state: [waiting_on_actin_terminal, waiting_on_nuclear_actin_terminal]
+      - fact: size
+        lessThan: 0.9
+    then:
+      wait:
+        for: [200, 600]
+        finally:
+          switch_state: dying
+  - if:
+      all:
+      - fact:
+          not: world.working_tyr1
+      - fact: size
+        greaterThan: 0.9
+    then:
+      wait:
+        for: [200, 600]
         finally:
           switch_state: dying
