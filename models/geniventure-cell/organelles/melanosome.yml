@@ -14,7 +14,18 @@ initialState: growing
 rules:
   growing:
   - if:
-      fact: world.working_tyr1
+      fact: world.albino
+    then:
+      grow:
+        by: 0.005
+        until: 0.4
+        finally:
+          switch_state: seeking_microtuble
+  - if:
+      all:
+        - fact:
+            not: world.albino
+        - fact: world.working_tyr1
     then:
     - grow:
         by: 0.005
@@ -45,7 +56,13 @@ rules:
           selector: "#Layer1_0_FILL"
           set:
             fill: url(#_Radial4)
-    else:
+  - if:
+      all:
+        - fact:
+            not: world.albino
+        - fact:
+            not: world.working_tyr1
+    then:
       grow:
         by: 0.005
         until: 0.6
@@ -164,5 +181,12 @@ rules:
     then:
       wait:
         for: [200, 600]
+        finally:
+          switch_state: dying
+  - if:
+      fact: world.albino
+    then:
+      wait:
+        for: [200, 400]
         finally:
           switch_state: dying
