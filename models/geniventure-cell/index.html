@@ -10,13 +10,13 @@
         height: 100vh;
         width: 160vh;
         opacity: 1;
-        -webkit-transition: opacity 5s;
-        transition: opacity 5s;
+        -webkit-transition: opacity 6s;
+        transition: opacity 6s;
       }
 
       .hidden-iframe {
-        width: 0;
-        height: 0;
+        width: 10;
+        height: 10;
         opacity: 0;
       }
 
@@ -31,12 +31,6 @@
         border: none;
       }
 
-      #close-protein-game {
-        position: absolute;
-        bottom: 2vh;
-        left: 140vh;
-      }
-
       #world-props {
         position: absolute;
         left: 161vh;
@@ -49,7 +43,6 @@
     </svg>
     <div id="protein-game-wrapper" class="model hidden-iframe">
       <iframe id="protein-game"></iframe>
-      <button id="close-protein-game">Zoom back to cell</button>
     </div>
 
     <fieldset id="world-props">
@@ -60,7 +53,10 @@
     </fieldset>
 
     <script>
-      var model;
+      var model,
+          initialDrakeColor = "lava",
+          finalDrakeColor = "charcoal",
+          gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand=10111111&initial-state=size&target-color=lava"
 
       Organelle.createModel({
         element: "model",
@@ -140,6 +136,33 @@
       }).then(function(m) {
         model = m;
 
+        // setTimeout( () => {
+          model.stop()
+          model.step(1000)
+        // // }, 2000)
+        model.run()
+
+        var urlParams;
+        (window.onpopstate = function () {
+            var match,
+                pl     = /\+/g,  // Regex for replacing addition symbol with a space
+                search = /([^&=]+)=?([^&]*)/g,
+                decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+                query  = window.location.search.substring(1)
+
+            urlParams = {}
+            while (match = search.exec(query))
+               urlParams[decode(match[1])] = decode(match[2])
+
+            let challenge = urlParams.chal
+            if (challenge) {
+              initialDrakeColor = challenge.split("-")[0]
+              finalDrakeColor = challenge.split("-")[1]
+              setCellPhenotype(initialDrakeColor)
+              setGameUrl(initialDrakeColor, finalDrakeColor)
+            }
+        })();
+
         model.addListener( () => {
           let saturation = Math.min(model.world.getProperty("saturation"), 1) || 0,
               lightness = Math.min(model.world.getProperty("lightness"), 1),
@@ -156,9 +179,11 @@
               orange = [200, 147, 107],
               color = gray.map( (g, i) => Math.floor(((g * grayness) + (orange[i] * (1-grayness))) + lightness * 30) ),
               colorStr = "rgb("+color.join()+")"
-          // rgb(123,116,110)
-          document.getElementById("cellshape_0_Layer0_0_FILL").style["fill-opacity"] = saturation
-          document.getElementById("cellshape_0_Layer0_0_FILL").style["fill"] = colorStr
+
+          if (document.getElementById("cellshape_0_Layer0_0_FILL")) {
+            document.getElementById("cellshape_0_Layer0_0_FILL").style["fill-opacity"] = saturation
+            document.getElementById("cellshape_0_Layer0_0_FILL").style["fill"] = colorStr
+          }
         })
       });
 
@@ -187,26 +212,34 @@
           return
         }
         entering = true
-        let delay = 1300
-        Snap.animate(el.attr("viewBox").vb.split(" "), [390, 518, 72, 45],
-          function (vals) { el.attr("viewBox", vals.join(" ")); }, delay
+
+        iframe.src = gameUrl
+
+        let zoomDelay = 1300,
+            iframeDelay = initialDrakeColor === "albino" ? 1800 : initialDrakeColor === "lava" ? 2300 : 2800,
+            modelStopDelay = 4000
+        Snap.animate(el.attr("viewBox").vb.split(" "), [391, 518, 72, 45],
+          function (vals) { el.attr("viewBox", vals.join(" ")); }, zoomDelay
         );
 
         model.setTimeout( () => {
           createdAgent = model.world.createAgent(model.world.species[1])
-        }, delay)
+        }, zoomDelay)
         model.setTimeout( () => {
-          iframe.src = "https://www.fablevision.com/geniverse_proteins/?allele-shorthand=00111111&initial-state=size&target-color=albino"
-
           var phone = new iframePhone.ParentEndpoint(iframe)
           phone.addListener('activityExit', function (content) {
-            console.log("parent received response: ", content)
             setTimeout(exitProteinGame, 1000)
-          });
+          })
+          phone.addListener('activityWin', function (content) {
+            setTimeout(exitProteinGame, 1000)
+            setCellPhenotype(finalDrakeColor)
+          })
 
           removeClass(wrapper, "hidden-iframe")
+        }, iframeDelay)
+        model.setTimeout( () => {
           model.stop()
-        }, delay * 2.6)
+        }, modelStopDelay)
 
         reverseZoom = function() {
           Snap.animate(el.attr("viewBox").vb.split(" "), [0, 0, 1280, 800],
@@ -215,8 +248,14 @@
         }
       }
 
+
       function exitProteinGame() {
         addClass(wrapper, "temp-iframe");
+
+        createdAgent.setProperty("size", 0.1)
+        createdAgent.state = "growing"
+        model.step(2000)
+
         setTimeout(function() {
           iframe.src = ""
           reverseZoom()
@@ -231,16 +270,57 @@
         }, 2000)
       }
 
-      document.getElementById("close-protein-game").onclick = exitProteinGame;
-
       function observePropCheckbox(prop) {
         document.getElementById(prop).onclick = function() {
           model.world.setProperty(prop, document.getElementById(prop).checked)
         }
       }
+      function setPropCheckbox(prop, value) {
+        model.world.setProperty(prop, value)
+        document.getElementById(prop).checked = value
+      }
       observePropCheckbox("albino");
       observePropCheckbox("working_tyr1");
       observePropCheckbox("working_myosin_5a");
+
+      function setCellPhenotype(color) {
+        if (color === "albino") {
+          setPropCheckbox("albino", true)
+        } else if (color === "charcoal") {
+          setPropCheckbox("albino", false)
+          setPropCheckbox("working_tyr1", true)
+          setPropCheckbox("working_myosin_5a", true)
+        } else if (color === "lava") {
+          setPropCheckbox("albino", false)
+          setPropCheckbox("working_tyr1", false)
+          setPropCheckbox("working_myosin_5a", true)
+        } else if (color === "ash") {
+          setPropCheckbox("albino", false)
+          setPropCheckbox("working_tyr1", true)
+          setPropCheckbox("working_myosin_5a", false)
+        } else if (color === "sand") {
+          setPropCheckbox("albino", false)
+          setPropCheckbox("working_tyr1", false)
+          setPropCheckbox("working_myosin_5a", false)
+        }
+      }
+
+      function setGameUrl(initial, final) {
+        // charcoal     allele-shorthand=10111111&initial-state=size&target-color=lava
+        // lava         allele-shorthand=00111111&initial-state=size&target-color=charcoal
+        // albino       allele-shorthand=11001111&initial-state=size&target-color=charcoal
+        let alleleShorthand = ""
+        if (initial === "albino") {
+          alleleShorthand = "11001111"
+        } else if (initial === "charcoal") {
+          alleleShorthand = "10111111"
+        } else if (initial === "lava") {
+          alleleShorthand = "00111111"
+        }
+
+        gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand="+alleleShorthand+"&initial-state=size&target-color="+final
+      }
+
     </script>
   </body>
 </html>

@@ -13,7 +13,20 @@ initialState: growing
 rules:
   growing:
   - if:
-      fact: world.working_tyr1
+      fact: world.albino
+    then:
+    - set_attr:
+        selector: "#Layer1_0_FILL"
+        set:
+          fill: url(#_Radial1)
+    - grow:
+        by: 0.005
+        until: 0.4
+  - if:
+      all:
+        - fact:
+            not: world.albino
+        - fact: world.working_tyr1
     then:
     - grow:
         by: 0.004
@@ -42,10 +55,16 @@ rules:
           selector: "#Layer1_0_FILL"
           set:
             fill: url(#_Radial4)
-    else:
+  - if:
+      all:
+        - fact:
+            not: world.albino
+        - fact:
+            not: world.working_tyr1
+    then:
       grow:
         by: 0.004
-        until: 0.6
+        until: 0.65
         finally:
           set_attr:
             selector: "#Layer1_0_FILL"
