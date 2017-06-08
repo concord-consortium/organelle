@@ -7,15 +7,25 @@ spawn:
     selector: "#golgi_x5F_apparatus path"
     at: random
   every: 90
+properties:
+  size: 0.1
+  speed: 1.5
+initialState: growing
 rules:
-  initialization:
-  - set:
-      size: 0.1
-      speed: 1
-    switch_state: growing
   growing:
   - if:
-      fact: world.working_tyr1
+      fact: world.albino
+    then:
+      grow:
+        by: 0.005
+        until: 0.4
+        finally:
+          switch_state: seeking_microtuble
+  - if:
+      all:
+        - fact:
+            not: world.albino
+        - fact: world.working_tyr1
     then:
     - grow:
         by: 0.005
@@ -46,7 +56,13 @@ rules:
           selector: "#Layer1_0_FILL"
           set:
             fill: url(#_Radial4)
-    else:
+  - if:
+      all:
+        - fact:
+            not: world.albino
+        - fact:
+            not: world.working_tyr1
+    then:
       grow:
         by: 0.005
         until: 0.6
@@ -132,7 +148,7 @@ rules:
       - state: waiting_on_nuclear_actin_terminal
     then:
       wait:
-        for: [100, 700]
+        for: [400, 900]
         finally:
           switch_state: dying
   - if:
@@ -142,6 +158,35 @@ rules:
       - state: waiting_on_actin_terminal
     then:
       wait:
-        for: [100, 700]
+        for: [500, 1100]
+        finally:
+          switch_state: dying
+  - if:
+      all:
+      - fact: world.working_tyr1
+      - state: [waiting_on_actin_terminal, waiting_on_nuclear_actin_terminal]
+      - fact: size
+        lessThan: 0.9
+    then:
+      wait:
+        for: [200, 600]
+        finally:
+          switch_state: dying
+  - if:
+      all:
+      - fact:
+          not: world.working_tyr1
+      - fact: size
+        greaterThan: 0.9
+    then:
+      wait:
+        for: [200, 600]
+        finally:
+          switch_state: dying
+  - if:
+      fact: world.albino
+    then:
+      wait:
+        for: [200, 400]
         finally:
           switch_state: dying
