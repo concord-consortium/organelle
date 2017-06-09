@@ -10,13 +10,13 @@
         height: 100vh;
         width: 160vh;
         opacity: 1;
-        -webkit-transition: opacity 5s;
-        transition: opacity 5s;
+        -webkit-transition: opacity 6s;
+        transition: opacity 6s;
       }
 
       .hidden-iframe {
-        width: 0;
-        height: 0;
+        width: 10;
+        height: 10;
         opacity: 0;
       }
 
@@ -31,12 +31,6 @@
         border: none;
       }
 
-      #close-protein-game {
-        position: absolute;
-        bottom: 2vh;
-        left: 140vh;
-      }
-
       #world-props {
         position: absolute;
         left: 161vh;
@@ -49,7 +43,6 @@
     </svg>
     <div id="protein-game-wrapper" class="model hidden-iframe">
       <iframe id="protein-game"></iframe>
-      <button id="close-protein-game">Zoom back to cell</button>
     </div>
 
     <fieldset id="world-props">
@@ -143,6 +136,12 @@
       }).then(function(m) {
         model = m;
 
+        // setTimeout( () => {
+          model.stop()
+          model.step(1000)
+        // // }, 2000)
+        model.run()
+
         var urlParams;
         (window.onpopstate = function () {
             var match,
@@ -180,9 +179,11 @@
               orange = [200, 147, 107],
               color = gray.map( (g, i) => Math.floor(((g * grayness) + (orange[i] * (1-grayness))) + lightness * 30) ),
               colorStr = "rgb("+color.join()+")"
-          // rgb(123,116,110)
-          document.getElementById("cellshape_0_Layer0_0_FILL").style["fill-opacity"] = saturation
-          document.getElementById("cellshape_0_Layer0_0_FILL").style["fill"] = colorStr
+
+          if (document.getElementById("cellshape_0_Layer0_0_FILL")) {
+            document.getElementById("cellshape_0_Layer0_0_FILL").style["fill-opacity"] = saturation
+            document.getElementById("cellshape_0_Layer0_0_FILL").style["fill"] = colorStr
+          }
         })
       });
 
@@ -211,8 +212,12 @@
           return
         }
         entering = true
+
+        iframe.src = gameUrl
+
         let zoomDelay = 1300,
-            iframeDelay = initialDrakeColor === "albino" ? 1800 : initialDrakeColor === "lava" ? 2500 : 3380
+            iframeDelay = initialDrakeColor === "albino" ? 1800 : initialDrakeColor === "lava" ? 2300 : 2800,
+            modelStopDelay = 4000
         Snap.animate(el.attr("viewBox").vb.split(" "), [391, 518, 72, 45],
           function (vals) { el.attr("viewBox", vals.join(" ")); }, zoomDelay
         );
@@ -221,8 +226,6 @@
           createdAgent = model.world.createAgent(model.world.species[1])
         }, zoomDelay)
         model.setTimeout( () => {
-          iframe.src = gameUrl
-
           var phone = new iframePhone.ParentEndpoint(iframe)
           phone.addListener('activityExit', function (content) {
             setTimeout(exitProteinGame, 1000)
@@ -233,8 +236,10 @@
           })
 
           removeClass(wrapper, "hidden-iframe")
-          model.stop()
         }, iframeDelay)
+        model.setTimeout( () => {
+          model.stop()
+        }, modelStopDelay)
 
         reverseZoom = function() {
           Snap.animate(el.attr("viewBox").vb.split(" "), [0, 0, 1280, 800],
@@ -242,6 +247,7 @@
           )
         }
       }
+
 
       function exitProteinGame() {
         addClass(wrapper, "temp-iframe");
@@ -263,8 +269,6 @@
           model.run()
         }, 2000)
       }
-
-      document.getElementById("close-protein-game").onclick = exitProteinGame;
 
       function observePropCheckbox(prop) {
         document.getElementById(prop).onclick = function() {
