@@ -24,6 +24,7 @@ module.exports = class Agent extends PropertiesHolder {
     this.world = world
 
     this.references = {}
+    this.taggedFacts = {}
 
     // default true for now
     this.dieWhenExitingWorld = true

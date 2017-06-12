@@ -56,8 +56,33 @@ function getValue(statement, world, agent, baseEntity) {
     let num = getValue(statement.ratio.numerator, world, agent),
         den = getValue(statement.ratio.denominator, world, agent)
     return num / den
+  } else if (statement.random) {
+    return getTaggedValue(statement, agent, () => Math.random() < statement.random)
   }
   return statement
+}
+
+
+
+function getTaggedValue(statement, agent, valueFunc) {
+  let tag = getTag(statement)
+  if (agent.taggedFacts[tag] !== undefined) {
+    return agent.taggedFacts[tag]
+  } else {
+    let value = valueFunc()
+    agent.taggedFacts[tag] = value
+    return value
+  }
+}
+
+function getTag(antecedent) {
+  if (antecedent.tag) {
+    return antecedent.tag
+  } else {
+    let tag = Math.random()
+    antecedent.tag = tag
+    return tag
+  }
 }
 
 function checkExpression(expression, world, agent, baseEntity) {

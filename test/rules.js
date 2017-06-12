@@ -185,6 +185,39 @@ describe('Rules', () => {
         }, world).should.equal(2)
       })
     })
+
+    describe('random', () => {
+      var world, rule
+
+      beforeEach( () => {
+        world = new World({})
+        for (let i = 0; i < 100; i++) {
+          world.createAgent({name: "species"})
+        }
+        rule = {random: 0.3}
+      })
+
+      it('should return True with correct probability', () => {
+        let totalTrues = 0
+        for (let i = 0; i < 100; i++) {
+          if (getValue(rule, world, world.agents[i])) {
+            totalTrues++
+          }
+        }
+        totalTrues.should.be.above(10)
+        totalTrues.should.be.below(50)
+      })
+
+      it('should return the same value for the same agent', () => {
+        let totalTrues = 0
+        for (let i = 0; i < 10; i++) {
+          let val = getValue(rule, world, world.agents[i])
+          for (let j = 0; j < 10; j++) {
+            getValue(rule, world, world.agents[i]).should.equal(val)
+          }
+        }
+      })
+    })
   })
 
 
