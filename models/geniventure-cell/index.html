@@ -50,6 +50,7 @@
       <input id="albino" type="checkbox" /><label for="albino">albino</label><br/>
       <input id="working_tyr1" type="checkbox" checked="checked"/><label for="working_tyr1">working_tyr1</label><br/>
       <input id="working_myosin_5a" type="checkbox" checked="checked"/><label for="working_tyr1">working_myosin_5a</label>
+      <input id="open_gates" type="checkbox" checked="checked"/><label for="open_gates">open_gates</label>
     </fieldset>
 
     <script>
@@ -67,7 +68,8 @@
         properties: {
           albino: false,
           working_tyr1: true,
-          working_myosin_5a: true
+          working_myosin_5a: true,
+          open_gates: true
         },
         calculatedProperties: {
           saturation: {
@@ -282,6 +284,7 @@
       observePropCheckbox("albino");
       observePropCheckbox("working_tyr1");
       observePropCheckbox("working_myosin_5a");
+      observePropCheckbox("open_gates");
 
       function setCellPhenotype(color) {
         if (color === "albino") {

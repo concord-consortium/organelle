@@ -80,7 +80,9 @@ rules:
         switch_state: following_microtuble_outwards
   following_microtuble_outwards:
   - if:
-      fact: world.working_myosin_5a
+      all:
+      - fact: world.working_myosin_5a
+      - random: 0.5
     then:
       follow:
         selector: "#microtubules_x5F_grouped path"
@@ -95,20 +97,56 @@ rules:
         which: nearest
         direction: forward
         finally:
-          switch_state: waiting_at_edge_of_cell
-  waiting_at_edge_of_cell:
-  - wait:
-      for: [0, 200]
-      finally:
+          switch_state: at_edge_of_cell
+  at_edge_of_cell:
+    - if:
+        all:
+        - fact: world.open_gates
+        - exists:
+            selector: "#gate_exits circle"
+            within: 100
+      then:
+        switch_state: moving_through_gate
+      else:
         switch_state: following_microtuble_inwards
-  following_microtuble_inwards:
-  - follow:
-      selector: "#microtubules_x5F_grouped path"
+  moving_through_gate:
+  - set:
+      speed: 0.5
+  - move_to:
+      selector: "#gate_exits circle"
       which: nearest
-      at: 1
-      direction: backward
       finally:
-        switch_state: find_nuclear_actin_terminal
+        switch_state: moving_to_scale_actin_terminal
+  moving_to_scale_actin_terminal:
+  - set:
+      speed: 1.5
+  - move_to:
+      selector: "#scale_actin_terminals circle"
+      which:
+        any_of_nearest: 10
+      random_offset: 10
+      finally:
+        switch_state: waiting_on_scale_actin_terminal
+  following_microtuble_inwards:
+  - if:
+      fact: world.working_myosin_5a
+    then:
+      follow:
+        selector: "#microtubules_x5F_grouped path"
+        which: nearest
+        at: 1
+        direction: backward
+        until: [0.2, 0.9]
+        finally:
+          switch_state: find_actin_terminal
+    else:
+      follow:
+        selector: "#microtubules_x5F_grouped path"
+        which: nearest
+        at: 1
+        direction: backward
+        finally:
+          switch_state: find_nuclear_actin_terminal
   find_actin_terminal:
   - move_to:
       selector: "#actin_terminals circle"
@@ -135,6 +173,16 @@ rules:
       for: 6000
       finally:
         switch_state: dying
+  waiting_on_scale_actin_terminal:
+  - wait:
+      for: 8000
+      finally:
+        switch_state: dying
+  - if:
+      fact:
+        not: world.open_gates
+    then:
+      switch_state: dying
   dying:
   - grow:
       by: -0.02
