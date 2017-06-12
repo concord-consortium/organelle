@@ -99,9 +99,10 @@ module.exports = class World extends PropertiesHolder {
         selection;
     if (props.which === "random") {
       selection = matches[Math.floor(Math.random() * matches.length)]
-    } else if (props.which === "nearest" || (props.which && props.which.any_of_nearest)) {
-      let numNearest = props.which.any_of_nearest | 1,
-          leastSqDistance = Array(numNearest).fill({dist: Infinity});
+    } else if (props.which === "nearest" || (props.which && props.which.any_of_nearest) || props.within) {
+      let numNearest = (props.which && props.which.any_of_nearest) ? props.which.any_of_nearest : 1,
+          leastSqDistance = Array(numNearest).fill({dist: Infinity}),
+          withinSq = (props.within * props.within) || Infinity
 
       matches.forEach( m => {
         let {x, y} = this.getPercentAlongPath(m.node, props.at)
@@ -109,7 +110,7 @@ module.exports = class World extends PropertiesHolder {
             dy = agent_y - y,
             sqDistance = dx * dx + dy * dy
         // bump furthest
-        if (sqDistance < leastSqDistance[numNearest-1].dist) {
+        if (sqDistance < withinSq && sqDistance < leastSqDistance[numNearest-1].dist) {
           leastSqDistance[numNearest-1] = {path: m, dist: sqDistance}
           // re-sort array from nearest to furthest
           leastSqDistance.sort(function(a, b) {
@@ -121,7 +122,12 @@ module.exports = class World extends PropertiesHolder {
     } else {
       selection = matches[0]
     }
-    return { path: selection, length: selection.getTotalLength() }
+    if (!selection) {
+      return null
+    } else {
+      let length = selection.getTotalLength ? selection.getTotalLength() : 0
+      return { path: selection, length: length }
+    }
   }
 
   getLocation(props, {x, y}) {
@@ -149,12 +155,16 @@ module.exports = class World extends PropertiesHolder {
     } else if (typeof perc !== "number") {
       perc = 0
     }
-    let distanceAlong = perc ? path.getTotalLength() * perc : 0
-    return path.getPointAtLength(distanceAlong)
+    let distanceAlong = (perc && path.getTotalLength) ? path.getTotalLength() * perc : 0
+    return this.getPointAlongPath(path, distanceAlong)
   }
 
   getPointAlongPath(path, dist) {
-    dist = Math.max(0, dist)
-    return path.getPointAtLength(dist)
+    if (path.getPointAtLength) {
+      dist = Math.max(0, dist)
+      return path.getPointAtLength(dist)
+    } else {
+      return path.getBBox()
+    }
   }
 }

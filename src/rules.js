@@ -50,6 +50,9 @@ function getValue(statement, world, agent, baseEntity) {
           entityState = entity.state
       return entityState === desiredState
     })
+  } else if (statement.exists) {
+    let feature = world.getPath(statement.exists, agent.props)
+    return feature !== null
   } else if (statement.count) {
     return getAgentCount(statement.count, world)
   } else if (statement.ratio) {
