@@ -272,9 +272,13 @@
         }, 2000)
       }
 
-      function observePropCheckbox(prop) {
+      function observePropCheckbox(prop, callback) {
         document.getElementById(prop).onclick = function() {
-          model.world.setProperty(prop, document.getElementById(prop).checked)
+          let val = document.getElementById(prop).checked
+          model.world.setProperty(prop, val)
+          if (callback) {
+            callback(val)
+          }
         }
       }
       function setPropCheckbox(prop, value) {
@@ -284,7 +288,12 @@
       observePropCheckbox("albino");
       observePropCheckbox("working_tyr1");
       observePropCheckbox("working_myosin_5a");
-      observePropCheckbox("open_gates");
+      observePropCheckbox("open_gates", (open) => {
+        let type = open ? "_open" : "_closed"
+        for (let id of ["gate_A", "gate_B", "gate_C", "gate_D"]) {
+          document.getElementById(id).setAttribute("xlink:href", "#"+id+type)
+        }
+      });
 
       function setCellPhenotype(color) {
         if (color === "albino") {
