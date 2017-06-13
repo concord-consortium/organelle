@@ -110,16 +110,28 @@ rules:
       else:
         switch_state: following_microtuble_inwards
   moving_through_gate:
-  - set:
-      speed: 0.5
   - move_to:
       selector: "#gate_exits circle"
       which: nearest
       finally:
         switch_state: moving_to_scale_actin_terminal
+  - set:
+      speed: 0.5
+  - if:
+      fact: size
+      greaterThan: 0.9
+    then:
+      set:
+        size: 0.8
   moving_to_scale_actin_terminal:
   - set:
       speed: 1.5
+  - if:
+      fact: size
+      equals: 0.8
+    then:
+      set:
+        size: 1
   - move_to:
       selector: "#scale_actin_terminals circle"
       which:
