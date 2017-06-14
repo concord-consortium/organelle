@@ -272,6 +272,18 @@
         }, 2000)
       }
 
+      function setGatesProp(open) {
+        // FIXME, need rendered callback
+        if (document.getElementById("gate_A") === null) {
+          setTimeout( () => { setGatesProp(open) }, 500)
+        } else {
+          let type = open ? "_open" : "_closed"
+          for (let id of ["gate_A", "gate_B", "gate_C", "gate_D"]) {
+            document.getElementById(id).setAttribute("xlink:href", "#"+id+type)
+          }
+        }
+      }
+
       function observePropCheckbox(prop, callback) {
         document.getElementById(prop).onclick = function() {
           let val = document.getElementById(prop).checked
@@ -284,37 +296,31 @@
       function setPropCheckbox(prop, value) {
         model.world.setProperty(prop, value)
         document.getElementById(prop).checked = value
+        if (prop === "open_gates") setGatesProp(value)
       }
       observePropCheckbox("albino");
       observePropCheckbox("working_tyr1");
       observePropCheckbox("working_myosin_5a");
-      observePropCheckbox("open_gates", (open) => {
-        let type = open ? "_open" : "_closed"
-        for (let id of ["gate_A", "gate_B", "gate_C", "gate_D"]) {
-          document.getElementById(id).setAttribute("xlink:href", "#"+id+type)
-        }
-      });
+      observePropCheckbox("open_gates", setGatesProp);
 
       function setCellPhenotype(color) {
-        if (color === "albino") {
-          setPropCheckbox("albino", true)
-        } else if (color === "charcoal") {
-          setPropCheckbox("albino", false)
-          setPropCheckbox("working_tyr1", true)
-          setPropCheckbox("working_myosin_5a", true)
-        } else if (color === "lava") {
-          setPropCheckbox("albino", false)
-          setPropCheckbox("working_tyr1", false)
-          setPropCheckbox("working_myosin_5a", true)
-        } else if (color === "ash") {
-          setPropCheckbox("albino", false)
-          setPropCheckbox("working_tyr1", true)
-          setPropCheckbox("working_myosin_5a", false)
-        } else if (color === "sand") {
-          setPropCheckbox("albino", false)
-          setPropCheckbox("working_tyr1", false)
-          setPropCheckbox("working_myosin_5a", false)
+        let colorProps = {
+                  // albino tyr1   myo5   gates
+          albino:   [true,  false, false, false],
+          charcoal: [false, true,  true,  true],
+          steel:    [false, true,  true,  false],
+          dust:     [false, true,  false, true],
+          silver:   [false, true,  false, false],
+          earth:    [false, false, true,  true],
+          copper:   [false, false, true,  false],
+          sand:     [false, false, false, true],
+          gold:     [false, false, false, false],
         }
+
+        setPropCheckbox("albino", colorProps[color][0])
+        setPropCheckbox("working_tyr1", colorProps[color][1])
+        setPropCheckbox("working_myosin_5a", colorProps[color][2])
+        setPropCheckbox("open_gates", colorProps[color][3])
       }
 
       function setGameUrl(initial, final) {
