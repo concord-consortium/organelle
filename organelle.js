@@ -724,14 +724,42 @@ function getValue(statement, world, agent, baseEntity) {
 
       return entityState === desiredState;
     });
+  } else if (statement.exists) {
+    var feature = world.getPath(statement.exists, agent.props);
+    return feature !== null;
   } else if (statement.count) {
     return getAgentCount(statement.count, world);
   } else if (statement.ratio) {
     var num = getValue(statement.ratio.numerator, world, agent),
         den = getValue(statement.ratio.denominator, world, agent);
     return num / den;
+  } else if (statement.random) {
+    return getTaggedValue(statement, agent, function () {
+      return Math.random() < statement.random;
+    });
   }
   return statement;
+}
+
+function getTaggedValue(statement, agent, valueFunc) {
+  var tag = getTag(statement);
+  if (agent.taggedFacts[tag] !== undefined) {
+    return agent.taggedFacts[tag];
+  } else {
+    var value = valueFunc();
+    agent.taggedFacts[tag] = value;
+    return value;
+  }
+}
+
+function getTag(antecedent) {
+  if (antecedent.tag) {
+    return antecedent.tag;
+  } else {
+    var tag = Math.random();
+    antecedent.tag = tag;
+    return tag;
+  }
 }
 
 function checkExpression(expression, world, agent, baseEntity) {
@@ -9692,8 +9720,10 @@ module.exports = function (_PropertiesHolder) {
           var _loop = function _loop() {
             var handler = _step2.value;
 
-            _this.snap.select(handler.selector).click(function () {
-              handler.action(Snap, _this.snap);
+            _this.snap.selectAll(handler.selector).forEach(function (sel) {
+              sel.click(function () {
+                handler.action(Snap, _this.snap, sel);
+              });
             });
           };
 
@@ -9872,9 +9902,10 @@ module.exports = function (_PropertiesHolder) {
           selection = void 0;
       if (props.which === "random") {
         selection = matches[Math.floor(Math.random() * matches.length)];
-      } else if (props.which === "nearest" || props.which && props.which.any_of_nearest) {
-        var numNearest = props.which.any_of_nearest | 1,
-            leastSqDistance = Array(numNearest).fill({ dist: Infinity });
+      } else if (props.which === "nearest" || props.which && props.which.any_of_nearest || props.within) {
+        var numNearest = props.which && props.which.any_of_nearest ? props.which.any_of_nearest : 1,
+            leastSqDistance = Array(numNearest).fill({ dist: Infinity }),
+            withinSq = props.within * props.within || Infinity;
 
         matches.forEach(function (m) {
           var _getPercentAlongPath = _this2.getPercentAlongPath(m.node, props.at),
@@ -9885,7 +9916,7 @@ module.exports = function (_PropertiesHolder) {
               dy = agent_y - y,
               sqDistance = dx * dx + dy * dy;
           // bump furthest
-          if (sqDistance < leastSqDistance[numNearest - 1].dist) {
+          if (sqDistance < withinSq && sqDistance < leastSqDistance[numNearest - 1].dist) {
             leastSqDistance[numNearest - 1] = { path: m, dist: sqDistance };
             // re-sort array from nearest to furthest
             leastSqDistance.sort(function (a, b) {
@@ -9897,7 +9928,12 @@ module.exports = function (_PropertiesHolder) {
       } else {
         selection = matches[0];
       }
-      return { path: selection, length: selection.getTotalLength() };
+      if (!selection) {
+        return null;
+      } else {
+        var length = selection.getTotalLength ? selection.getTotalLength() : 0;
+        return { path: selection, length: length };
+      }
     }
   }, {
     key: "getLocation",
@@ -9930,14 +9966,18 @@ module.exports = function (_PropertiesHolder) {
       } else if (typeof perc !== "number") {
         perc = 0;
       }
-      var distanceAlong = perc ? path.getTotalLength() * perc : 0;
-      return path.getPointAtLength(distanceAlong);
+      var distanceAlong = perc && path.getTotalLength ? path.getTotalLength() * perc : 0;
+      return this.getPointAlongPath(path, distanceAlong);
     }
   }, {
     key: "getPointAlongPath",
     value: function getPointAlongPath(path, dist) {
-      dist = Math.max(0, dist);
-      return path.getPointAtLength(dist);
+      if (path.getPointAtLength) {
+        dist = Math.max(0, dist);
+        return path.getPointAtLength(dist);
+      } else {
+        return path.getBBox();
+      }
     }
   }]);
 
@@ -10108,6 +10148,7 @@ module.exports = function (_PropertiesHolder) {
     _this.world = world;
 
     _this.references = {};
+    _this.taggedFacts = {};
 
     // default true for now
     _this.dieWhenExitingWorld = true;
