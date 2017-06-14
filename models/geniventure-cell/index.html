@@ -195,7 +195,7 @@
             document.getElementById("cellshape_0_Layer0_0_FILL").style["fill-opacity"] = saturation
             document.getElementById("cellshape_0_Layer0_0_FILL").style["fill"] = colorStr
             if (model.world.getProperty("open_gates") && !model.world.getProperty("albino")) {
-              document.getElementById("backcell_x5F_color").style["fill-opacity"] = saturation
+              document.getElementById("backcell_x5F_color").style["fill-opacity"] = Math.max(0.5, saturation)
               document.getElementById("backcell_x5F_color").style["fill"] = colorStr
             } else {
               document.getElementById("backcell_x5F_color").style["fill-opacity"] = 1
@@ -377,7 +377,7 @@
 
       function setCellPhenotype(color) {
         let colorProps = {
-                  // albino tyr1   myo5   gates/asip?
+                  // albino tyr1   myo5   gates
           frost:    [true,  false, false, false],
           charcoal: [false, true,  true,  true],
           steel:    [false, true,  true,  false],
