@@ -5,8 +5,9 @@
     <style media="screen" type="text/css">
       .model {
         position: absolute;
-        left: 0;
+        left: 50%;
         top: 0;
+        transform: translate(-50%, 0);
         height: 100vh;
         width: 160vh;
         opacity: 1;
@@ -33,7 +34,7 @@
 
       #world-props {
         position: absolute;
-        left: 161vh;
+        left: 217vh;
         bottom: 1vh;
       }
     </style>
@@ -57,6 +58,7 @@
       var model,
           initialDrakeColor = "lava",
           finalDrakeColor = "charcoal",
+          gameType = "size",
           gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand=10111111&initial-state=size&target-color=lava"
 
       Organelle.createModel({
@@ -132,7 +134,11 @@
         clickHandlers: [
           {
             selector: "#golgi_x5F_apparatus",
-            action: enterProteinGame
+            action: enterSizeGame
+          },
+          {
+            selector: ".gate",
+            action: enterGatesGame
           }
         ]
       }).then(function(m) {
@@ -155,6 +161,8 @@
             urlParams = {}
             while (match = search.exec(query))
                urlParams[decode(match[1])] = decode(match[2])
+
+            gameType = urlParams.game || "size"
 
             let challenge = urlParams.chal
             if (challenge) {
@@ -185,6 +193,14 @@
           if (document.getElementById("cellshape_0_Layer0_0_FILL")) {
             document.getElementById("cellshape_0_Layer0_0_FILL").style["fill-opacity"] = saturation
             document.getElementById("cellshape_0_Layer0_0_FILL").style["fill"] = colorStr
+            if (model.world.getProperty("open_gates") && !model.world.getProperty("albino")) {
+              document.getElementById("backcell_x5F_color").style["fill-opacity"] = saturation
+              document.getElementById("backcell_x5F_color").style["fill"] = colorStr
+            } else {
+              document.getElementById("backcell_x5F_color").style["fill-opacity"] = 1
+              document.getElementById("backcell_x5F_color").style["fill"] = "rgb(180,180,180)"
+
+            }
           }
         })
       });
@@ -209,8 +225,8 @@
           createdAgent,
           reverseZoom;
 
-      function enterProteinGame(Snap, el) {
-        if (entering) {
+      function enterSizeGame(Snap, svg) {
+        if (entering || gameType !== "size") {
           return
         }
         entering = true
@@ -218,10 +234,10 @@
         iframe.src = gameUrl
 
         let zoomDelay = 1300,
-            iframeDelay = initialDrakeColor === "albino" ? 1800 : initialDrakeColor === "lava" ? 2300 : 2800,
+            iframeDelay = initialDrakeColor === "frost" ? 1800 : initialDrakeColor === "lava" ? 2300 : 2800,
             modelStopDelay = 4000
-        Snap.animate(el.attr("viewBox").vb.split(" "), [391, 518, 72, 45],
-          function (vals) { el.attr("viewBox", vals.join(" ")); }, zoomDelay
+        Snap.animate(svg.attr("viewBox").vb.split(" "), [391, 518, 72, 45],
+          function (vals) { svg.attr("viewBox", vals.join(" ")); }, zoomDelay
         );
 
         model.setTimeout( () => {
@@ -244,8 +260,8 @@
         }, modelStopDelay)
 
         reverseZoom = function() {
-          Snap.animate(el.attr("viewBox").vb.split(" "), [0, 0, 1280, 800],
-            function (vals) { el.attr("viewBox", vals.join(" ")); }, 1500
+          Snap.animate(svg.attr("viewBox").vb.split(" "), [0, 0, 1280, 800],
+            function (vals) { svg.attr("viewBox", vals.join(" ")); }, 1500
           )
         }
       }
@@ -254,8 +270,10 @@
       function exitProteinGame() {
         addClass(wrapper, "temp-iframe");
 
-        createdAgent.setProperty("size", 0.1)
-        createdAgent.state = "growing"
+        if (gameType === "size") {
+          createdAgent.setProperty("size", 0.1)
+          createdAgent.state = "growing"
+        }
         model.step(2000)
 
         setTimeout(function() {
@@ -265,11 +283,58 @@
           removeClass(wrapper, "temp-iframe")
 
           model.setTimeout(function() {
-            createdAgent.species = model.world.species[0]
+            if (gameType === "size") {
+              createdAgent.species = model.world.species[0]
+            }
             entering = false
           }, 600)
           model.run()
         }, 2000)
+      }
+
+      function enterGatesGame(Snap, svg, el) {
+        if (entering || gameType !== "gate") {
+          return
+        }
+        entering = true
+
+        iframe.src = gameUrl
+
+        let zoomDelay = 1300,
+            iframeDelay = 1100,
+            // iframeDelay = initialDrakeColor === "albino" ? 1800 : initialDrakeColor === "lava" ? 2300 : 2800,
+            modelStopDelay = 2000
+        let {x, y} = el.node.getBBox()
+        Snap.animate(svg.attr("viewBox").vb.split(" "), [x-15, y-5, 72, 45],
+          function (vals) { svg.attr("viewBox", vals.join(" ")); }, zoomDelay
+        );
+
+        // model.setTimeout( () => {
+        //   createdAgent = model.world.createAgent(model.world.species[1])
+        // }, zoomDelay)
+        model.setTimeout( () => {
+          var phone = new iframePhone.ParentEndpoint(iframe)
+          phone.addListener('activityExit', function (content) {
+            setTimeout(exitProteinGame, 1000)
+            // FIXME gate game doesn't call win
+            setCellPhenotype(finalDrakeColor)
+          })
+          phone.addListener('activityWin', function (content) {
+            setTimeout(exitProteinGame, 1000)
+            setCellPhenotype(finalDrakeColor)
+          })
+
+          removeClass(wrapper, "hidden-iframe")
+        }, iframeDelay)
+        model.setTimeout( () => {
+          model.stop()
+        }, modelStopDelay)
+
+        reverseZoom = function() {
+          Snap.animate(svg.attr("viewBox").vb.split(" "), [0, 0, 1280, 800],
+            function (vals) { svg.attr("viewBox", vals.join(" ")); }, 1500
+          )
+        }
       }
 
       function setGatesProp(open) {
@@ -305,13 +370,13 @@
 
       function setCellPhenotype(color) {
         let colorProps = {
-                  // albino tyr1   myo5   gates
-          albino:   [true,  false, false, false],
+                  // albino tyr1   myo5   gates/asip?
+          frost:    [true,  false, false, false],
           charcoal: [false, true,  true,  true],
           steel:    [false, true,  true,  false],
           dust:     [false, true,  false, true],
           silver:   [false, true,  false, false],
-          earth:    [false, false, true,  true],
+          lava:     [false, false, true,  true],
           copper:   [false, false, true,  false],
           sand:     [false, false, false, true],
           gold:     [false, false, false, false],
@@ -324,19 +389,16 @@
       }
 
       function setGameUrl(initial, final) {
-        // charcoal     allele-shorthand=10111111&initial-state=size&target-color=lava
-        // lava         allele-shorthand=00111111&initial-state=size&target-color=charcoal
-        // albino       allele-shorthand=11001111&initial-state=size&target-color=charcoal
-        let alleleShorthand = ""
-        if (initial === "albino") {
-          alleleShorthand = "11001111"
-        } else if (initial === "charcoal") {
-          alleleShorthand = "10111111"
-        } else if (initial === "lava") {
-          alleleShorthand = "00111111"
+        let alleleShorthands = {
+                  // t a m g?
+          frost:    "11001111",
+          charcoal: "10111111",
+          lava:     "00111111",
+          copper:   "00111110",
+          sand:     "00110011"
         }
 
-        gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand="+alleleShorthand+"&initial-state=size&target-color="+final
+        gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand="+alleleShorthands[initial]+"&initial-state="+gameType+"&target-color="+final
       }
 
     </script>

@@ -38,9 +38,9 @@ module.exports = class World extends PropertiesHolder {
         }
 
         for (let handler of clickHandlers) {
-          this.snap.select(handler.selector).click( () => {
-            handler.action(Snap, this.snap)
-          })
+          this.snap.selectAll(handler.selector).forEach( (sel) => {sel.click( () => {
+            handler.action(Snap, this.snap, sel)
+          })})
         }
       });
     }
