@@ -173,6 +173,19 @@
             }
         })();
 
+        function glow(bool) {
+          let els = Array.from(document.getElementsByClassName(gameType+"-glow")),
+              style = bool ? "url(#glow)" : ""
+          els.forEach( (el) => el.style["filter"] = style )
+        }
+
+        setTimeout( () => glow(true),  3000)
+        setTimeout( () => glow(false), 3800)
+        setTimeout( () => glow(true),  4600)
+        setTimeout( () => glow(false), 5400)
+        setTimeout( () => glow(true),  6200)
+        setTimeout( () => glow(false), 7000)
+
         model.addListener( () => {
           let saturation = Math.min(model.world.getProperty("saturation"), 1) || 0,
               lightness = Math.min(model.world.getProperty("lightness"), 1),
@@ -370,7 +383,7 @@
 
       function setCellPhenotype(color) {
         let colorProps = {
-                  // albino tyr1   myo5   gates/asip?
+                  // albino tyr1   myo5   gates
           frost:    [true,  false, false, false],
           charcoal: [false, true,  true,  true],
           steel:    [false, true,  true,  false],
