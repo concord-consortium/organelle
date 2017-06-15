@@ -59,7 +59,8 @@
           initialDrakeColor = "lava",
           finalDrakeColor = "charcoal",
           gameType = "size",
-          gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand=10111111&initial-state=size&target-color=lava"
+          gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand=10111111&initial-state=size&target-color=lava",
+          parentPhone
 
       Organelle.createModel({
         element: "model",
@@ -207,7 +208,7 @@
             document.getElementById("cellshape_0_Layer0_0_FILL").style["fill-opacity"] = saturation
             document.getElementById("cellshape_0_Layer0_0_FILL").style["fill"] = colorStr
             if (model.world.getProperty("open_gates") && !model.world.getProperty("albino")) {
-              document.getElementById("backcell_x5F_color").style["fill-opacity"] = saturation
+              document.getElementById("backcell_x5F_color").style["fill-opacity"] = Math.max(0.5, saturation)
               document.getElementById("backcell_x5F_color").style["fill"] = colorStr
             } else {
               document.getElementById("backcell_x5F_color").style["fill-opacity"] = 1
@@ -264,6 +265,7 @@
           phone.addListener('activityWin', function (content) {
             setTimeout(exitProteinGame, 1000)
             setCellPhenotype(finalDrakeColor)
+            setTimeout( () => phone.post('activityWin'), 5000)
           })
 
           removeClass(wrapper, "hidden-iframe")
@@ -329,12 +331,17 @@
           var phone = new iframePhone.ParentEndpoint(iframe)
           phone.addListener('activityExit', function (content) {
             setTimeout(exitProteinGame, 1000)
+            console.log("exiting")
             // FIXME gate game doesn't call win
             setCellPhenotype(finalDrakeColor)
+            setTimeout( () => {console.log("win!!!"); parentPhone.post('activityWin')}, 5000)
+            ;
           })
           phone.addListener('activityWin', function (content) {
             setTimeout(exitProteinGame, 1000)
+            console.log("winning")
             setCellPhenotype(finalDrakeColor)
+            setTimeout( () => {console.log("win!!!"); parentPhone.post('activityWin')}, 5000)
           })
 
           removeClass(wrapper, "hidden-iframe")
@@ -387,7 +394,7 @@
           frost:    [true,  false, false, false],
           charcoal: [false, true,  true,  true],
           steel:    [false, true,  true,  false],
-          dust:     [false, true,  false, true],
+          ash:      [false, true,  false, true],
           silver:   [false, true,  false, false],
           lava:     [false, false, true,  true],
           copper:   [false, false, true,  false],
@@ -413,6 +420,9 @@
 
         gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand="+alleleShorthands[initial]+"&initial-state="+gameType+"&target-color="+final
       }
+
+      parentPhone = iframePhone.getIFrameEndpoint();
+      parentPhone.initialize();
 
     </script>
   </body>
