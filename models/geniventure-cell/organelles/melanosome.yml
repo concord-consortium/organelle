@@ -198,7 +198,7 @@ rules:
   dying:
   - grow:
       by: -0.02
-      until: 0
+      until: 0.01
       finally:
         die: true
   always:

@@ -3,6 +3,10 @@
     <script type="text/javascript" src="../../organelle.js" charset="utf-8"></script>
     <script type="text/javascript" src="lib/iframe-phone.js" charset="utf-8"></script>
     <style media="screen" type="text/css">
+      svg {
+        background-color: white;
+      }
+
       .model {
         position: absolute;
         left: 50%;
@@ -34,7 +38,7 @@
 
       #world-props {
         position: absolute;
-        left: 217vh;
+        right: 1vw;
         bottom: 1vh;
       }
     </style>
@@ -58,6 +62,8 @@
       var model,
           initialDrakeColor = "lava",
           finalDrakeColor = "charcoal",
+          alleles,
+          numStars,
           gameType = "size",
           gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand=10111111&initial-state=size&target-color=lava",
           parentPhone
@@ -163,6 +169,9 @@
             while (match = search.exec(query))
                urlParams[decode(match[1])] = decode(match[2])
 
+            alleles = urlParams.alleles
+            numStars = urlParams.numStars
+
             gameType = urlParams.game || "size"
 
             let challenge = urlParams.chal
@@ -265,7 +274,7 @@
           phone.addListener('activityWin', function (content) {
             setTimeout(exitProteinGame, 1000)
             setCellPhenotype(finalDrakeColor)
-            setTimeout( () => phone.post('activityWin'), 5000)
+            setTimeout( () => phone.post('challengeWin'), 4000)
           })
 
           removeClass(wrapper, "hidden-iframe")
@@ -409,16 +418,25 @@
       }
 
       function setGameUrl(initial, final) {
-        let alleleShorthands = {
-                  // t a m g?
-          frost:    "11001111",
-          charcoal: "10111111",
-          lava:     "00111111",
-          copper:   "00111110",
-          sand:     "00110011"
-        }
+        let alleleShorthand, stars
 
-        gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand="+alleleShorthands[initial]+"&initial-state="+gameType+"&target-color="+final
+        if (alleles) {
+          alleleShorthand = alleles
+        } else {
+          let alleleShorthands = {
+                    // t a m g?
+            frost:    "11001111",
+            charcoal: "10111111",
+            lava:     "00111111",
+            copper:   "00111110",
+            sand:     "00110011"
+          }
+          alleleShorthand = alleleShorthands[initial]
+        }
+        stars = numStars ? "&num-stars="+numStars : ""
+
+
+        gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand="+alleleShorthand+"&initial-state="+gameType+"&target-color="+final+stars
       }
 
       parentPhone = iframePhone.getIFrameEndpoint();
