@@ -343,14 +343,14 @@
             console.log("exiting")
             // FIXME gate game doesn't call win
             setCellPhenotype(finalDrakeColor)
-            setTimeout( () => {console.log("win!!!"); parentPhone.post('activityWin')}, 5000)
+            setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 5000)
             ;
           })
           phone.addListener('activityWin', function (content) {
             setTimeout(exitProteinGame, 1000)
             console.log("winning")
             setCellPhenotype(finalDrakeColor)
-            setTimeout( () => {console.log("win!!!"); parentPhone.post('activityWin')}, 5000)
+            setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 5000)
           })
 
           removeClass(wrapper, "hidden-iframe")
