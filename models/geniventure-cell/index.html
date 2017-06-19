@@ -269,12 +269,14 @@
         model.setTimeout( () => {
           var phone = new iframePhone.ParentEndpoint(iframe)
           phone.addListener('activityExit', function (content) {
+            console.log("exit")
             setTimeout(exitProteinGame, 1000)
           })
           phone.addListener('activityWin', function (content) {
+            console.log("win!")
             setTimeout(exitProteinGame, 1000)
             setCellPhenotype(finalDrakeColor)
-            setTimeout( () => phone.post('challengeWin'), 4000)
+            setTimeout( () => parentPhone.post('challengeWin'), 4000)
           })
 
           removeClass(wrapper, "hidden-iframe")
@@ -340,17 +342,17 @@
           var phone = new iframePhone.ParentEndpoint(iframe)
           phone.addListener('activityExit', function (content) {
             setTimeout(exitProteinGame, 1000)
-            console.log("exiting")
+            console.log("exit")
             // FIXME gate game doesn't call win
             setCellPhenotype(finalDrakeColor)
-            setTimeout( () => {console.log("win!!!"); parentPhone.post('activityWin')}, 5000)
+            setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 5000)
             ;
           })
           phone.addListener('activityWin', function (content) {
             setTimeout(exitProteinGame, 1000)
-            console.log("winning")
+            console.log("win!")
             setCellPhenotype(finalDrakeColor)
-            setTimeout( () => {console.log("win!!!"); parentPhone.post('activityWin')}, 5000)
+            setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 5000)
           })
 
           removeClass(wrapper, "hidden-iframe")
