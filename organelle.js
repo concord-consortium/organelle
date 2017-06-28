@@ -9744,6 +9744,10 @@ module.exports = function (_PropertiesHolder) {
             }
           }
         }
+
+        for (var i = 0; i < 1500; i++) {
+          _this.step();
+        }
       });
     }
     return _this;
@@ -10540,6 +10544,9 @@ var Model = function () {
               _this.timeouts[i].func();
               _this.timeouts[i] = null;
             }
+          }
+          if (!_this.running) {
+            _this.totalSteps = 0;
           }
         };
         keepRunning();

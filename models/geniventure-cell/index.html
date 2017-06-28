@@ -161,12 +161,12 @@
         // // }, 2000)
         model.run()
 
-        var urlParams;
+        var urlParams
         (window.onpopstate = function () {
             var match,
                 pl     = /\+/g,  // Regex for replacing addition symbol with a space
                 search = /([^&=]+)=?([^&]*)/g,
-                decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+                decode = function (s) { return decodeURIComponent(s.replace(pl, " ")) },
                 query  = window.location.search.substring(1)
 
             urlParams = {}
@@ -277,7 +277,7 @@
             console.log("win!")
             setTimeout(exitProteinGame, 1000)
             setCellPhenotype(finalDrakeColor)
-            setTimeout( () => parentPhone.post('challengeWin'), 4000)
+            model.setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 4000)
           })
 
           removeClass(wrapper, "hidden-iframe")
@@ -343,17 +343,12 @@
           var phone = new iframePhone.ParentEndpoint(iframe)
           phone.addListener('activityExit', function (content) {
             setTimeout(exitProteinGame, 1000)
-            console.log("exit")
-            // FIXME gate game doesn't call win
-            setCellPhenotype(finalDrakeColor)
-            setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 5000)
-            ;
           })
           phone.addListener('activityWin', function (content) {
             setTimeout(exitProteinGame, 1000)
             console.log("win!")
             setCellPhenotype(finalDrakeColor)
-            setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 5000)
+            model.setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 4000)
           })
 
           removeClass(wrapper, "hidden-iframe")
@@ -396,7 +391,7 @@
             setGameUrl(content.resultingGeneticColor, finalDrakeColor, true)
             setTimeout(exitProteinGame, 500)
             if (content.resultingGeneticColor === finalDrakeColor) {
-              model.setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 300)
+              model.setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 4000)
             }
           })
 
@@ -439,10 +434,10 @@
         document.getElementById(prop).checked = value
         if (prop === "open_gates") setGatesProp(value)
       }
-      observePropCheckbox("albino");
-      observePropCheckbox("working_tyr1");
-      observePropCheckbox("working_myosin_5a");
-      observePropCheckbox("open_gates", setGatesProp);
+      observePropCheckbox("albino")
+      observePropCheckbox("working_tyr1")
+      observePropCheckbox("working_myosin_5a")
+      observePropCheckbox("open_gates", setGatesProp)
 
       function setCellPhenotype(color) {
         let colorProps = {
@@ -487,8 +482,8 @@
         gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand="+alleleShorthand+"&initial-state="+gameType+"&target-color="+final+stars
       }
 
-      parentPhone = iframePhone.getIFrameEndpoint();
-      parentPhone.initialize();
+      parentPhone = iframePhone.getIFrameEndpoint()
+      parentPhone.initialize()
 
     </script>
   </body>
