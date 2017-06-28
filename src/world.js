@@ -42,6 +42,10 @@ module.exports = class World extends PropertiesHolder {
             handler.action(Snap, this.snap, sel)
           })})
         }
+
+        for (let i=0; i<1500; i++) {
+          this.step()
+        }
       });
     }
   }
