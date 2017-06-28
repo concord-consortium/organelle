@@ -55,13 +55,16 @@ class Model {
         this.step(steps)
 
         // assume we caught up, even if we only ran maxCatchUpSteps
-        this.totalSteps = targetTotalSteps;
+        this.totalSteps = targetTotalSteps
 
         for (let i=0; i < this.timeouts.length; i++) {
           if (this.timeouts[i] && this.timeouts[i].step < this.totalSteps) {
             this.timeouts[i].func()
             this.timeouts[i] = null
           }
+        }
+        if (!this.running) {
+          this.totalSteps = 0
         }
       }
       keepRunning()
