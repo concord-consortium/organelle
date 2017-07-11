@@ -40,6 +40,7 @@
         position: absolute;
         right: 1vw;
         bottom: 1vh;
+        display: none;
       }
     </style>
   </head>
@@ -65,6 +66,8 @@
           alleles,
           numStars,
           gameType = "size", // "gate", "nucleus"
+          isNucleusGame = false,
+          nucleusGenes,
           gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand=10111111&initial-state=size&target-color=lava",
           parentPhone
 
@@ -177,6 +180,9 @@
             numStars = urlParams.numStars
 
             gameType = urlParams.game || "size"
+
+            nucleusGenes = urlParams.nucleusGenes || null
+            isNucleusGame = !!nucleusGenes
 
             let challenge = urlParams.chal
             if (challenge) {
@@ -478,8 +484,13 @@
         }
         stars = numStars ? "&num-stars="+numStars : ""
 
+        let nucleusString = ""
+        if (isNucleusGame) {
+          nucleusString = "&nucleus=true&relevant-gene-shorthand="+nucleusGenes
+        }
 
-        gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand="+alleleShorthand+"&initial-state="+gameType+"&target-color="+final+stars
+
+        gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand="+alleleShorthand+"&initial-state="+gameType+"&target-color="+final+stars+nucleusString
       }
 
       parentPhone = iframePhone.getIFrameEndpoint()
