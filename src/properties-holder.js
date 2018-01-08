@@ -37,7 +37,7 @@ let setDefaults = (properties, defaultProperties) => {
   return merged
 }
 
-module.exports = class PropertiesHolder {
+export default class PropertiesHolder {
   constructor(options) {
     this.props = {}
 

@@ -3,7 +3,7 @@ require("./lib/snap-plugins")
 import PropertiesHolder from "./properties-holder"
 import Agent from "./agent"
 
-module.exports = class World extends PropertiesHolder {
+export default class World extends PropertiesHolder {
   constructor(options) {
     super(options)
 

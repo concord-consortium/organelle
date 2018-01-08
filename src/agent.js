@@ -3,7 +3,7 @@ import AgentView from "./agent-view";
 import rules from './rules'
 const { runRules } = rules
 
-module.exports = class Agent extends PropertiesHolder {
+export default class Agent extends PropertiesHolder {
   /**
    * image       image to load, if any
    * selector    selector in image
