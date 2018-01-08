@@ -104,7 +104,9 @@ module.exports = class World extends PropertiesHolder {
   getPath(props, {x: agent_x, y: agent_y}) {
     let matches = this.snap.selectAll(props.selector),
         selection;
-    if (props.which === "random") {
+    if (typeof props.which === "number") {
+      selection = matches[props.which]
+    } else if (props.which === "random") {
       selection = matches[Math.floor(Math.random() * matches.length)]
     } else if (props.which === "nearest" || (props.which && props.which.any_of_nearest) || props.within) {
       let numNearest = (props.which && props.which.any_of_nearest) ? props.which.any_of_nearest : 1,
