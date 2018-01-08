@@ -139,7 +139,9 @@
         },
         species: [
           "organelles/melanosome.yml",
-          "organelles/zoomed-melanosome.yml"
+          "organelles/zoomed-melanosome.yml",
+          "organelles/hexagon.yml",
+          "organelles/triangle.yml"
         ],
         clickHandlers: [
           {
@@ -491,6 +493,34 @@
 
 
         gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand="+alleleShorthand+"&initial-state="+gameType+"&target-color="+final+stars+nucleusString
+      }
+
+      function showHexBinding() {
+        var a = model.world.createAgent(model.world.species[0]);
+        a.state = "heading_to_receptor";
+
+        var transformReceptor = function() {
+          var protein = this.Snap.select("#receptor_x5F_protein")
+
+          document.getElementById("sensor_0_Layer0_0_FILL").style["fill"] = "rgb(239,1,82)"
+          var a = this.Snap.select("#sensor_0_Layer0_0_FILL")
+          b = a.getBBox()
+          matrix = new Snap.Matrix()
+          matrix.translate(-201, -78)
+          matrix.scale(1.3)
+          a.nativeAttrs({transform: matrix})
+        }
+
+        var waitingForBinding = function() {
+          console.log("waiting");
+          if (a.state == "waiting_on_receptor") {
+            transformReceptor();
+          } else {
+            model.setTimeout(waitingForBinding, 500)
+          }
+        }
+        
+        model.setTimeout(waitingForBinding, 500)
       }
 
       parentPhone = iframePhone.getIFrameEndpoint()

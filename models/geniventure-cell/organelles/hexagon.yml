@@ -1,0 +1,31 @@
+---
+name: hexagon
+image: assets/hexagon.svg
+selector: "#hexagon"
+spawn:
+  'on':
+    selector: "#intercellular-paths path"
+    which: random
+  every: 300
+  # never: true
+properties:
+  size: 1
+initialState: flowing
+rules:
+  flowing:
+  - follow:
+      selector: "#intercellular-paths path"
+      which: nearest
+      direction: forward
+      finally:
+        die: true
+  heading_to_receptor:
+  - follow:
+      selector: "#intercellular-path-to-receptor path"
+      which: nearest
+      direction: forward
+      finally:
+        switch_state: waiting_on_receptor
+  waiting_on_receptor:
+  - wait:
+      for: 6000
