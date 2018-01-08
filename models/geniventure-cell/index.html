@@ -42,6 +42,11 @@
         bottom: 1vh;
         display: none;
       }
+
+      .clickable {
+        cursor: pointer;
+      }
+
     </style>
   </head>
   <body>
@@ -196,7 +201,11 @@
         function glow(bool) {
           let els = Array.from(document.getElementsByClassName(gameType+"-glow")),
               style = bool ? "url(#glow)" : ""
-          els.forEach( (el) => el.style["filter"] = style )
+          els.forEach( (el) => {
+            el.style["filter"] = style
+            // add style to change cursor to pointer when element is interactable
+            if (el.className.baseVal.indexOf('clickable') === -1) el.className.baseVal += " clickable"
+          } )
 
           model.setTimeout(() => glow(!bool),1000)
         }
