@@ -27,7 +27,7 @@ module.exports = class Agent extends PropertiesHolder {
     this.taggedFacts = {}
 
     // default true for now
-    this.dieWhenExitingWorld = true
+    this.dieWhenExitingWorld = species.dieWhenExitingWorld !== undefined ? species.dieWhenExitingWorld : true
 
     if (species.spawn && species.spawn.on) {
       let {x, y} = this.world.getLocation(species.spawn.on, this.props)
