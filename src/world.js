@@ -34,6 +34,9 @@ module.exports = class World extends PropertiesHolder {
           if (kind.spawn.every) {
             this.creationTimes[kind.name] = {}
             this.creationTimes[kind.name].nextCreation = kind.spawn.every
+          } else if (kind.spawn.start) {
+            this.creationTimes[kind.name] = {}
+            this.creationTimes[kind.name].nextCreation = 0
           }
         }
 
