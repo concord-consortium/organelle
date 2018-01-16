@@ -1,16 +1,80 @@
-import yaml from "js-yaml"
-import World from "./world"
+import yaml from 'js-yaml'
+import 'whatwg-fetch'         // fetch polyfill
+
+import World from './world'
+import View from './view'
 
 class Model {
-  constructor({element, background, properties, calculatedProperties, species, clickHandlers, stepsPerSecond=100, autoplay=true}) {
-    this.world = new World({element, background, properties, calculatedProperties, species, clickHandlers})
-    this.running = false
-    this.setSpeed(stepsPerSecond)
+  constructor({modelSvg: modelSvgPath, properties, calculatedProperties, species, container, stepsPerSecond=100, autoplay=true, hotStart=0}) {
     this.timeouts = []
     this.listeners = []
-    if (autoplay) {
-      this.run();
-    }
+    const {elId, width, height} = container
+    this.setSpeed(stepsPerSecond)
+
+    // initialize loading view
+    this.view = new View(null, elId, width, height)
+
+    // load model SVG
+    const loadModelSvg = new Promise(resolve => {
+      fetch(modelSvgPath).then(response => {
+        resolve(response.text())
+      })
+    })
+
+    // load species definitions
+    const speciesLoaders = []
+    species.forEach(function(kind, i) {
+      if (typeof kind === "string") {
+        if (kind.indexOf(".yml") > -1) {
+          speciesLoaders.push(new Promise(resolve =>
+            fetch(kind)
+            .then( response => response.text() )
+            .then( yml => resolve(yaml.safeLoad(yml)) )
+          ))
+        } else {
+          speciesLoaders.push(new Promise(resolve => resolve(yaml.safeLoad(kind))))
+        }
+      } else if (typeof kind === "object") {
+        speciesLoaders.push(new Promise(resolve => resolve(kind)))
+      }
+    })
+
+    // collect all loaded species into single arrayof defs, and also preload images
+    let speciesDefs
+    const loadSpecies = Promise.all(speciesLoaders)
+    .then(defs => {
+      speciesDefs = defs
+      const imagePaths = speciesDefs.map(def => def.image)
+      return Promise.all(imagePaths.map(url => fetch(url)))
+    })
+    .then(speciesImages => Promise.all(speciesImages.map(image => image.text())))
+    .then((speciesImageSvgs) => {
+      for (let i = 0; i < speciesDefs.length; i++) {
+        speciesDefs[i].image = speciesImageSvgs[i]
+      }
+      return speciesDefs
+    })
+
+    // when everything has loaded, initialize the world
+    this.creationPromise = Promise.all([loadModelSvg, loadSpecies])
+    .then(data => {
+      const [worldSvgString, speciesDefs] = data
+      this.world = new World({worldSvgString, properties, calculatedProperties, species: speciesDefs})
+      
+      // autorun some steps before initial render
+      for (let i = 0; i < hotStart; i++) {
+        this.world.step()
+      }
+
+      this.view = new View(this.world, elId, width, height)
+
+      if (autoplay) {
+        this.run()
+      }
+
+
+      return this
+    })
   }
 
   setSpeed(stepsPerSecond) {
@@ -30,7 +94,7 @@ class Model {
     for (let i=0; i<steps; i++) {
       this.world.step()
     }
-    this.world.render()
+    this.view.render()
     this.notifyListeners()
   }
 
@@ -92,60 +156,12 @@ class Model {
   }
 }
 
-// fixme
-function makeRequest (method, url) {
-  return new Promise(function (resolve, reject) {
-    var xhr = new XMLHttpRequest();
-    xhr.open(method, url);
-    xhr.onload = function () {
-      if (this.status >= 200 && this.status < 300) {
-        resolve(xhr.response);
-      } else {
-        reject({
-          status: this.status,
-          statusText: xhr.statusText
-        });
-      }
-    };
-    xhr.onerror = function () {
-      reject({
-        status: this.status,
-        statusText: xhr.statusText
-      });
-    };
-    xhr.send();
-  });
-}
-
 
 module.exports = {
+  Model: Model,
 
   createModel(options) {
-    let speciesLoaderPromises = [],
-        { species } = options
-
-    for (let kind of species) {
-      if (typeof kind === "string") {
-        yaml.safeLoad(kind);
-      }
-    }
-    species.forEach(function(kind, i) {
-      if (typeof kind === "string") {
-        if (kind.indexOf(".yml") > -1) {
-          speciesLoaderPromises.push(makeRequest('GET', kind)
-            .then(function (yml) {
-              species[i] = yaml.safeLoad(yml);
-            })
-          );
-        } else {
-          species[i] = yaml.safeLoad(kind);
-        }
-      }
-    });
-
-    return Promise.all(speciesLoaderPromises).then( () => {
-      return new Model(options)
-    });
+    const model = new Model(options)
+    return model.creationPromise
   }
-
 }

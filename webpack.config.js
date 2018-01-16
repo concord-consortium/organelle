@@ -19,11 +19,6 @@ module.exports = {
           presets: ['es2015'],
           plugins: ["transform-object-rest-spread"]
         }
-      },
-      {
-        // See https://github.com/adobe-webplatform/Snap.svg/issues/341
-        test: require.resolve('snapsvg'),
-        loader: 'imports-loader?this=>window,fix=>module.exports=0'
       }
     ]
   },

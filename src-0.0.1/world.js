@@ -1,3 +1,5 @@
+var Snap = require("snapsvg")
+require("./lib/snap-plugins")
 import PropertiesHolder from "./properties-holder"
 import Agent from "./agent"
 
@@ -5,33 +7,55 @@ export default class World extends PropertiesHolder {
   constructor(options) {
     super(options)
 
-    const parser = new DOMParser()
-    this.worldSvgString = options.worldSvgString
-    this.worldSvg = parser.parseFromString(this.worldSvgString, "image/svg+xml")
+    let {element, background, species, clickHandlers} = options
+
+    this.snap = Snap("#"+element)
+
+    let vb = this.snap.node.viewBox.baseVal
+    this.left   = vb.x
+    this.top    = vb.y
+    this.right  = vb.x + vb.width
+    this.bottom = vb.y + vb.height
 
     this.tick = 0
-    this.species = options.species
+    this.species = species
     this.agents = []
-    this.deadAgents = []
 
 
 
     this.creationTimes = {}
 
-    // refactor this into a spawning helper
-    for (let kind of this.species) {
-      if (kind.spawn.every) {
-        this.creationTimes[kind.name] = {}
-        this.creationTimes[kind.name].nextCreation = kind.spawn.every
-      } else if (kind.spawn.start) {
-        this.creationTimes[kind.name] = {}
-        this.creationTimes[kind.name].nextCreation = 0
-      }
+    if (background && background.file) {
+      Snap.load(background.file, (img) => {
+        window.snapAppend(this.snap, img, background.selector)
+
+        // refactor this into a spawning helper
+        for (let kind of species) {
+          if (kind.spawn.every) {
+            this.creationTimes[kind.name] = {}
+            this.creationTimes[kind.name].nextCreation = kind.spawn.every
+          } else if (kind.spawn.start) {
+            this.creationTimes[kind.name] = {}
+            this.creationTimes[kind.name].nextCreation = 0
+          }
+        }
+
+        for (let handler of clickHandlers) {
+          this.snap.selectAll(handler.selector).forEach( (sel) => {sel.click( () => {
+            handler.action(Snap, this.snap, sel)
+          })})
+        }
+
+        for (let i=0; i<1500; i++) {
+          this.step()
+        }
+      });
     }
   }
 
   step() {
     this.tick++
+
     for (let kind of this.species) {
       if (this.creationTimes[kind.name] && this.creationTimes[kind.name].nextCreation < this.tick) {
         this.creationTimes[kind.name].nextCreation = this.tick + kind.spawn.every
@@ -45,15 +69,20 @@ export default class World extends PropertiesHolder {
 
     for (let agent of this.agents) {
       if (agent.dead) {
-        // does this make sense? view needs to know which agent images to remove
-        this.deadAgents.push(agent)
+        agent.destroy()
       }
     }
 
-    this.agents = this.agents.filter( (a) => !a.dead)
-
     if (this.tick % 10 === 0) {
       this.updateCalculatedProperties()
+    }
+
+    this.agents = this.agents.filter( (a) => !a.dead)
+  }
+
+  render() {
+    for (let agent of this.agents) {
+      agent.view.render()
     }
   }
 
@@ -63,8 +92,8 @@ export default class World extends PropertiesHolder {
     return agent
   }
 
-  clearDeadAgents() {
-    this.deadAgents = []
+  append(img, selector, fromCache) {
+    return window.snapAppend(this.snap, img, selector, fromCache)
   }
 
   isInWorld({x, y}) {
@@ -73,8 +102,8 @@ export default class World extends PropertiesHolder {
   }
 
   getPath(props, {x: agent_x, y: agent_y}) {
-    let matches = this.worldSvg.querySelectorAll(props.selector),
-        selection
+    let matches = this.snap.selectAll(props.selector),
+        selection;
     if (typeof props.which === "number") {
       selection = matches[props.which]
     } else if (props.which === "random") {
@@ -85,7 +114,7 @@ export default class World extends PropertiesHolder {
           withinSq = (props.within * props.within) || Infinity
 
       matches.forEach( m => {
-        let {x, y} = this.getLocationOfNode(m, props.at)
+        let {x, y} = this.getPercentAlongPath(m.node, props.at)
         let dx = agent_x - x,
             dy = agent_y - y,
             sqDistance = dx * dx + dy * dy
@@ -94,8 +123,8 @@ export default class World extends PropertiesHolder {
           leastSqDistance[numNearest-1] = {path: m, dist: sqDistance}
           // re-sort array from nearest to furthest
           leastSqDistance.sort(function(a, b) {
-            return a.dist - b.dist
-          })
+            return a.dist - b.dist;
+          });
         }
       })
       selection = leastSqDistance[Math.floor(Math.random() * numNearest)].path
@@ -114,7 +143,7 @@ export default class World extends PropertiesHolder {
     let loc = {}
     if (props.selector) {
       let path = this.getPath(props, {x, y}).path
-      loc = this.getLocationOfNode(path, props.at)
+      loc = this.getPercentAlongPath(path.node, props.at)
     }
     if (typeof props.x === "number") {
       loc.x = props.x
@@ -129,25 +158,14 @@ export default class World extends PropertiesHolder {
     return loc
   }
 
-  getLocationOfNode(node, percentageAlongPath) {
-    if (node.tagName === "circle") {
-      return {x: node.cx.baseVal.value, y: node.cy.baseVal.value}
-    } else if (node.tagName === "rect") {
-      const x = node.x.baseVal.value
-      const y = node.y.baseVal.value
-      const width = node.width.baseVal.value
-      const height = node.height.baseVal.value
-      return {x: x + width / 2, y: y + height / 2}
-    } else if (node.tagName === "path") {
-      if (percentageAlongPath === "random") {
-        percentageAlongPath = Math.random()
-      } else if (typeof percentageAlongPath !== "number") {
-        percentageAlongPath = 0
-      }
-      let distanceAlong = (percentageAlongPath && node.getTotalLength) ? node.getTotalLength() * percentageAlongPath : 0
-      return this.getPointAlongPath(node, distanceAlong)
+  getPercentAlongPath(path, perc) {
+    if (perc === "random") {
+      perc = Math.random()
+    } else if (typeof perc !== "number") {
+      perc = 0
     }
-    return {x: 0, y: 0}
+    let distanceAlong = (perc && path.getTotalLength) ? path.getTotalLength() * perc : 0
+    return this.getPointAlongPath(path, distanceAlong)
   }
 
   getPointAlongPath(path, dist) {

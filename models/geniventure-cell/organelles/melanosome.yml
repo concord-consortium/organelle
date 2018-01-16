@@ -1,15 +1,16 @@
 ---
 name: melanosome
 image: assets/melanosome.svg
-selector: "#melanosome"
 spawn:
   'on':
     selector: "#golgi_x5F_apparatus path"
     at: random
-  every: 90
+  every: 70
+dieWhenExitingWorld: false
 properties:
   size: 0.1
   speed: 1.5
+  image_selector: melanosome_1
 initialState: growing
 rules:
   growing:
@@ -36,26 +37,17 @@ rules:
         fact: size
         between: [0.5, 0.7]
       then:
-        set_attr:
-          selector: "#Layer1_0_FILL"
-          set:
-            fill: url(#_Radial2)
+        set_image_selector: melanosome_2
     - if:
         fact: size
         between: [0.7, 0.9]
       then:
-        set_attr:
-          selector: "#Layer1_0_FILL"
-          set:
-            fill: url(#_Radial3)
+        set_image_selector: melanosome_3
     - if:
         fact: size
         greaterThan: 0.9
       then:
-        set_attr:
-          selector: "#Layer1_0_FILL"
-          set:
-            fill: url(#_Radial4)
+        set_image_selector: melanosome_4
   - if:
       all:
         - fact:
@@ -67,10 +59,7 @@ rules:
         by: 0.005
         until: 0.6
         finally:
-          set_attr:
-            selector: "#Layer1_0_FILL"
-            set:
-              fill: url(#_Radial2)
+          set_image_selector: melanosome_2
           switch_state: seeking_microtuble
   seeking_microtuble:
   - move_to:

@@ -1,12 +1,10 @@
-import PropertiesHolder from "./properties-holder"
+import PropertiesHolder from "./properties-holder";
+import AgentView from "./agent-view";
 import rules from './rules'
 const { runRules } = rules
 
 export default class Agent extends PropertiesHolder {
-  /**
-   * image       image to load, if any
-   * selector    selector in image
-   */
+  
   constructor(species, world) {
     let properties = species.properties || {},
 
@@ -37,7 +35,8 @@ export default class Agent extends PropertiesHolder {
 
     this.state = species.initialState || "initialization"
 
-    // really?
+    this.view = new AgentView(this, this.world)
+
     this.step()
   }
 
@@ -51,7 +50,7 @@ export default class Agent extends PropertiesHolder {
       this.dead = true
     }
 
-    return
+    return;
   }
 
   doTask(task) {
@@ -100,7 +99,7 @@ export default class Agent extends PropertiesHolder {
 
   task_move_to(val) {
     let key = JSON.stringify(val),
-        x, y
+        x, y;
     if (this.references[key]) {
       ({x, y} = this.references[key])
     } else {
@@ -120,7 +119,7 @@ export default class Agent extends PropertiesHolder {
     let key = JSON.stringify(val),
         speed = this.getNumber(this.props.speed, 1),
         direction = val.direction === "backward" ? -1 : 1,
-        pathInfo
+        pathInfo;
     if (this.references[key]) {
       pathInfo = this.references[key].pathInfo
     } else {
@@ -154,7 +153,7 @@ export default class Agent extends PropertiesHolder {
         distSq = (dx * dx) + (dy * dy),
         speed = this.getNumber(this.props.speed, 1),
         speedSq = speed * speed,
-        direction = Math.atan2(dy, dx)
+        direction = Math.atan2(dy, dx);
 
     speed = (distSq > speedSq) ? speed : Math.sqrt(distSq)
 
@@ -167,14 +166,9 @@ export default class Agent extends PropertiesHolder {
     return (this.props.x === x && this.props.y === y)
   }
 
-  task_set_image_selector(selector) {
-    this.props.image_selector = selector
-  }
-
   task_set_attr(val) {
     // FIXME
-    debugger
-    // this.view.setAttr(val)
+    this.view.setAttr(val)
   }
 
   task_wait(val) {
@@ -198,6 +192,10 @@ export default class Agent extends PropertiesHolder {
     if (val) {
       this.dead = true
     }
+  }
+
+  destroy() {
+    this.view.destroy()
   }
 
   // utils, refactor

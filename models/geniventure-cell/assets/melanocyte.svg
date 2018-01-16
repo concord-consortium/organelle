@@ -202,7 +202,7 @@
                 <path id="part2_0_Layer0_0_1_STROKES" d="M653.05,233.3C653.15,232.4 652.65,231.7 651.75,231.2C651.05,230.9 650.45,230.9 649.85,231.3C649.55,231.6 649.25,232 649.15,232.4C649.05,232.8 648.95,233.3 648.85,233.7C648.85,234 648.75,234.2 648.75,234.5C647.85,234.6 647.25,235 646.75,235.6C646.35,236.1 646.15,236.7 646.05,237.3C645.95,238.2 646.35,238.6 647.15,238.8C647.45,238.9 647.75,239.1 648.05,239.1C648.35,239.1 648.65,239.2 648.95,239.2C649.35,239.1 649.65,239 650.05,238.8C650.35,238.6 650.55,238.3 650.75,238C651.25,238.4 651.55,238.7 651.85,238.8C652.15,239.1 652.55,239.3 652.95,239.5C653.25,239.6 653.55,239.8 653.85,239.8C654.35,239.8 654.75,239.7 655.15,239.7C655.45,239.6 655.65,239.4 655.75,239.2C655.95,238.9 656.05,238.5 656.15,238.1C656.15,237.7 656.05,237.4 655.85,237C655.55,236.5 655.15,236.1 654.75,235.7C654.35,235.4 653.95,235.1 653.55,234.8C653.45,234.8 653.45,234.7 653.45,234.7L653.25,233.8" style="fill:none;stroke:rgb(153,102,204);stroke-width:2px;"/>
             </g>
         </g>
-        <g id="actin_terminals" visibility="hidden">
+        <g id="actin_terminals" style="visibility: hidden">
             <circle cx="473" cy="316" r="2"/>
             <circle cx="490" cy="344" r="2"/>
             <circle cx="451" cy="344" r="2"/>
@@ -321,7 +321,7 @@
             <circle cx="840" cy="398" r="2"/>
             <circle cx="794" cy="435" r="2"/>
         </g>
-        <g id="nuclear_actin_terminals" visibility="hidden">
+        <g id="nuclear_actin_terminals" style="visibility: hidden">
             <circle cx="671" cy="609" r="2" style="fill:rgb(255,0,0);"/>
             <circle cx="628" cy="585" r="2" style="fill:rgb(255,0,0);"/>
             <circle cx="646" cy="590" r="2" style="fill:rgb(255,0,0);"/>
@@ -360,13 +360,13 @@
             <circle cx="690" cy="626" r="2" style="fill:rgb(255,0,0);"/>
             <circle cx="513" cy="708" r="2" style="fill:rgb(255,0,0);"/>
         </g>
-        <g id="gate_exits" visibility="hidden">
+        <g id="gate_exits" style="visibility: hidden">
             <circle cx="393" cy="14" r="3" style="fill:rgb(239,244,0);"/>
             <circle cx="5" cy="616" r="3" style="fill:rgb(239,244,0);"/>
             <circle cx="1209" cy="480" r="3" style="fill:rgb(239,244,0);"/>
             <circle cx="1093" cy="143" r="3" style="fill:rgb(239,244,0);"/>
         </g>
-        <g id="scale_actin_terminals" visibility="hidden">
+        <g id="scale_actin_terminals" style="visibility: hidden">
             <circle cx="1165" cy="441" r="3" style="fill:rgb(0,30,241);"/>
             <circle cx="1213" cy="434" r="3" style="fill:rgb(0,30,241);"/>
             <circle cx="1247" cy="467" r="3" style="fill:rgb(0,30,241);"/>

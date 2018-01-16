@@ -1,13 +1,14 @@
 ---
 name: triangle
-image: assets/triangle.svg
+image: triangle.svg
 selector: "#triangle"
 spawn:
   'on':
     selector: "#intercellular-paths path"
     which: random
-  every: 15
+  every: 30
   # never: true
+  # start: true
 dieWhenExitingWorld: false
 properties:
   speed: 1.2
