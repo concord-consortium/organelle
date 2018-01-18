@@ -421,7 +421,7 @@
       <filter id="glow" x="-40% "y="-40%" width="180%" height="180%">
           <feColorMatrix type="matrix" values=
              "0 0 0 0 1 0 0 0 0 0.6 0 0 0 0 0 0 0 0 1 0"/>
-          <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+          <feGaussianBlur stdDeviation="20" result="coloredBlur"/>
           <feMerge>
             <feMergeNode in="coloredBlur"/>
             <feMergeNode in="SourceGraphic"/>
