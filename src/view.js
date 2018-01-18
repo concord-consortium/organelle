@@ -55,7 +55,7 @@ export default class View {
 
 
       this.canvas.add(agentImage)
-      util.preventInteraction(agentImage)
+      // util.preventInteraction(agentImage)
       
       this.position(agentImage, agent.props)
       agent.addingImage = false
@@ -69,6 +69,14 @@ export default class View {
     const viewY = (y * this.scale) - (image.height * imageScale /2)
     image.set({left: viewX, top: viewY})
     image.scale(imageScale)
+  }
+
+  getModelSvgObject(id) {
+    if (!this.background) {
+      return null
+    }
+    const objects = this.background.getObjects()
+    return objects.find(o => o.id === id)
   }
 
   render() {
