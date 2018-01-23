@@ -4,18 +4,36 @@ module.exports = {
     fabricObj.hoverCursor = 'default'
   },
 
+  /**
+   * @param {string} selector A simplified CSS-style selector. It can match ".objClass",
+   *                          "#objId", can have variants separated by commas, and will
+   *                          optionally check ancestors.
+   * @param {string} species  The name of the species of an agent attached to this image
+   * @param {object} fabricObject
+   * @param {boolean} checkAncestors Whether to search the ancestor class and id names
+   * @returns true or the name of the selector if matched
+   */
   matches: function({selector="", species}, fabricObj, checkAncestors) {
-    if (selector.indexOf('#') === 0) {
-      const id = selector.slice(1)
-      if (fabricObj.id === id) return true
-      if (checkAncestors && fabricObj._organelle && fabricObj._organelle.ancestors) {
-        return fabricObj._organelle.ancestors.ids.includes(id)
-      }
-    } else if (selector.indexOf('.') === 0 && fabricObj._organelle) {
-      const clazz = selector.slice(1)
-      if (fabricObj._organelle.class.includes[clazz]) return true
-      if (checkAncestors && fabricObj._organelle.ancestors) {
-        return fabricObj._organelle.ancestors.classes.includes(clazz)
+    if (selector) {
+      const selectorVars = selector.split(",").map(sel => sel.trim())
+      for (let selectorVar of selectorVars) {
+        if (selectorVar.indexOf('#') === 0) {
+          const id = selectorVar.slice(1)
+          if (fabricObj.id === id) return selectorVar
+          if (checkAncestors && fabricObj._organelle && fabricObj._organelle.ancestors) {
+            if (fabricObj._organelle.ancestors.ids.includes(id)) {
+              return selectorVar
+            }
+          }
+        } else if (selectorVar.indexOf('.') === 0 && fabricObj._organelle) {
+          const clazz = selectorVar.slice(1)
+          if (fabricObj._organelle.class.includes[clazz]) return selectorVar
+          if (checkAncestors && fabricObj._organelle.ancestors) {
+            if (fabricObj._organelle.ancestors.classes.includes(clazz)) {
+              return selectorVar
+            }
+          }
+        }
       }
     } else if (species && fabricObj._organelle && fabricObj._organelle.agent) {
       return fabricObj._organelle.agent.species.name === species
@@ -80,5 +98,31 @@ module.exports = {
         }
       }
     }
+  },
+
+  /**
+   * Extends the basic fabricObject.set method to allow maipulating number values.
+   * e.g. setWithMultiples(obj, {opacity: "*0.5"}) will set opacity to half the current value
+   */
+  setWithMultiples: function(fabricObject, _props) {
+    const props = {..._props}
+    // update the prop values, but still do one single `set` call, in case that is optimized in fabricjs
+    for (let key in props) {
+      let changeValue = props[key]
+      // if it starts with *, /, +, -
+      if (typeof changeValue === "string" && changeValue.match(/^[\*\/\+\-]/)) {
+        let value = fabricObject.get(key)
+        if (changeValue.startsWith("*")) {
+          props[key] = value * parseFloat(changeValue.slice(1))
+        } else if (changeValue.startsWith("/")) {
+          props[key] = value / parseFloat(changeValue.slice(1))
+        } else if (changeValue.startsWith("+")) {
+          props[key] = value + parseFloat(changeValue.slice(1))
+        } else if (changeValue.startsWith("-")) {
+          props[key] = value - parseFloat(changeValue.slice(1))
+        }
+      }
+    }
+    fabricObject.set(props)
   }
 }

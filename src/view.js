@@ -2,7 +2,7 @@ import { fabric } from 'fabric'
 import util from './util'
 
 export default class View {
-  constructor(world, elId, width, height, onClick) {
+  constructor(world, elId, width, height, onClick, onHover) {
     this.world = world
     this.container = document.getElementById(elId)
     if (!this.container) {
@@ -20,14 +20,15 @@ export default class View {
     this.canvas.add(this.loadingText)
     this.loaded = false
 
-    this.agentImages = []
-
     this.width = width
     this.height = height
     this.onClick = onClick
+    this.onHover = onHover
 
     this.handleClick = this.handleClick.bind(this)
+    this.handleHover = this.handleHover.bind(this)
     this.canvas.on("mouse:up", this.handleClick)
+    this.canvas.on("mouse:move", this.handleHover)
 
     if (world) {
       this.loadWorldImage()
@@ -35,10 +36,20 @@ export default class View {
   }
 
   handleClick(evt) {
-    if (evt.subTargets.length > 0) {
-      this.onClick(evt, evt.subTargets[0])
+    if (evt.subTargets && evt.subTargets.length > 0) {
+      evt.target = evt.subTargets[0]
+      this.onClick(evt)
     } else {
-      this.onClick(evt, evt.target)
+      this.onClick(evt)
+    }
+  }
+
+  handleHover(evt) {
+    if (evt.subTargets && evt.subTargets.length > 0) {
+      evt.target = evt.subTargets[0]
+      this.onHover(evt)
+    } else {
+      this.onHover(evt)
     }
   }
 
@@ -86,6 +97,11 @@ export default class View {
       this.canvas.add(agentImage)
       util.preventInteraction(agentImage)
 
+      if (this.newAgentImageProps) {
+        this.setPropertiesOnObject(agentImage,
+          this.newAgentImageProps.props, this.newAgentImageProps.isTemporary, this.newAgentImageProps.skip)
+      }
+
       this.position(agentImage, agent.props)
       agent.addingImage = false
       agent.agentImage = agentImage
@@ -100,12 +116,65 @@ export default class View {
     image.scale(imageScale)
   }
 
-  getModelSvgObject(id) {
-    if (!this.background) {
-      return null
+  getAllViewObjects() {
+    const viewObjects = []
+
+    if (this.background) {
+      viewObjects.push(...this.background.getObjects())
     }
-    const objects = this.background.getObjects()
-    return objects.find(o => o.id === id)
+    const remainingCanvasObjects = this.canvas.getObjects().filter(o => o !== this.background)
+    viewObjects.push(...remainingCanvasObjects)
+    return viewObjects
+  }
+
+  getModelSvgObjectById(id) {
+    return this.getAllViewObjects().find(o => o.id === id)
+  }
+
+  /**
+   *
+   * @param {object} props An object of keys and values, e.g. {opacity: 0.5, fill: "blue"}
+   * @param {boolean} isTemporary If true, old value will be stored and can be recovered
+   * @param {any} skip One object, an array of objects, or a selector that will be skipped
+   */
+  setPropertiesOnAllObjects(props, isTemporary, skip, includeNewAgents) {
+    const viewObjects = this.getAllViewObjects()
+    viewObjects.forEach(o => {
+      this.setPropertiesOnObject(o, props, isTemporary, skip)
+    })
+    if (includeNewAgents) {
+      this.newAgentImageProps = {props, isTemporary, skip}
+    }
+  }
+
+  setPropertiesOnObject(o, props, isTemporary, skip) {
+    if (o === skip ||
+      (Array.isArray(skip) && skip.includes(o)) ||
+      ((skip.selector || skip.species) && util.matches(skip, o, true))) {
+        return
+    }
+    if (isTemporary) {
+      if (!o._organelle) o._organelle = {}
+      o._organelle.oldProps = {...props}
+      for (let key in props) {
+        o._organelle.oldProps[key] = o.get(key)
+      }
+    }
+    util.setWithMultiples(o, props)
+  }
+
+  /**
+   * Reverts the effects of setPropertiesOnAllObjects
+   */
+  resetPropertiesOnAllObjects() {
+    const viewObjects = this.getAllViewObjects()
+    viewObjects.forEach(o => {
+      if (o._organelle && o._organelle.oldProps) {
+        o.set(o._organelle.oldProps)
+        delete o._organelle.oldProps
+      }
+    })
+    delete this.newAgentImageProps
   }
 
   render() {

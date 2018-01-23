@@ -7,7 +7,10 @@ import util from './util'
 
 const events = {
   MODEL_STEP: "model.step",
-  VIEW_CLICK: "view.click"
+  VIEW_CLICK: "view.click",
+  VIEW_HOVER: "view.hover",
+  VIEW_HOVER_ENTER: "view.hover.enter",
+  VIEW_HOVER_EXIT: "view.hover.exit"
 }
 
 class Model {
@@ -29,9 +32,10 @@ class Model {
     this.setSpeed(stepsPerSecond)
 
     this._onViewClick = this._onViewClick.bind(this)
+    this._onViewHover = this._onViewHover.bind(this)
 
     // initialize loading view
-    this.view = new View(null, elId, width, height, this._onViewClick)
+    this.view = new View(null, elId, width, height, this._onViewClick, this._onViewHover)
 
     // load model SVG
     const loadModelSvg = new Promise(resolve => {
@@ -171,13 +175,11 @@ class Model {
     this.listeners[event].push(listener)
   }
 
-  _onViewClick(evt, target) {
-    evt.target = target
-
+  _onViewClick(evt) {
     // go through built-in click handlers
     for (let handler of this.clickHandlers) {
       if (!handler.action) continue
-      if (util.matches(handler, target, true)) {
+      if (util.matches(handler, evt.target, true)) {
         // move agent prop up for easier handling
         if (evt.target._organelle && evt.target._organelle.agent) {
           evt.agent = evt.target._organelle.agent
@@ -187,13 +189,34 @@ class Model {
     }
 
     // also notify listeners directly.
+    this._notifyViewEvent(events.VIEW_CLICK, evt)
+  }
+
+  _onViewHover(evt) {
+    if (this.lastTargetHovered && this.lastTargetHovered !== evt.target) {
+      const offEvt = {...evt}
+      offEvt.target = this.lastTargetHovered
+      this._notifyViewEvent(events.VIEW_HOVER_EXIT, offEvt)
+    }
+
+    if (!this.lastTargetHovered || this.lastTargetHovered && this.lastTargetHovered !== evt.target) {
+      this._notifyViewEvent(events.VIEW_HOVER_ENTER, evt)
+    }
+
+    this._notifyViewEvent(events.VIEW_HOVER, evt)
+
+    this.lastTargetHovered = evt.target
+  }
+
+  _notifyViewEvent(eventName, evt) {
+    if (!evt.target) return
     // first add matches util function for easier click handling in listener
     if (!evt.target._organelle) evt.target._organelle = {}
     evt.target._organelle.matches = (match, checkAncestors=true) => {
-      return util.matches(match, target, checkAncestors)
+      return util.matches(match, evt.target, checkAncestors)
     }
 
-    this._notifyListeners(events.VIEW_CLICK, evt)
+    this._notifyListeners(eventName, evt)
   }
 
   _notifyListeners(event, evtProps) {
