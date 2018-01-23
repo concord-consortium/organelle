@@ -3,6 +3,7 @@ import 'whatwg-fetch'         // fetch polyfill
 
 import World from './world'
 import View from './view'
+import util from './util'
 
 const events = {
   MODEL_STEP: "model.step",
@@ -10,9 +11,20 @@ const events = {
 }
 
 class Model {
-  constructor({modelSvg: modelSvgPath, properties, calculatedProperties, species, container, stepsPerSecond=100, autoplay=true, hotStart=0}) {
+  constructor({
+      modelSvg: modelSvgPath,
+      properties,
+      calculatedProperties,
+      species,
+      container,
+      clickHandlers=[],
+      stepsPerSecond=100,
+      autoplay=true,
+      hotStart=0}) {
+
     this.timeouts = []
     this.listeners = {}
+    this.clickHandlers = clickHandlers
     const {elId, width, height} = container
     this.setSpeed(stepsPerSecond)
 
@@ -67,7 +79,7 @@ class Model {
     .then(data => {
       const [worldSvgString, speciesDefs] = data
       this.world = new World({worldSvgString, properties, calculatedProperties, species: speciesDefs})
-      
+
       // autorun some steps before initial render
       for (let i = 0; i < hotStart; i++) {
         this.world.step()
@@ -88,7 +100,7 @@ class Model {
     this.stepPeriodMs = (1 / stepsPerSecond) * 1000
     // if user had tabbed away for a while, we don't need to try and catch
     // up completely when they return, blocking the model while we do so
-    this.maxCatchUpSteps = stepsPerSecond * 10
+    this.maxCatchUpSteps = stepsPerSecond * 2
 
     if (this.running) {
       // start tracking our time afresh
@@ -160,6 +172,21 @@ class Model {
   }
 
   _onViewClick(evt, target) {
+    // go through built-in click handlers
+    for (let handler of this.clickHandlers) {
+      if (!handler.selector || !handler.action) continue
+      if (util.matchesSelector(handler.selector, target, true)) {
+        handler.action()
+      }
+    }
+
+    // also notify listeners directly.
+    // first add matches util function for easier click handling in listener
+    if (!target._organelle) target._organelle = {}
+    target._organelle.matches = (selector, checkAncestors=true) => {
+      return util.matchesSelector(selector, target, checkAncestors)
+    }
+
     evt.target = target
     this._notifyListeners(events.VIEW_CLICK, evt)
   }

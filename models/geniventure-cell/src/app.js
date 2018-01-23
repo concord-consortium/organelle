@@ -173,6 +173,9 @@ var model,
 
     model.on("view.click", evt => {
       console.log("click!", evt.target)
+      if (evt.target._organelle.matches(".gate")) {
+        console.log("clicked a gate")
+      }
     })
   });
 

@@ -48,51 +48,52 @@ export default class View {
   }
 
   loadWorldImage() {
-    fabric.loadSVGFromString(this.world.worldSvgString, (objects, options) => {
+    fabric.loadSVGFromString(this.world.worldSvgString, (objects, options, svgElements) => {
+      util.addAncestorAndClassAttributes(objects, svgElements)
       options.subTargetCheck = true
       this.background = fabric.util.groupSVGElements(objects, options)
 
       this.canvas.add(this.background)
       util.preventInteraction(this.background)
-      
+
       const fitWidthScale = this.width / this.background.width
       const fitHeightScale = this.height / this.background.height
       this.scale = Math.min(fitWidthScale, fitHeightScale)
       this.background.scale(this.scale)
-      
+
       this.loaded = true
       this.canvas.remove(this.loadingText)
-    }); 
+    });
   }
 
   addAgentImage(agent) {
     agent.addingImage = true
-    fabric.loadSVGFromString(agent.species.image, (objects, options) => {
-      // would like a better way to recover the <g> hierarchy
-      // see: https://github.com/kangax/fabric.js/issues/899
+    fabric.loadSVGFromString(agent.species.image, (objects, options, svgElements) => {
+      util.addAncestorAndClassAttributes(objects, svgElements)
+
       const imageSelector = agent.props.image_selector
       if (imageSelector) {
         objects = objects.filter(o => o.id === imageSelector)
       }
       const agentImage = fabric.util.groupSVGElements(objects, options)
-      agentImage.organelle = {}     // container for custom props, to not overwrite fabric props
-      agentImage.organelle.imageSelector = imageSelector
+      if (!agentImage._organelle) agentImage._organelle = {}
+      agentImage._organelle.imageSelector = imageSelector
 
       if (agent.oldImage) {
         this.canvas.remove(agent.oldImage)
       }
       this.canvas.add(agentImage)
       util.preventInteraction(agentImage)
-      
+
       this.position(agentImage, agent.props)
       agent.addingImage = false
       agent.agentImage = agentImage
-    }); 
+    });
   }
 
   position(image,{x, y, size=1}) {
     const imageScale = this.scale * size
-    const viewX = (x * this.scale) - (image.width * imageScale/2) 
+    const viewX = (x * this.scale) - (image.width * imageScale/2)
     const viewY = (y * this.scale) - (image.height * imageScale /2)
     image.set({left: viewX, top: viewY})
     image.scale(imageScale)
@@ -113,7 +114,7 @@ export default class View {
       } else if (agent.agentImage && !agent.dead) {
         this.position(agent.agentImage, agent.props)
 
-        if (agent.props.image_selector !== agent.agentImage.organelle.imageSelector) {
+        if (agent.props.image_selector !== agent.agentImage._organelle.imageSelector) {
           // agent's rules have changed the selector
           // we don't delete the old image right away, or we'll get flashing. Instead,
           // store old image and delete it after the async add-image operation
