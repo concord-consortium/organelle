@@ -172,22 +172,27 @@ class Model {
   }
 
   _onViewClick(evt, target) {
+    evt.target = target
+
     // go through built-in click handlers
     for (let handler of this.clickHandlers) {
-      if (!handler.selector || !handler.action) continue
-      if (util.matchesSelector(handler.selector, target, true)) {
-        handler.action()
+      if (!handler.action) continue
+      if (util.matches(handler, target, true)) {
+        // move agent prop up for easier handling
+        if (evt.target._organelle && evt.target._organelle.agent) {
+          evt.agent = evt.target._organelle.agent
+        }
+        handler.action(evt)
       }
     }
 
     // also notify listeners directly.
     // first add matches util function for easier click handling in listener
-    if (!target._organelle) target._organelle = {}
-    target._organelle.matches = (selector, checkAncestors=true) => {
-      return util.matchesSelector(selector, target, checkAncestors)
+    if (!evt.target._organelle) evt.target._organelle = {}
+    evt.target._organelle.matches = (match, checkAncestors=true) => {
+      return util.matches(match, target, checkAncestors)
     }
 
-    evt.target = target
     this._notifyListeners(events.VIEW_CLICK, evt)
   }
 

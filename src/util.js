@@ -4,7 +4,7 @@ module.exports = {
     fabricObj.hoverCursor = 'default'
   },
 
-  matchesSelector: function(selector, fabricObj, checkAncestors) {
+  matches: function({selector="", species}, fabricObj, checkAncestors) {
     if (selector.indexOf('#') === 0) {
       const id = selector.slice(1)
       if (fabricObj.id === id) return true
@@ -17,6 +17,8 @@ module.exports = {
       if (checkAncestors && fabricObj._organelle.ancestors) {
         return fabricObj._organelle.ancestors.classes.includes(clazz)
       }
+    } else if (species && fabricObj._organelle && fabricObj._organelle.agent) {
+      return fabricObj._organelle.agent.species.name === species
     }
     return false
   },

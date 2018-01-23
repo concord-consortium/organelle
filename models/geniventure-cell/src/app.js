@@ -96,6 +96,10 @@ var model,
       {
         selector: "#nucleus_x5F_A",
         action: enterNucleusGame
+      },
+      {
+        species: "melanosome",
+        action: sayHiMelanosome
       }
     ]
   }).then(function(m) {
@@ -173,8 +177,12 @@ var model,
 
     model.on("view.click", evt => {
       console.log("click!", evt.target)
-      if (evt.target._organelle.matches(".gate")) {
-        console.log("clicked a gate")
+
+      if (evt.target._organelle.matches({selector: ".gate"})) {
+        console.log("clicked a gate", evt.target)
+      }
+      if (evt.target._organelle.matches({species: "melanosome"})) {
+        console.log("clicked a melanosome", evt.target._organelle.agent)
       }
     })
   });
@@ -368,6 +376,10 @@ var model,
         document.getElementById(id).setAttribute("xlink:href", "#"+id+type)
       }
     }
+  }
+
+  function sayHiMelanosome(evt) {
+    console.log("melansome says hi", evt.agent)
   }
 
   function observePropCheckbox(prop, callback) {

@@ -77,6 +77,7 @@ export default class View {
       }
       const agentImage = fabric.util.groupSVGElements(objects, options)
       if (!agentImage._organelle) agentImage._organelle = {}
+      agentImage._organelle.agent = agent
       agentImage._organelle.imageSelector = imageSelector
 
       if (agent.oldImage) {
