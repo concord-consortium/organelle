@@ -4,15 +4,22 @@ import 'whatwg-fetch'         // fetch polyfill
 import World from './world'
 import View from './view'
 
+const events = {
+  MODEL_STEP: "model.step",
+  VIEW_CLICK: "view.click"
+}
+
 class Model {
   constructor({modelSvg: modelSvgPath, properties, calculatedProperties, species, container, stepsPerSecond=100, autoplay=true, hotStart=0}) {
     this.timeouts = []
-    this.listeners = []
+    this.listeners = {}
     const {elId, width, height} = container
     this.setSpeed(stepsPerSecond)
 
+    this._onViewClick = this._onViewClick.bind(this)
+
     // initialize loading view
-    this.view = new View(null, elId, width, height)
+    this.view = new View(null, elId, width, height, this._onViewClick)
 
     // load model SVG
     const loadModelSvg = new Promise(resolve => {
@@ -95,7 +102,7 @@ class Model {
       this.world.step()
     }
     this.view.render()
-    this.notifyListeners()
+    this._notifyListeners(events.MODEL_STEP)
   }
 
   run() {
@@ -145,13 +152,22 @@ class Model {
     this.timeouts.push({step, func})
   }
 
-  addListener(listener) {
-    this.listeners.push(listener)
+  on(event, listener) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = []
+    }
+    this.listeners[event].push(listener)
   }
 
-  notifyListeners() {
-    for (let listener of this.listeners) {
-      listener()
+  _onViewClick(evt, target) {
+    evt.target = target
+    this._notifyListeners(events.VIEW_CLICK, evt)
+  }
+
+  _notifyListeners(event, evtProps) {
+    if (!this.listeners[event]) return
+    for (let listener of this.listeners[event]) {
+      listener(evtProps)
     }
   }
 }

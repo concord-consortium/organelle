@@ -2,7 +2,7 @@ import { fabric } from 'fabric'
 import util from './util'
 
 export default class View {
-  constructor(world, elId, width, height) {
+  constructor(world, elId, width, height, onClick) {
     this.world = world
     this.container = document.getElementById(elId)
     if (!this.container) {
@@ -24,9 +24,21 @@ export default class View {
 
     this.width = width
     this.height = height
+    this.onClick = onClick
+
+    this.handleClick = this.handleClick.bind(this)
+    this.canvas.on("mouse:up", this.handleClick)
 
     if (world) {
       this.loadWorldImage()
+    }
+  }
+
+  handleClick(evt) {
+    if (evt.subTargets.length > 0) {
+      this.onClick(evt, evt.subTargets[0])
+    } else {
+      this.onClick(evt, evt.target)
     }
   }
 
@@ -37,6 +49,7 @@ export default class View {
 
   loadWorldImage() {
     fabric.loadSVGFromString(this.world.worldSvgString, (objects, options) => {
+      options.subTargetCheck = true
       this.background = fabric.util.groupSVGElements(objects, options)
 
       this.canvas.add(this.background)

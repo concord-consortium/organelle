@@ -141,7 +141,7 @@ var model,
 
     glow(true)
 
-    model.addListener( () => {
+    model.on("model.step", () => {
       let saturation = Math.min(model.world.getProperty("saturation"), 1) || 0,
           lightness = Math.min(model.world.getProperty("lightness"), 1),
           grayness = Math.min(model.world.getProperty("grayness"), 1)
@@ -169,6 +169,10 @@ var model,
           backgroundFill.set({opacity: Math.max(0.5, saturation)})
         }
       }
+    })
+
+    model.on("view.click", evt => {
+      console.log("click!", evt.target)
     })
   });
 
