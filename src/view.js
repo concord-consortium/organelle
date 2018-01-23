@@ -20,18 +20,30 @@ export default class View {
     this.canvas.add(this.loadingText)
     this.loaded = false
 
-    if (!world) {
-      return;
-    }
+    this.agentImages = []
 
-    fabric.loadSVGFromString(world.worldSvgString, (objects, options) => {
+    this.width = width
+    this.height = height
+
+    if (world) {
+      this.loadWorldImage()
+    }
+  }
+
+  setWorld(world) {
+    this.world = world
+    this.loadWorldImage()
+  }
+
+  loadWorldImage() {
+    fabric.loadSVGFromString(this.world.worldSvgString, (objects, options) => {
       this.background = fabric.util.groupSVGElements(objects, options)
 
       this.canvas.add(this.background)
       util.preventInteraction(this.background)
       
-      const fitWidthScale = width / this.background.width
-      const fitHeightScale = height / this.background.height
+      const fitWidthScale = this.width / this.background.width
+      const fitHeightScale = this.height / this.background.height
       this.scale = Math.min(fitWidthScale, fitHeightScale)
       this.background.scale(this.scale)
       
@@ -53,9 +65,11 @@ export default class View {
       agentImage.organelle = {}     // container for custom props, to not overwrite fabric props
       agentImage.organelle.imageSelector = imageSelector
 
-
+      if (agent.oldImage) {
+        this.canvas.remove(agent.oldImage)
+      }
       this.canvas.add(agentImage)
-      // util.preventInteraction(agentImage)
+      util.preventInteraction(agentImage)
       
       this.position(agentImage, agent.props)
       agent.addingImage = false
@@ -87,8 +101,12 @@ export default class View {
         this.position(agent.agentImage, agent.props)
 
         if (agent.props.image_selector !== agent.agentImage.organelle.imageSelector) {
+          // agent's rules have changed the selector
+          // we don't delete the old image right away, or we'll get flashing. Instead,
+          // store old image and delete it after the async add-image operation
+          agent.oldImage = agent.agentImage
+          delete agent.agentImage
           // re-add image with new selector
-          this.canvas.remove(agent.agentImage)
           this.addAgentImage(agent)
         }
       }

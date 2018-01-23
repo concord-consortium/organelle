@@ -66,7 +66,7 @@ class Model {
         this.world.step()
       }
 
-      this.view = new View(this.world, elId, width, height)
+      this.view.setWorld(this.world)
 
       if (autoplay) {
         this.run()
