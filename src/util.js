@@ -1,5 +1,24 @@
 module.exports = {
-  preventInteraction: function (fabricObj) {
+  parseSVG(svgString) {
+    let doc
+    if (typeof DOMParser !== 'undefined') {
+      var parser = new DOMParser()
+      doc = parser.parseFromString(svgString, 'text/xml')
+    } else if (fabric.window.ActiveXObject) {
+      doc = new ActiveXObject('Microsoft.XMLDOM')
+      doc.async = 'false'
+      // IE chokes on DOCTYPE
+      doc.loadXML(svgString.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''))
+    }
+    return doc.documentElement
+  },
+
+  parseViewbox(svgDoc) {
+    const vb = svgDoc.viewBox.baseVal
+    return {left: vb.x, top: vb.y, width: vb.width, height: vb.height}
+  },
+
+  preventInteraction (fabricObj) {
     fabricObj.selectable = false
     fabricObj.hoverCursor = 'default'
   },
@@ -13,7 +32,7 @@ module.exports = {
    * @param {boolean} checkAncestors Whether to search the ancestor class and id names
    * @returns true or the name of the selector if matched
    */
-  matches: function({selector="", species}, fabricObj, checkAncestors) {
+  matches({selector="", species}, fabricObj, checkAncestors) {
     if (selector) {
       const selectorVars = selector.split(",").map(sel => sel.trim())
       for (let selectorVar of selectorVars) {
@@ -76,7 +95,7 @@ module.exports = {
    *
    * See: https://github.com/kangax/fabric.js/issues/899
    */
-  addAncestorAndClassAttributes: function(fabricObjects, svgObjects) {
+  addAncestorAndClassAttributes(fabricObjects, svgObjects) {
     for (let i = 0; i < fabricObjects.length; i++) {
       const obj = fabricObjects[i]
       if (!obj._organelle) obj._organelle = {}
@@ -104,7 +123,7 @@ module.exports = {
    * Extends the basic fabricObject.set method to allow maipulating number values.
    * e.g. setWithMultiples(obj, {opacity: "*0.5"}) will set opacity to half the current value
    */
-  setWithMultiples: function(fabricObject, _props) {
+  setWithMultiples(fabricObject, _props) {
     const props = {..._props}
     // update the prop values, but still do one single `set` call, in case that is optimized in fabricjs
     for (let key in props) {

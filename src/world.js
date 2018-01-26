@@ -1,13 +1,21 @@
 import PropertiesHolder from "./properties-holder"
 import Agent from "./agent"
+import util from './util'
 
 export default class World extends PropertiesHolder {
   constructor(options) {
     super(options)
 
-    const parser = new DOMParser()
-    this.worldSvgString = options.worldSvgString
-    this.worldSvg = parser.parseFromString(this.worldSvgString, "image/svg+xml")
+    this.worldSvgModel = util.parseSVG(options.worldSvgString)
+
+    this.bounds = options.bounds || util.parseViewbox(this.worldSvgModel)
+    this.bounds.right = this.bounds.left + this.bounds.width
+    this.bounds.bottom = this.bounds.top + this.bounds.height
+
+    const b = this.bounds
+    const viewBox = [b.left, b.top, b.width, b.height].join(' ')
+
+    this.worldSvgModel.setAttribute("viewBox", viewBox)
 
     this.tick = 0
     this.species = options.species
@@ -68,12 +76,12 @@ export default class World extends PropertiesHolder {
   }
 
   isInWorld({x, y}) {
-    return x >= this.left && x <= this.right &&
-        y >= this.top && y <= this.bottom
+    return x >= this.bounds.left && x <= this.bounds.right &&
+        y >= this.bounds.top && y <= this.bounds.bottom
   }
 
   getPath(props, {x: agent_x, y: agent_y}) {
-    let matches = this.worldSvg.querySelectorAll(props.selector),
+    let matches = this.worldSvgModel.querySelectorAll(props.selector),
         selection
     if (typeof props.which === "number") {
       selection = matches[props.which]

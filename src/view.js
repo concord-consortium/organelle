@@ -59,7 +59,7 @@ export default class View {
   }
 
   loadWorldImage() {
-    fabric.loadSVGFromString(this.world.worldSvgString, (objects, options, svgElements) => {
+    fabric.parseSVGDocument(this.world.worldSvgModel, (objects, options, svgElements) => {
       util.addAncestorAndClassAttributes(objects, svgElements)
       options.subTargetCheck = true
       this.background = fabric.util.groupSVGElements(objects, options)
@@ -129,8 +129,8 @@ export default class View {
 
   position(image,{x, y, size=1}) {
     const imageScale = this.scale * size
-    const viewX = (x * this.scale) - (image.width * imageScale/2)
-    const viewY = (y * this.scale) - (image.height * imageScale /2)
+    const viewX = ((x - this.world.bounds.left) * this.scale) - (image.width * imageScale/2)
+    const viewY = ((y - this.world.bounds.top) * this.scale) - (image.height * imageScale /2)
     image.set({left: viewX, top: viewY})
     image.scale(imageScale)
   }

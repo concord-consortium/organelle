@@ -32,6 +32,7 @@ const maybeFetch = (extension) => (maybeUrl) => {
 class Model {
   constructor({
       modelSvg: modelSvgPath,
+      bounds,
       properties,
       calculatedProperties,
       species,
@@ -98,7 +99,7 @@ class Model {
     this.creationPromise = Promise.all([loadModelSvg, loadSpecies])
     .then(data => {
       const [worldSvgString, speciesDefs] = data
-      this.world = new World({worldSvgString, properties, calculatedProperties, species: speciesDefs})
+      this.world = new World({worldSvgString, bounds, properties, calculatedProperties, species: speciesDefs})
 
       // autorun some steps before initial render
       for (let i = 0; i < hotStart; i++) {
