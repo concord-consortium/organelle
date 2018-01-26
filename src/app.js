@@ -13,6 +13,22 @@ const events = {
   VIEW_HOVER_EXIT: "view.hover.exit"
 }
 
+/**
+ * Returns a function that can be passed a url to an asset, or the asset itself.
+ * If passed a url, it `fetch()`es it. If passed anything else, it returns an object that can
+ * respond to the same text() function to return itself.
+ *
+ * @param {string} extension The extension to look for to see if it's a url. Accepts regex.
+ * @param {*} maybeUrl A url to an asset or a raw asset
+ */
+const maybeFetch = (extension) => (maybeUrl) => {
+  if (typeof maybeUrl === 'string' && maybeUrl.match(`.${extension}$`))
+    return fetch(maybeUrl)
+  return {
+    text() { return maybeUrl }
+  }
+}
+
 class Model {
   constructor({
       modelSvg: modelSvgPath,
@@ -68,7 +84,7 @@ class Model {
     .then(defs => {
       speciesDefs = defs
       const imagePaths = speciesDefs.map(def => def.image)
-      return Promise.all(imagePaths.map(url => fetch(url)))
+      return Promise.all(imagePaths.map(maybeFetch("svg")))
     })
     .then(speciesImages => Promise.all(speciesImages.map(image => image.text())))
     .then((speciesImageSvgs) => {

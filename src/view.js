@@ -77,34 +77,53 @@ export default class View {
     });
   }
 
+/**
+   * Returns a Promise which resolves to a fabric image object
+   *
+   * @param {*} imgDef
+   */
+  _getAgentImage(imgDef, imageSelector) {
+    if (imgDef.shape) {
+      const shapes = {
+        rect: fabric.Rect
+      }
+      return Promise.resolve(new shapes[imgDef.shape](imgDef.props))
+    } else {
+      return new Promise((resolve) => {
+        fabric.loadSVGFromString(imgDef, (objects, options, svgElements) => {
+          util.addAncestorAndClassAttributes(objects, svgElements)
+
+          if (imageSelector) {
+            objects = objects.filter(o => o.id === imageSelector)
+          }
+          resolve(fabric.util.groupSVGElements(objects, options))
+        });
+      });
+    }
+  }
+
   addAgentImage(agent) {
     agent.addingImage = true
-    fabric.loadSVGFromString(agent.species.image, (objects, options, svgElements) => {
-      util.addAncestorAndClassAttributes(objects, svgElements)
-
-      const imageSelector = agent.props.image_selector
-      if (imageSelector) {
-        objects = objects.filter(o => o.id === imageSelector)
-      }
-      const agentImage = fabric.util.groupSVGElements(objects, options)
+    this._getAgentImage(agent.species.image, agent.props.image_selector)
+    .then(agentImage => {
       if (!agentImage._organelle) agentImage._organelle = {}
-      agentImage._organelle.agent = agent
-      agentImage._organelle.imageSelector = imageSelector
+        agentImage._organelle.agent = agent
+        agentImage._organelle.imageSelector = agent.props.image_selector
 
-      if (agent.oldImage) {
-        this.canvas.remove(agent.oldImage)
-      }
-      this.canvas.add(agentImage)
-      util.preventInteraction(agentImage)
+        if (agent.oldImage) {
+          this.canvas.remove(agent.oldImage)
+        }
+        this.canvas.add(agentImage)
+        util.preventInteraction(agentImage)
 
-      if (this.newAgentImageProps) {
-        this.setPropertiesOnObject(agentImage,
-          this.newAgentImageProps.props, this.newAgentImageProps.isTemporary, this.newAgentImageProps.skip)
-      }
+        if (this.newAgentImageProps) {
+          this.setPropertiesOnObject(agentImage,
+            this.newAgentImageProps.props, this.newAgentImageProps.isTemporary, this.newAgentImageProps.skip)
+        }
 
-      this.position(agentImage, agent.props)
-      agent.addingImage = false
-      agent.agentImage = agentImage
+        this.position(agentImage, agent.props)
+        agent.addingImage = false
+        agent.agentImage = agentImage
     });
   }
 
@@ -178,6 +197,8 @@ export default class View {
   }
 
   render() {
+    if (!this.loaded) return
+
     for (let agent of this.world.agents) {
       if (!agent.addingImage && !agent.agentImage && !agent.dead) {
         this.addAgentImage(agent)
