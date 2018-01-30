@@ -10,7 +10,6 @@ var model,
     parentPhone
 
   Organelle.createModel({
-    speed: 10,
     container: {
       elId: "model",
       width: 960,
@@ -19,9 +18,9 @@ var model,
     modelSvg: "assets/melanocyte.svg",
     properties: {
       albino: false,
-      working_tyr1: true,
+      working_tyr1: false,
       working_myosin_5a: true,
-      open_gates: true
+      open_gates: false
     },
     calculatedProperties: {
       saturation: {
@@ -79,11 +78,9 @@ var model,
     },
     species: [
       "organelles/melanosome.yml",
-      "organelles/hexagon.yml",
-      "organelles/triangle.yml"
-      // "organelles/dots.yml"      
+      "organelles/dots.yml"
     ],
-    hotStart: 500,
+    hotStart: 1200,
     clickHandlers: [
       {
         selector: "#golgi_x5F_apparatus",
@@ -96,10 +93,6 @@ var model,
       {
         selector: "#nucleus_x5F_A",
         action: enterNucleusGame
-      },
-      {
-        species: "melanosome",
-        action: sayHiMelanosome
       }
     ]
   }).then(function(m) {
@@ -165,64 +158,16 @@ var model,
       const cellFill = model.view.getModelSvgObjectById("cellshape_0_Layer0_0_FILL")
       if (cellFill) {
         cellFill.setColor(colorStr)
-        // cellFill.set({opacity: saturation})
+        cellFill.set({opacity: saturation})
 
         if (model.world.getProperty("open_gates") && !model.world.getProperty("albino")) {
           const backgroundFill = model.view.getModelSvgObjectById("backcell_x5F_color")
           backgroundFill.setColor(colorStr)
-          // backgroundFill.set({opacity: Math.max(0.5, saturation)})
+          backgroundFill.set({opacity: Math.max(0.5, saturation)})
         }
       }
     })
-
-    model.on("view.click", evt => {
-      console.log("click!", evt.target)
-
-      if (evt.target._organelle.matches({selector: ".gate"})) {
-        console.log("clicked a gate", evt.target)
-      }
-      if (evt.target._organelle.matches({species: "melanosome"})) {
-        console.log("clicked a melanosome", evt.target._organelle.agent)
-      }
-    })
   });
-
-  function makeTransparent() {
-    makeEverythingTransparentExcept({})
-
-    model.on("view.hover", evt => {
-      if (evt.target) console.log(evt.target.id)
-    })
-
-    model.on("view.hover.enter", evt => {
-      const highlightClasses = [
-        ".gate-a",
-        ".gate-b",
-        ".gate-c",
-        ".gate-d",
-        "#golgi_x5F_apparatus",
-        "#nucleus"
-      ].join(",")
-      let matches = evt.target._organelle.matches({selector: highlightClasses});
-      if (matches) {
-        makeEverythingOpaque()
-        makeEverythingTransparentExcept({selector: matches})
-      }
-    })
-
-    model.on("view.hover.exit", evt => {
-      makeEverythingOpaque()
-      makeEverythingTransparentExcept({})
-    })
-  }
-
-  function makeEverythingTransparentExcept(skip) {
-    model.view.setPropertiesOnAllObjects({opacity: "*0.2"}, true, skip, true)
-  }
-
-  function makeEverythingOpaque() {
-    model.view.resetPropertiesOnAllObjects()
-  }
 
   function addClass(el, className) {
     if (el.classList)
@@ -415,10 +360,6 @@ var model,
     }
   }
 
-  function sayHiMelanosome(evt) {
-    console.log("melansome says hi", evt.agent)
-  }
-
   function observePropCheckbox(prop, callback) {
     document.getElementById(prop).onclick = function() {
       let val = document.getElementById(prop).checked
@@ -510,7 +451,7 @@ var model,
         model.setTimeout(waitingForBinding, 500)
       }
     }
-    
+
     model.setTimeout(waitingForBinding, 500)
   }
 

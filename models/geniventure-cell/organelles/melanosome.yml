@@ -5,7 +5,7 @@ spawn:
   'on':
     selector: "#golgi_x5F_apparatus path"
     at: random
-  every: 70
+  every: 45
 dieWhenExitingWorld: false
 properties:
   size: 0.1
