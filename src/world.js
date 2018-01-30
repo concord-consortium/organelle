@@ -36,6 +36,9 @@ export default class World extends PropertiesHolder {
         this.creationTimes[kind.name].nextCreation = 0
       }
     }
+
+    this._pathCacheIdIndex = 0
+    this._cachedPathPoints = {}
   }
 
   step() {
@@ -158,12 +161,39 @@ export default class World extends PropertiesHolder {
     return {x: 0, y: 0}
   }
 
+  /**
+   * If passed a path, this returns a point on the path at distance dist.
+   *
+   * If passed another SVG shape, it just returns the x,y location of the bounding box (for now).
+   *
+   * The native SVG method path.getPointAtLength(dist) is fairly slow. To reduce the time spent
+   * on this in a model with a lot of path following, we cache every result we find.
+   *
+   * In the basic Geniventure Melanocyte model, with about 30 followable paths, this allows a ~10x
+   * speed increase, and results in ~14,000 points cached, weighing about 7MB.
+   *
+   * @param {SVG Element} path
+   * @param {number} dist Optional distance measured in SVG units. Default 0.
+   */
   getPointAlongPath(path, dist) {
+    if (!path.cacheId) {
+      path.cacheId = ++this._pathCacheIdIndex
+    }
+    // use toFixed so as not to cache dist = 20 and dist = 20.00001 separately
+    const cacheStr = path.cacheId + "." + dist.toFixed()
+    if (this._cachedPathPoints[cacheStr]) {
+      return this._cachedPathPoints[cacheStr]
+    }
+    let val
     if (path.getPointAtLength) {
       dist = Math.max(0, dist)
-      return path.getPointAtLength(dist)
+      val = path.getPointAtLength(dist)
     } else {
-      return path.getBBox()
+      val = path.getBBox()
     }
+    // cache just the x and y, which is a (tiny) bit lighter than the SVGPoint returned above
+    const ret = {x: val.x, y: val.y}
+    this._cachedPathPoints[cacheStr] = ret
+    return ret
   }
 }
