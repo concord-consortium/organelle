@@ -48,6 +48,9 @@ class Model {
     const {elId, width, height} = container
     this.setSpeed(stepsPerSecond)
 
+    this._currentZoom = 1
+    this._targetZoom = 1
+
     this._onViewClick = this._onViewClick.bind(this)
     this._onViewHover = this._onViewHover.bind(this)
 
@@ -161,6 +164,10 @@ class Model {
         // assume we caught up, even if we only ran maxCatchUpSteps
         this.totalSteps = targetTotalSteps
 
+        if (this._currentZoom !== this._targetZoom) {
+          this._updateZoom()
+        }
+
         for (let i=0; i < this.timeouts.length; i++) {
           if (this.timeouts[i] && this.timeouts[i].step < this.totalSteps) {
             this.timeouts[i].func()
@@ -183,6 +190,35 @@ class Model {
     let stepCount = delay / this.stepPeriodMs,
         step = this.totalSteps + stepCount
     this.timeouts.push({step, func})
+  }
+
+  zoom(zoomLevel, center, timeMs) {
+    this._originalZoom = this.view.zoom
+    this._targetZoom = zoomLevel
+    this._targetZoomStart = Date.now()
+    this._targetZoomPeriod = timeMs
+
+    this._originalZoomCenter = this.view.zoomCenter
+    this._targetZoomCenter = center || this.view.center
+  }
+
+  resetZoom(timeMs) {
+    this.zoom(1, null, timeMs || 0)
+  }
+
+  _updateZoom() {
+    const now = Date.now()
+    const percZoomed = Math.min((now - this._targetZoomStart) / this._targetZoomPeriod, 1)
+    const percValue = (start, end) =>
+      start + (percZoomed * (end - start))
+    let currentCenter = {
+      x: percValue(this._originalZoomCenter.x, this._targetZoomCenter.x),
+      y: percValue(this._originalZoomCenter.y, this._targetZoomCenter.y)
+    }
+    this._currentZoom = percValue(this._originalZoom, this._targetZoom)
+
+    this.view.zoomCenter = currentCenter
+    this.view.zoom = this._currentZoom
   }
 
   on(event, listener) {

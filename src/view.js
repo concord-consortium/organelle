@@ -196,6 +196,31 @@ export default class View {
     delete this.newAgentImageProps
   }
 
+  get zoom() {
+    return this.canvas.getZoom()
+  }
+
+  set zoom(z) {
+    const {x, y} = this.zoomCenter
+    this.canvas.zoomToPoint(new fabric.Point(x, y), z)
+  }
+
+  get center() {
+    const center = this.canvas.getCenter()
+    return {x: center.left, y: center.top}
+  }
+
+  get zoomCenter() {
+    if (!this._zoomCenter) {
+      return this.center
+    }
+    return this._zoomCenter
+  }
+
+  set zoomCenter(c) {
+    this._zoomCenter = c
+  }
+
   render() {
     if (!this.loaded) return
 

@@ -1,3 +1,24 @@
+import { fabric } from 'fabric'
+// patch fabric.js:
+
+// improve zoomToPoint (see https://github.com/kangax/fabric.js/issues/2446):
+fabric.StaticCanvas.prototype.zoomToPoint = function (point, value) {
+  // TODO: just change the scale, preserve other transformations
+  var before = point;
+  this.viewportTransform[0] = value;
+  this.viewportTransform[3] = value;
+  this.viewportTransform[4] = 0;
+  this.viewportTransform[5] = 0;
+  this.viewportTransform[4] = (-point.x*value + this.width / 2);
+  this.viewportTransform[5] = (-point.y*value + this.height / 2) ;
+  this.renderAll();
+  for (var i = 0, len = this._objects.length; i < len; i++) {
+    this._objects[i].setCoords();
+  }
+  return this;
+};
+
+
 module.exports = {
   parseSVG(svgString) {
     let doc

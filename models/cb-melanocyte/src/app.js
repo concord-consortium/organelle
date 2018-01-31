@@ -175,6 +175,20 @@ function sayHiMelanosome(evt) {
   console.log("melansome says hi", evt.agent)
 }
 
+let zoomed = false
+function zoomToReceptor() {
+  if (!zoomed) {
+    model.zoom(7, {x: 500, y: 180}, 500)
+    document.getElementById("button-zoom").innerHTML = "Zoom out"
+    zoomed = true
+  } else {
+    model.resetZoom(500)
+    document.getElementById("button-zoom").innerHTML = "Zoom to receptor"
+    zoomed = false
+  }
+
+}
+
 function showHexBinding() {
   var a = model.world.createAgent(model.world.species[0]);
   a.state = "heading_to_receptor";
