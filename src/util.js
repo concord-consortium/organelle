@@ -67,7 +67,7 @@ module.exports = {
           }
         } else if (selectorVar.indexOf('.') === 0 && fabricObj._organelle) {
           const clazz = selectorVar.slice(1)
-          if (fabricObj._organelle.class.includes[clazz]) return selectorVar
+          if (fabricObj._organelle.class && fabricObj._organelle.class.includes[clazz]) return selectorVar
           if (checkAncestors && fabricObj._organelle.ancestors) {
             if (fabricObj._organelle.ancestors.classes.includes(clazz)) {
               return selectorVar

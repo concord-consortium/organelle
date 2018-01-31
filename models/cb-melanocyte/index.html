@@ -1,7 +1,7 @@
 <html>
   <head>
     <script type="text/javascript" src="../../organelle.js" charset="utf-8"></script>
-    <script type="text/javascript" src="lib/iframe-phone.js" charset="utf-8"></script>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
     <style media="screen" type="text/css">
       svg {
         background-color: white;
@@ -18,10 +18,22 @@
         -webkit-transition: opacity 6s;
         transition: opacity 6s;
       }
+
+      #buttons {
+        position: absolute;
+        right: 0;
+        bottom: 1vh;
+      }
     </style>
   </head>
   <body>
     <div id="model" class="model"></div>
+
+    <fieldset id="buttons">
+      <legend>Demo buttons</legend>
+      <button id="button-transparent" onClick="makeTransparent()">Show transparent hover</button><br />
+      <button id="button-zoom" onClick="zoomToReceptor()">Zoom to receptor</button>
+    </fieldset>
 
     <script type="text/javascript" src="src/app.js"></script>
   </body>
