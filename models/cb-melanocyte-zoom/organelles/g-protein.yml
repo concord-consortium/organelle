@@ -1,0 +1,40 @@
+---
+name: gProtein
+image: assets/g-protein.svg
+spawn:
+  'on':
+    selector: "#gprotein-paths-to-receptor path"
+    at: 0
+    which: random
+  # every: 60
+  never: true
+dieWhenExitingWorld: false
+properties:
+  size: 1
+  image_selector: gbody
+initialState: away
+rules:
+  towards:
+  - follow:
+      selector: "#gprotein-paths-to-receptor path"
+      which: nearest
+      direction: backward
+      finally:
+        switch_state: wait_near_receptor
+  wait_near_receptor:
+  - wait:
+      for: 5
+      finally:
+        switch_state: away
+  away:
+  - follow:
+      selector: "#gprotein-paths-to-receptor path"
+      which: nearest
+      direction: forward
+      finally:
+        switch_state: towards
+  waitingForEver:
+  - wait:
+      for: 50
+      finally:
+        switch_state: waitingForEver

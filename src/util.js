@@ -45,6 +45,9 @@ module.exports = {
   },
 
   /**
+   * Checks to see if an image object matches a query selector. A query selector can either
+   * be a CSS-style string or an agent species name.
+   *
    * @param {string} selector A simplified CSS-style selector. It can match ".objClass",
    *                          "#objId", can have variants separated by commas, and will
    *                          optionally check ancestors.
@@ -79,6 +82,19 @@ module.exports = {
       return fabricObj._organelle.agent.species.name === species
     }
     return false
+  },
+
+  /**
+   * Checks to see if an object matches a selector, where the selector may be an object,
+   * an array of objects, or a query selector as in util.matches
+   *
+   * @param {*} query One object, an array of objects, or a selector
+   * @param {object} fabricObject
+   */
+  matchesObjectOrQuery(query, fabricObject) {
+    return fabricObject === query ||
+      (Array.isArray(query) && query.includes(fabricObject)) ||
+      ((query.selector || query.species) && this.matches(query, fabricObject, true))
   },
 
   /**

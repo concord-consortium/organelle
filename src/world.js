@@ -12,10 +12,10 @@ export default class World extends PropertiesHolder {
     this.bounds.right = this.bounds.left + this.bounds.width
     this.bounds.bottom = this.bounds.top + this.bounds.height
 
-    const b = this.bounds
-    const viewBox = [b.left, b.top, b.width, b.height].join(' ')
+    // const b = this.bounds
+    // const viewBox = [b.left, b.top, b.width, b.height].join(' ')
 
-    this.worldSvgModel.setAttribute("viewBox", viewBox)
+    // this.worldSvgModel.setAttribute("viewBox", viewBox)
 
     this.tick = 0
     this.species = options.species

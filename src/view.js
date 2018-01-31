@@ -117,8 +117,10 @@ export default class View {
         util.preventInteraction(agentImage)
 
         if (this.newAgentImageProps) {
-          this.setPropertiesOnObject(agentImage,
-            this.newAgentImageProps.props, this.newAgentImageProps.isTemporary, this.newAgentImageProps.skip)
+          if (!util.matchesObjectOrQuery(this.newAgentImageProps.skip, agentImage)) {
+            this.setPropertiesOnObject(agentImage,
+              this.newAgentImageProps.props, this.newAgentImageProps.isTemporary)
+          }
         }
 
         this.position(agentImage, agent.props)
@@ -146,8 +148,34 @@ export default class View {
     return viewObjects
   }
 
+  /**
+   * Returns the first view object with the given id
+   *
+   * @param {string} id
+   */
   getModelSvgObjectById(id) {
     return this.getAllViewObjects().find(o => o.id === id)
+  }
+
+  /**
+   * Returns all objects that match the query selection, as defined by util.js:matches
+   *
+   * @param {string} query CSS-style selector: ".classExample", "#idExample", ".option1, .option2"
+   * @param {*} checkAncestors Whether to check ids/classnames of parent objects
+   */
+  querySelectorAll(query, checkAncestors) {
+    const viewObjects = this.getAllViewObjects()
+    return viewObjects.filter( o => util.matches({selector: query}, o, checkAncestors))
+  }
+
+  setPropertiesOnObjectsByQuery(query, props, isTemporary, checkAncestors, includeNewAgents) {
+    const queryObjects = this.querySelectorAll(query, checkAncestors)
+    queryObjects.forEach(o => {
+      this.setPropertiesOnObject(o, props, isTemporary)
+    })
+    if (includeNewAgents) {
+      this.newAgentImageProps = {props, isTemporary, skip}
+    }
   }
 
   /**
@@ -157,21 +185,19 @@ export default class View {
    * @param {any} skip One object, an array of objects, or a selector that will be skipped
    */
   setPropertiesOnAllObjects(props, isTemporary, skip, includeNewAgents) {
-    const viewObjects = this.getAllViewObjects()
-    viewObjects.forEach(o => {
-      this.setPropertiesOnObject(o, props, isTemporary, skip)
+    let queryObjects = this.getAllViewObjects()
+    if (skip) {
+      queryObjects = queryObjects.filter( o => !util.matchesObjectOrQuery(skip, o) )
+    }
+    queryObjects.forEach(o => {
+      this.setPropertiesOnObject(o, props, isTemporary)
     })
     if (includeNewAgents) {
       this.newAgentImageProps = {props, isTemporary, skip}
     }
   }
 
-  setPropertiesOnObject(o, props, isTemporary, skip) {
-    if (o === skip ||
-      (Array.isArray(skip) && skip.includes(o)) ||
-      ((skip.selector || skip.species) && util.matches(skip, o, true))) {
-        return
-    }
+  setPropertiesOnObject(o, props, isTemporary) {
     if (isTemporary) {
       if (!o._organelle) o._organelle = {}
       o._organelle.oldProps = {...props}
@@ -194,6 +220,14 @@ export default class View {
       }
     })
     delete this.newAgentImageProps
+  }
+
+  hide(query, checkAncestors) {
+    this.setPropertiesOnObjectsByQuery(query, {visible: false}, false, checkAncestors, false)
+  }
+
+  show(query, checkAncestors) {
+    this.setPropertiesOnObjectsByQuery(query, {visible: true}, false, checkAncestors, false)
   }
 
   get zoom() {

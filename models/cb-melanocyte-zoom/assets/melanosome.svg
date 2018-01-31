@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg viewBox="0 0 50 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;">
+    <g id="melanosome_1">
+        <path d="M31.5,16.1C31.3,10.4 29.5,6.3 26,3.6C23,0.9 19.6,-0.3 15.6,0.3C14.3,0.4 13,0.6 11.9,0.8C11.5,0.9 11.1,1 10.6,1.1C6.9,2 4,4.1 2,7.4C0.5,9.9 -0.3,12.9 -0.3,16.1C-0.1,20.6 1.5,24.4 4.4,27.4C7.4,30.3 11.3,31.9 16,32C18.3,31.9 20.5,31.2 22.7,30C24.8,28.8 26.6,27.5 27.9,26.1C30.3,23.6 31.5,20.3 31.5,16.1Z" style="fill:url(#_Radial1);fill-rule:nonzero;stroke:rgb(70,70,70);stroke-width:1px;"/>
+    </g>
+    <g id="melanosome_2">
+        <path d="M31.5,16.1C31.3,10.4 29.5,6.3 26,3.6C23,0.9 19.6,-0.3 15.6,0.3C14.3,0.4 13,0.6 11.9,0.8C11.5,0.9 11.1,1 10.6,1.1C6.9,2 4,4.1 2,7.4C0.5,9.9 -0.3,12.9 -0.3,16.1C-0.1,20.6 1.5,24.4 4.4,27.4C7.4,30.3 11.3,31.9 16,32C18.3,31.9 20.5,31.2 22.7,30C24.8,28.8 26.6,27.5 27.9,26.1C30.3,23.6 31.5,20.3 31.5,16.1Z" style="fill:url(#_Radial2);fill-rule:nonzero;stroke:rgb(70,70,70);stroke-width:1px;"/>
+    </g>
+    <g id="melanosome_3">
+        <path d="M31.5,16.1C31.3,10.4 29.5,6.3 26,3.6C23,0.9 19.6,-0.3 15.6,0.3C14.3,0.4 13,0.6 11.9,0.8C11.5,0.9 11.1,1 10.6,1.1C6.9,2 4,4.1 2,7.4C0.5,9.9 -0.3,12.9 -0.3,16.1C-0.1,20.6 1.5,24.4 4.4,27.4C7.4,30.3 11.3,31.9 16,32C18.3,31.9 20.5,31.2 22.7,30C24.8,28.8 26.6,27.5 27.9,26.1C30.3,23.6 31.5,20.3 31.5,16.1Z" style="fill:url(#_Radial3);fill-rule:nonzero;stroke:rgb(70,70,70);stroke-width:1px;"/>
+    </g>
+    <g id="melanosome_4">
+        <path d="M31.5,16.1C31.3,10.4 29.5,6.3 26,3.6C23,0.9 19.6,-0.3 15.6,0.3C14.3,0.4 13,0.6 11.9,0.8C11.5,0.9 11.1,1 10.6,1.1C6.9,2 4,4.1 2,7.4C0.5,9.9 -0.3,12.9 -0.3,16.1C-0.1,20.6 1.5,24.4 4.4,27.4C7.4,30.3 11.3,31.9 16,32C18.3,31.9 20.5,31.2 22.7,30C24.8,28.8 26.6,27.5 27.9,26.1C30.3,23.6 31.5,20.3 31.5,16.1Z" style="fill:url(#_Radial4);fill-rule:nonzero;stroke:rgb(70,70,70);stroke-width:1px;"/>
+    </g>
+    <defs>
+        <radialGradient id="_Radial1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.4871,0,0,-16.4871,15.5554,16.1143)"><stop offset="0" style="stop-color:rgb(255,255,255);stop-opacity:0.105882"/><stop offset="0.53" style="stop-color:rgb(255,255,255);stop-opacity:0.2"/><stop offset="1" style="stop-color:rgb(255,255,255);stop-opacity:1"/></radialGradient>
+        <radialGradient id="_Radial2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.4871,0,0,-16.4871,15.5554,16.1143)"><stop offset="0" style="stop-color:rgb(255,220,200);stop-opacity:0.2"/><stop offset="0.45" style="stop-color:rgb(255,220,200);stop-opacity:0.3"/><stop offset="1" style="stop-color:rgb(237,115,80);stop-opacity:1"/></radialGradient>
+        <radialGradient id="_Radial3" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.4871,0,0,-16.4871,15.5554,16.1143)"><stop offset="0" style="stop-color:rgb(255,206,180);stop-opacity:0.3"/><stop offset="0.3" style="stop-color:rgb(255,206,180);stop-opacity:0.4"/><stop offset="1" style="stop-color:rgb(171,74,25);stop-opacity:1"/></radialGradient>
+        <radialGradient id="_Radial4" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.4871,0,0,-16.4871,15.5554,16.1143)"><stop offset="0" style="stop-color:rgb(255,206,180);stop-opacity:0.5"/><stop offset="0.1" style="stop-color:rgb(255,206,180);stop-opacity:0.8"/><stop offset="1" style="stop-color:rgb(89, 83, 80);stop-opacity:1"/></radialGradient>
+    </defs>
+</svg>

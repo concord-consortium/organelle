@@ -1,4 +1,7 @@
-var model;
+var model,
+    gproteins,
+    bindingAgent,
+    isBound = false;
 
 Organelle.createModel({
   container: {
@@ -69,9 +72,11 @@ Organelle.createModel({
   },
   species: [
     "organelles/melanosome.yml",
-    // "organelles/hexagon.yml",
-    // "organelles/triangle.yml",
-    "organelles/dots.yml"
+    "organelles/hexagon.yml",
+    "organelles/triangle.yml",
+    "organelles/g-protein.yml",
+    "organelles/g-protein-body.yml",
+    "organelles/g-protein-part.yml"
   ],
   hotStart: 1500,
   clickHandlers: [
@@ -86,7 +91,15 @@ Organelle.createModel({
   ]
 }).then(function(m) {
   window.model = m
-  model = m;
+  model = m
+
+  gproteins = []
+
+  for (var i=0; i < 4; i++) {
+    var g = model.world.createAgent(model.world.species[3]);
+    g.setProperty("speed", 0.5 + i/10)
+    gproteins.push(g)
+  }
 
   model.on("model.step", () => {
     let saturation = Math.min(model.world.getProperty("saturation"), 1) || 0,
@@ -175,20 +188,50 @@ function sayHiMelanosome(evt) {
   console.log("melansome says hi", evt.agent)
 }
 
-let zoomed = false
-function zoomToReceptor() {
-  if (!zoomed) {
-    model.zoom(7, {x: 500, y: 180}, 800)
-    document.getElementById("button-zoom").innerHTML = "Zoom out"
-    model.view.show("#receptor_x5F_protein", true)
-    model.view.hide("#receptor_zoomed_out", true)
-    zoomed = true
+function waitForGProtein() {
+  var proteinToBreak = null
+  for (var i = 0; i < gproteins.length; i++) {
+    if (gproteins[i].state == "wait_near_receptor") {
+      proteinToBreak = gproteins[i]
+      break
+    }
+  }
+  if (proteinToBreak) {
+    proteinToBreak.state = "waitingForEver"
+    model.setTimeout( () => {
+      var body = model.world.createAgent(model.world.species[4]);
+      body.setProperties({x: proteinToBreak.getProperty("x"), y: proteinToBreak.getProperty("y"), speed: 0.01})
+
+      var part = model.world.createAgent(model.world.species[5]);
+      part.setProperties({x: proteinToBreak.getProperty("x"), y: proteinToBreak.getProperty("y"), speed: 0.01})
+
+      proteinToBreak.die()
+    }, 100)
   } else {
-    model.resetZoom(800)
-    document.getElementById("button-zoom").innerHTML = "Zoom to receptor"
+    model.setTimeout(waitForGProtein, 20)
+  }
+}
+
+function showHexBinding() {
+  var a = model.world.createAgent(model.world.species[1]);
+  a.state = "heading_to_receptor";
+
+  var transformReceptor = function() {
     model.view.hide("#receptor_x5F_protein", true)
-    model.view.show("#receptor_zoomed_out", true)
-    zoomed = false
+    model.view.show("#receptor_x5F_protein_bound", true)
+
+    waitForGProtein()
   }
 
+  var waitingForBinding = function() {
+    console.log("waiting");
+    if (a.state == "waiting_on_receptor") {
+      console.log("arrived!")
+      transformReceptor();
+    } else {
+      model.setTimeout(waitingForBinding, 200)
+    }
+  }
+
+  model.setTimeout(waitingForBinding, 200)
 }
