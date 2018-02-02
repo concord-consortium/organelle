@@ -96,7 +96,7 @@ Organelle.createModel({
   gproteins = []
 
   for (var i=0; i < 4; i++) {
-    var g = model.world.createAgent(model.world.species[3]);
+    var g = model.world.createAgent(model.world.species.gProtein);
     g.setProperty("speed", 0.5 + i/10)
     gproteins.push(g)
   }

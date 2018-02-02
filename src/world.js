@@ -18,16 +18,19 @@ export default class World extends PropertiesHolder {
     // this.worldSvgModel.setAttribute("viewBox", viewBox)
 
     this.tick = 0
-    this.species = options.species
+    this.speciesArr = options.species
+    this.species = {}
     this.agents = []
     this.deadAgents = []
 
-
+    for (let kind of this.speciesArr) {
+      this.species[kind.name] = kind
+    }
 
     this.creationTimes = {}
 
     // refactor this into a spawning helper
-    for (let kind of this.species) {
+    for (let kind of this.speciesArr) {
       if (kind.spawn.every) {
         this.creationTimes[kind.name] = {}
         this.creationTimes[kind.name].nextCreation = kind.spawn.every
@@ -43,7 +46,7 @@ export default class World extends PropertiesHolder {
 
   step() {
     this.tick++
-    for (let kind of this.species) {
+    for (let kind of this.speciesArr) {
       if (this.creationTimes[kind.name] && this.creationTimes[kind.name].nextCreation < this.tick) {
         this.creationTimes[kind.name].nextCreation = this.tick + kind.spawn.every
         this.createAgent(kind)
