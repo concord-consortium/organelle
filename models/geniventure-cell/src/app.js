@@ -17,8 +17,8 @@ var model,
     },
     modelSvg: "assets/melanocyte.svg",
     properties: {
-      albino: false,
-      working_tyr1: false,
+      albino: true,
+      working_tyr1: true,
       working_myosin_5a: true,
       open_gates: false
     },
@@ -78,9 +78,10 @@ var model,
     },
     species: [
       "organelles/melanosome.yml",
+      "organelles/zoomed-melanosome.yml",
       "organelles/dots.yml"
     ],
-    hotStart: 1200,
+    hotStart: 10,
     clickHandlers: [
       {
         selector: "#golgi_x5F_apparatus",
@@ -123,6 +124,7 @@ var model,
         if (challenge) {
           initialDrakeColor = challenge.split("-")[0]
           finalDrakeColor = challenge.split("-")[1]
+          console.log(initialDrakeColor)
           setCellPhenotype(initialDrakeColor)
           setGameUrl(initialDrakeColor, finalDrakeColor)
         }
@@ -197,40 +199,59 @@ var model,
 
     iframe.src = gameUrl
 
-    let zoomDelay = 1300,
-        iframeDelay = initialDrakeColor === "frost" ? 1800 : initialDrakeColor === "lava" ? 2300 : 2800,
-        modelStopDelay = 4000
-    Snap.animate(svg.attr("viewBox").vb.split(" "), [391, 518, 72, 45],
-      function (vals) { svg.attr("viewBox", vals.join(" ")); }, zoomDelay
-    );
+    let iframeDelay = 500;
+    model.zoom(16, {x: 320.5, y: 405.5}, 1200).then(() => {
+      createdAgent = model.world.createAgent(model.world.species.zoomedMelanosome)
+      model.on("zoomedMelanosome.notify.grown", () => {
+        model.stop()
+        setTimeout( () => {
+          var phone = new iframePhone.ParentEndpoint(iframe)
+          phone.addListener('activityExit', function (content) {
+            console.log("exit")
+            setTimeout(exitProteinGame, 200)
+          })
+          phone.addListener('activityWin', function (content) {
+            console.log("win!")
+            setTimeout(exitProteinGame, 200)
+            setCellPhenotype(finalDrakeColor)
+            model.setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 4000)
+          })
 
-    model.setTimeout( () => {
-      createdAgent = model.world.createAgent(model.world.species[1])
-    }, zoomDelay)
-    model.setTimeout( () => {
-      var phone = new iframePhone.ParentEndpoint(iframe)
-      phone.addListener('activityExit', function (content) {
-        console.log("exit")
-        setTimeout(exitProteinGame, 1000)
+          removeClass(wrapper, "hidden-iframe")
+        }, iframeDelay)
       })
-      phone.addListener('activityWin', function (content) {
-        console.log("win!")
-        setTimeout(exitProteinGame, 1000)
-        setCellPhenotype(finalDrakeColor)
-        model.setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 4000)
-      })
+    })
+    // Snap.animate(svg.attr("viewBox").vb.split(" "), [391, 518, 72, 45],
+    //   function (vals) { svg.attr("viewBox", vals.join(" ")); }, zoomDelay
+    // );
 
-      removeClass(wrapper, "hidden-iframe")
-    }, iframeDelay)
-    model.setTimeout( () => {
-      model.stop()
-    }, modelStopDelay)
+    // model.setTimeout( () => {
+    //   createdAgent = model.world.createAgent(model.world.species[1])
+    // }, zoomDelay)
+    // model.setTimeout( () => {
+    //   var phone = new iframePhone.ParentEndpoint(iframe)
+    //   phone.addListener('activityExit', function (content) {
+    //     console.log("exit")
+    //     setTimeout(exitProteinGame, 1000)
+    //   })
+    //   phone.addListener('activityWin', function (content) {
+    //     console.log("win!")
+    //     setTimeout(exitProteinGame, 1000)
+    //     setCellPhenotype(finalDrakeColor)
+    //     model.setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 4000)
+    //   })
 
-    reverseZoom = function() {
-      Snap.animate(svg.attr("viewBox").vb.split(" "), [0, 0, 1280, 800],
-        function (vals) { svg.attr("viewBox", vals.join(" ")); }, 1500
-      )
-    }
+    //   removeClass(wrapper, "hidden-iframe")
+    // }, iframeDelay)
+    // model.setTimeout( () => {
+    //   model.stop()
+    // }, modelStopDelay)
+
+    // reverseZoom = function() {
+    //   Snap.animate(svg.attr("viewBox").vb.split(" "), [0, 0, 1280, 800],
+    //     function (vals) { svg.attr("viewBox", vals.join(" ")); }, 1500
+    //   )
+    // }
   }
 
 
@@ -241,17 +262,18 @@ var model,
       createdAgent.setProperty("size", 0.1)
       createdAgent.state = "growing"
     }
-    model.step(2000)
+    model.step(600)
 
     setTimeout(function() {
       iframe.src = ""
-      reverseZoom()
+      model.resetZoom(1500)
       addClass(wrapper, "hidden-iframe")
       removeClass(wrapper, "temp-iframe")
 
       model.setTimeout(function() {
         if (gameType === "size") {
-          createdAgent.species = model.world.species[0]
+          createdAgent.species = model.world.species.melanosome
+          createdAgent.state = "seeking_microtuble"
         }
         entering = false
       }, 600)
@@ -397,6 +419,8 @@ var model,
     setPropCheckbox("working_tyr1", colorProps[color][1])
     setPropCheckbox("working_myosin_5a", colorProps[color][2])
     setPropCheckbox("open_gates", colorProps[color][3])
+
+    model.step(800)
   }
 
   function setGameUrl(initial, final, forceNewShorthand) {
@@ -425,34 +449,6 @@ var model,
 
 
     gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand="+alleleShorthand+"&initial-state="+gameType+"&target-color="+final+stars+nucleusString
-  }
-
-  function showHexBinding() {
-    var a = model.world.createAgent(model.world.species[0]);
-    a.state = "heading_to_receptor";
-
-    var transformReceptor = function() {
-      var protein = this.Snap.select("#receptor_x5F_protein")
-
-      document.getElementById("sensor_0_Layer0_0_FILL").style["fill"] = "rgb(239,1,82)"
-      var a = this.Snap.select("#sensor_0_Layer0_0_FILL")
-      b = a.getBBox()
-      matrix = new Snap.Matrix()
-      matrix.translate(-201, -78)
-      matrix.scale(1.3)
-      a.nativeAttrs({transform: matrix})
-    }
-
-    var waitingForBinding = function() {
-      console.log("waiting");
-      if (a.state == "waiting_on_receptor") {
-        transformReceptor();
-      } else {
-        model.setTimeout(waitingForBinding, 500)
-      }
-    }
-
-    model.setTimeout(waitingForBinding, 500)
   }
 
   parentPhone = iframePhone.getIFrameEndpoint()

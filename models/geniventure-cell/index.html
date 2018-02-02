@@ -12,8 +12,8 @@
         left: 50%;
         top: 0;
         transform: translate(-50%, 0);
-        height: 100vh;
-        width: 160vh;
+        width: 960px;       /* need to make responsize with 160 vh */
+        height: 600px;      /* need to make responsize with 100 vh */
         opacity: 1;
         -webkit-transition: opacity 6s;
         transition: opacity 6s;
@@ -45,7 +45,7 @@
     </style>
   </head>
   <body>
-    <div id="model" class="model" />
+    <div id="model" class="model" ></div>
     <div id="protein-game-wrapper" class="model hidden-iframe">
       <iframe id="protein-game"></iframe>
     </div>

@@ -3,14 +3,14 @@ name: dot
 image:
   shape: rect
   props:
-    height: 2
-    width: 2
+    height: 3
+    width: 3
     fill: rgb(0,204,153)
 spawn:
   'on':
     selector: "#intercellular-paths path"
     which: random
-  every: 19
+  every: 20
   # never: true
 dieWhenExitingWorld: false
 properties:

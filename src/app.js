@@ -201,10 +201,14 @@ class Model {
 
     this._originalZoomCenter = this.view.zoomCenter
     this._targetZoomCenter = center || this.view.center
+
+    return new Promise( (resolve) => {
+      this._zoomCompletion = resolve
+    })
   }
 
   resetZoom(timeMs) {
-    this.zoom(1, null, timeMs || 0)
+    return this.zoom(1, null, timeMs || 0)
   }
 
   _updateZoom() {
@@ -220,6 +224,11 @@ class Model {
 
     this.view.zoomCenter = currentCenter
     this.view.zoom = this._currentZoom
+
+    if (percZoomed === 1 && this._zoomCompletion) {
+      this._zoomCompletion()
+      this._zoomCompletion = null
+    }
   }
 
   on(event, listener) {
