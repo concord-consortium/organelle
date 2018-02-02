@@ -273,9 +273,17 @@ class Model {
   }
 
   _notifyListeners(event, evtProps) {
-    if (!this.listeners[event]) return
-    for (let listener of this.listeners[event]) {
-      listener(evtProps)
+    // given an event name "x.y.z", we want to notify listeners of "x",
+    // of "x.y" and of "x.y.z"
+    const eventParts = event.split('.')
+    while (eventParts.length) {
+      let eventName = eventParts.join(".")
+      if (this.listeners[eventName]) {
+        for (let listener of this.listeners[eventName]) {
+          listener(evtProps)
+        }
+      }
+      eventParts.pop()
     }
   }
 }
