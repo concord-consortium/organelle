@@ -141,6 +141,10 @@ Organelle.createModel({
       console.log("clicked a melanosome", evt.target._organelle.agent)
     }
   })
+
+  model.on("gProtein.notify.bound", evt => {
+    console.log("woooo!!!", evt)
+  })
 });
 
 function makeTransparent() {

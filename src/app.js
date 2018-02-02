@@ -53,6 +53,7 @@ class Model {
 
     this._onViewClick = this._onViewClick.bind(this)
     this._onViewHover = this._onViewHover.bind(this)
+    this._onWorldEvent = this._onWorldEvent.bind(this)
 
     // initialize loading view
     this.view = new View(null, elId, width, height, this._onViewClick, this._onViewHover)
@@ -102,7 +103,7 @@ class Model {
     this.creationPromise = Promise.all([loadModelSvg, loadSpecies])
     .then(data => {
       const [worldSvgString, speciesDefs] = data
-      this.world = new World({worldSvgString, bounds, properties, calculatedProperties, species: speciesDefs})
+      this.world = new World({worldSvgString, bounds, properties, calculatedProperties, species: speciesDefs, notify: this._onWorldEvent})
 
       // autorun some steps before initial render
       for (let i = 0; i < hotStart; i++) {
@@ -269,6 +270,10 @@ class Model {
       return util.matches(match, evt.target, checkAncestors)
     }
 
+    this._notifyListeners(eventName, evt)
+  }
+
+  _onWorldEvent(eventName, evt) {
     this._notifyListeners(eventName, evt)
   }
 

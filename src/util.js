@@ -57,6 +57,9 @@ module.exports = {
    * @returns true or the name of the selector if matched
    */
   matches({selector="", species}, fabricObj, checkAncestors) {
+    if (!fabricObj) {
+      return false
+    }
     if (selector) {
       const selectorVars = selector.split(",").map(sel => sel.trim())
       for (let selectorVar of selectorVars) {

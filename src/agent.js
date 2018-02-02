@@ -7,7 +7,7 @@ export default class Agent extends PropertiesHolder {
    * image       image to load, if any
    * selector    selector in image
    */
-  constructor(species, world) {
+  constructor(species, world, listener) {
     let properties = species.properties || {},
 
         defaultProperties = {
@@ -21,6 +21,7 @@ export default class Agent extends PropertiesHolder {
 
     this.species = species
     this.world = world
+    this.listener = listener
 
     this.references = {}
     this.taggedFacts = {}
@@ -36,6 +37,8 @@ export default class Agent extends PropertiesHolder {
     }
 
     this.state = species.initialState || "initialization"
+
+    this.stateChangeCount = 0     // updates each time we change state
 
     // really?
     this.step()
@@ -64,13 +67,22 @@ export default class Agent extends PropertiesHolder {
       }
     }
     if (task.switch_state) {
-      this.state = task.switch_state
+      if (this.species.rules[task.switch_state]) {
+        this.state = task.switch_state
+        this.stateChangeCount++
+      } else {
+        throw Error(`Can't switch state to "${task.switch_state}", requested by ${this.species.name} rules`)
+      }
     }
     for (let taskName of Object.keys(task)) {
       if (this["task_"+taskName] && typeof this["task_"+taskName] === "function") {
         let complete = this["task_"+taskName](task[taskName])
         if (complete && task[taskName].finally) {
           this.doTask(task[taskName].finally)
+        }
+      } else {
+        if (taskName !== "debugger" && taskName !== "set" && taskName !== "switch_state") {
+          throw Error(`"${taskName}" is not a known agent task, requested by ${this.species.name} rules`)
         }
       }
     }
@@ -99,7 +111,7 @@ export default class Agent extends PropertiesHolder {
   }
 
   task_move_to(val) {
-    let key = JSON.stringify(val),
+    let key = this.stateChangeCount + JSON.stringify(val),
         x, y
     if (this.references[key]) {
       ({x, y} = this.references[key])
@@ -117,7 +129,7 @@ export default class Agent extends PropertiesHolder {
   }
 
   task_follow(val) {
-    let key = JSON.stringify(val),
+    let key = this.stateChangeCount + JSON.stringify(val),
         speed = this.getNumber(this.props.speed, 1),
         direction = val.direction === "backward" ? -1 : 1,
         pathInfo
@@ -148,6 +160,15 @@ export default class Agent extends PropertiesHolder {
     return arrived
   }
 
+  task_notify(message) {
+    const key = this.stateChangeCount + message
+    if (this.references[key]) {
+      return
+    }
+    this.references[key] = true
+    this.listener.notify(this, message)
+  }
+
   travelTo({x, y}) {
     let dx = x - this.props.x,
         dy = y - this.props.y,
@@ -171,15 +192,10 @@ export default class Agent extends PropertiesHolder {
     this.props.image_selector = selector
   }
 
-  task_set_attr(val) {
-    // FIXME
-    debugger
-    // this.view.setAttr(val)
-  }
-
   task_wait(val) {
-    let key = JSON.stringify(val),
+    let key = this.stateChangeCount + JSON.stringify(val),
         waitTime
+    if (val === "forever") return
     if (this.references[key]) {
       waitTime = this.references[key]
     } else {
@@ -196,8 +212,12 @@ export default class Agent extends PropertiesHolder {
 
   task_die(val) {
     if (val) {
-      this.dead = true
+      this.die()
     }
+  }
+
+  die() {
+    this.dead = true
   }
 
   // utils, refactor

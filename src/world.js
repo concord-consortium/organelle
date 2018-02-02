@@ -40,6 +40,9 @@ export default class World extends PropertiesHolder {
       }
     }
 
+    this._agentNotified = this._agentNotified.bind(this)
+    this.notify = options.notify
+
     this._pathCacheIdIndex = 0
     this._cachedPathPoints = {}
   }
@@ -72,7 +75,7 @@ export default class World extends PropertiesHolder {
   }
 
   createAgent(kind) {
-    let agent = new Agent(kind, this)
+    let agent = new Agent(kind, this, {notify: this._agentNotified})
     this.agents.push(agent)
     return agent
   }
@@ -84,6 +87,11 @@ export default class World extends PropertiesHolder {
   isInWorld({x, y}) {
     return x >= this.bounds.left && x <= this.bounds.right &&
         y >= this.bounds.top && y <= this.bounds.bottom
+  }
+
+  _agentNotified(agent, message) {
+    const evtName = `${agent.species.name}.notify${typeof message === 'string' ? '.' + message : ''}`
+    this.notify(evtName, {agent: agent, message: message})
   }
 
   getPath(props, {x: agent_x, y: agent_y}) {
