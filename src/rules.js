@@ -179,5 +179,6 @@ function runRules (world, agent) {
 module.exports = {
   runRules,
   getValue,
-  checkExpression
+  checkExpression,
+  getEntityAndProp
 }

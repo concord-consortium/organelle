@@ -1,6 +1,6 @@
 import PropertiesHolder from "./properties-holder"
 import rules from './rules'
-const { runRules } = rules
+const { runRules, getEntityAndProp } = rules
 
 export default class Agent extends PropertiesHolder {
   /**
@@ -61,11 +61,6 @@ export default class Agent extends PropertiesHolder {
     if (task.debugger) {
       debugger
     }
-    if (task.set) {
-      for (let prop of Object.keys(task.set)) {
-        this.props[prop] = task.set[prop]
-      }
-    }
     if (task.switch_state) {
       if (this.species.rules[task.switch_state]) {
         this.state = task.switch_state
@@ -107,6 +102,18 @@ export default class Agent extends PropertiesHolder {
       }
     } else {
       this.props[val.prop] += val.by
+    }
+  }
+
+  /**
+   * set:
+   *   size: 0.5
+   *   world.some_boolean: false
+   */
+  task_set(val) {
+    for (let prop of Object.keys(val)) {
+      const { entity, prop: propName } = getEntityAndProp(prop, this.world, this);
+      entity.setProperty(propName, val[prop])
     }
   }
 

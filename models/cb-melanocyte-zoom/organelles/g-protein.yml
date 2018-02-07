@@ -10,22 +10,24 @@ spawn:
   never: true
 dieWhenExitingWorld: false
 properties:
-  size: 1
+  size: 0.8
   image_selector: gbody
 initialState: away
 rules:
   towards:
   - follow:
       selector: "#gprotein-paths-to-receptor path"
-      which: nearest
+      which: random
       direction: backward
       finally:
-        switch_state: wait_near_receptor
-  wait_near_receptor:
-  - wait:
-      for: 5
-      finally:
-        switch_state: away
+        switch_state: check_if_bound
+  check_if_bound:
+  - if:
+      fact: world.receptor_bound
+    then:
+      switch_state: away
+    else:
+      switch_state: bind_to_receptor
   away:
   - follow:
       selector: "#gprotein-paths-to-receptor path"
@@ -33,8 +35,13 @@ rules:
       direction: forward
       finally:
         switch_state: towards
-  waitingForEver:
-  - wait:
-      for: 50
+  bind_to_receptor:
+  - move_to:
+      selector: "#path-away-from-receptor-part"
       finally:
-        switch_state: waitingForEver
+        switch_state: bound
+  bound:
+  - notify: "bound"
+  - set:
+      world.receptor_bound: true
+  - wait: forever
