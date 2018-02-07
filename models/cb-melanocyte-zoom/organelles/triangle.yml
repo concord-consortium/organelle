@@ -9,11 +9,15 @@ spawn:
   # never: true
 dieWhenExitingWorld: false
 properties:
-  speed: 1.2
+  speed: [0.9, 1.2]
   size: 1
+  rotation_speed: [-2, 2]
 initialState: flowing
 rules:
   flowing:
+  - change:
+      prop: direction
+      by: rotation_speed
   - follow:
       selector: "#intercellular-paths path"
       which: nearest

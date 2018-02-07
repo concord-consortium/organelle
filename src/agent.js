@@ -93,16 +93,17 @@ export default class Agent extends PropertiesHolder {
   }
 
   task_change(val) {
+    const by = this.getNumber(val.by)
     if (typeof val.until === "number") {
-      let complete = val.by > 0 ? this.props[val.prop] >= val.until : this.props[val.prop] <= val.until
+      let complete = by > 0 ? this.props[val.prop] >= val.until : this.props[val.prop] <= val.until
       if (!complete) {
-        let bounds = val.by > 0 ? Math.min : Math.max
-        this.props[val.prop] = bounds(this.props[val.prop] + val.by, val.until)
+        let bounds = by > 0 ? Math.min : Math.max
+        this.props[val.prop] = bounds(this.props[val.prop] + by, val.until)
       } else {
         return true
       }
     } else {
-      this.props[val.prop] += val.by
+      this.props[val.prop] += by
     }
   }
 
@@ -226,20 +227,5 @@ export default class Agent extends PropertiesHolder {
 
   die() {
     this.dead = true
-  }
-
-  // utils, refactor
-  getNumber(val, defaultVal) {
-    let num
-    if (typeof val === "number") {
-      num = val
-    } else if (Array.isArray(val)) {
-      let range = val[1] - val[0],
-          floor = val[0]
-      num = floor + Math.random() * range
-    } else {
-      num = defaultVal
-    }
-    return num
   }
 }

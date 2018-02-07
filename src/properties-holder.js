@@ -52,6 +52,9 @@ export default class PropertiesHolder {
   }
 
   setProperty(prop, value) {
+    if (Array.isArray(value)) {
+      value = this.getNumber(value)
+    }
     this.props[prop] = value
   }
 
@@ -72,5 +75,21 @@ export default class PropertiesHolder {
     for (let prop in this.calcProps) {
       this.setProperty(prop, getValue(this.calcProps[prop], world, agent, this))
     }
+  }
+
+  getNumber(val, defaultVal) {
+    let num
+    if (typeof val === "number") {
+      return val
+    }
+    if (Array.isArray(val)) {
+      let range = val[1] - val[0],
+          floor = val[0]
+      return floor + Math.random() * range
+    }
+    if (typeof val === "string") {
+      return this.getProperty(val)
+    }
+    return defaultVal
   }
 }
