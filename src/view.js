@@ -109,6 +109,7 @@ export default class View {
       if (!agentImage._organelle) agentImage._organelle = {}
         agentImage._organelle.agent = agent
         agentImage._organelle.imageSelector = agent.props.image_selector
+        agentImage._organelle.direction = 0
 
         if (agent.oldImage) {
           this.canvas.remove(agent.oldImage)
@@ -123,17 +124,22 @@ export default class View {
           }
         }
 
+        agentImage._setOriginToCenter()
         this.position(agentImage, agent.props)
         agent.addingImage = false
         agent.agentImage = agentImage
     });
   }
 
-  position(image,{x, y, size=1}) {
+  position(image,{x, y, size=1, direction=0}) {
     const imageScale = this.scale * size
-    const viewX = ((x - this.world.bounds.left) * this.scale) - (image.width * imageScale/2)
-    const viewY = ((y - this.world.bounds.top) * this.scale) - (image.height * imageScale /2)
+    const viewX = ((x - this.world.bounds.left) * this.scale)
+    const viewY = ((y - this.world.bounds.top) * this.scale)
     image.set({left: viewX, top: viewY})
+    if (direction !== image._organelle.direction) {
+      image.rotate(direction)
+      image._organelle.direction = direction
+    }
     image.scale(imageScale)
   }
 

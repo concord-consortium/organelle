@@ -14,7 +14,8 @@ export default class Agent extends PropertiesHolder {
           x: 0,
           y: 0,
           size: 1,
-          speed: 1
+          speed: 1,
+          direction: 0
         }
 
     super({ properties, defaultProperties })
