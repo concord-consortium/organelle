@@ -2,27 +2,18 @@
 name: gProteinBody
 image: assets/g-protein.svg
 spawn:
-  'on':
-    selector: "#path-away-from-receptor-body"
-    which: random
   never: true
 dieWhenExitingWorld: false
 properties:
   size: 1
   speed: 0.7
   image_selector: gbodypart2
-initialState: findPathStart
+initialState: away
 rules:
-  findPathStart:
-  - move_to:
-      selector: "#path-away-from-receptor-body"
-      which: random
-      finally:
-        switch_state: away
   away:
   - follow:
-      selector: "#path-away-from-receptor-body"
-      which: nearest
+      selector: "#gprotein-paths-to-receptor path"
+      which: random
       direction: forward
       finally:
         die: true

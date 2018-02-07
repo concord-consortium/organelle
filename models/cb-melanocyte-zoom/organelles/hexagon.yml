@@ -27,9 +27,17 @@ rules:
       finally:
         switch_state: waiting_on_receptor
   waiting_on_receptor:
+  - set:
+      world.hormone_bound: true
+  - notify: "bound"
   - wait:
-      for: 6000
+      for: 500
+      finally:
+        switch_state: heading_away_from_receptor
   heading_away_from_receptor:
+  - set:
+      world.hormone_bound: false
+  - notify: "unbound"
   - follow:
       selector: "#intercellular-path-away-from-receptor path"
       which: nearest

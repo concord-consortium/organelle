@@ -1,7 +1,4 @@
-var model,
-    gproteins,
-    bindingAgent,
-    isBound = false;
+var model;
 
 Organelle.createModel({
   container: {
@@ -10,11 +7,19 @@ Organelle.createModel({
     height: 600
   },
   modelSvg: "assets/melanocyte.svg",
+  bounds: {
+    left: 565,
+    top: 180,
+    width: 200,
+    height: 125
+  },
   properties: {
     albino: false,
     working_tyr1: false,
     working_myosin_5a: true,
-    open_gates: true
+    open_gates: true,
+    hormone_bound: false,
+    g_protein_bound: false
   },
   calculatedProperties: {
     saturation: {
@@ -93,13 +98,11 @@ Organelle.createModel({
   window.model = m
   model = m
 
-  gproteins = []
-
-  for (var i=0; i < 4; i++) {
-    var g = model.world.createAgent(model.world.species.gProtein);
-    g.setProperty("speed", 0.5 + i/10)
-    gproteins.push(g)
-  }
+  model.setTimeout( () => {
+    for (var i=0; i < 3; i++) {
+      model.world.createAgent(model.world.species.gProtein)
+    }
+  }, 1300)
 
   model.on("model.step", () => {
     let saturation = Math.min(model.world.getProperty("saturation"), 1) || 0,
@@ -142,8 +145,26 @@ Organelle.createModel({
     }
   })
 
-  model.on("gProtein.notify.bound", evt => {
-    console.log("woooo!!!", evt)
+  model.on("hexagon.notify", evt => {
+    transformReceptor()
+    if (!model.world.getProperty("hormone_bound")) {
+      sendHexToReceptor()
+    }
+  })
+
+  model.on("gProtein.notify.break_time", evt => {
+    let proteinToBreak = evt.agent;
+    var body = model.world.createAgent(model.world.species.gProteinBody);
+    body.setProperties({x: proteinToBreak.getProperty("x"), y: proteinToBreak.getProperty("y")})
+
+    var part = model.world.createAgent(model.world.species.gProteinPart);
+    part.setProperties({x: proteinToBreak.getProperty("x"), y: proteinToBreak.getProperty("y")})
+
+    proteinToBreak.die()
+
+    model.world.setProperty("g_protein_bound", false)
+
+    model.world.createAgent(model.world.species.gProtein)
   })
 });
 
@@ -192,50 +213,17 @@ function sayHiMelanosome(evt) {
   console.log("melansome says hi", evt.agent)
 }
 
-function waitForGProtein() {
-  var proteinToBreak = null
-  for (var i = 0; i < gproteins.length; i++) {
-    if (gproteins[i].state == "wait_near_receptor") {
-      proteinToBreak = gproteins[i]
-      break
-    }
-  }
-  if (proteinToBreak) {
-    proteinToBreak.state = "waitingForEver"
-    model.setTimeout( () => {
-      var body = model.world.createAgent(model.world.species[4]);
-      body.setProperties({x: proteinToBreak.getProperty("x"), y: proteinToBreak.getProperty("y"), speed: 0.01})
-
-      var part = model.world.createAgent(model.world.species[5]);
-      part.setProperties({x: proteinToBreak.getProperty("x"), y: proteinToBreak.getProperty("y"), speed: 0.01})
-
-      proteinToBreak.die()
-    }, 100)
+function transformReceptor() {
+  if (model.world.getProperty("hormone_bound")) {
+    model.view.hide("#receptor_x5F_protein", true)
+    model.view.show("#receptor_x5F_protein_bound", true)
   } else {
-    model.setTimeout(waitForGProtein, 20)
+    model.view.show("#receptor_x5F_protein", true)
+    model.view.hide("#receptor_x5F_protein_bound", true)
   }
 }
 
-function showHexBinding() {
-  var a = model.world.createAgent(model.world.species[1]);
-  a.state = "heading_to_receptor";
-
-  var transformReceptor = function() {
-    model.view.hide("#receptor_x5F_protein", true)
-    model.view.show("#receptor_x5F_protein_bound", true)
-
-    waitForGProtein()
-  }
-
-  var waitingForBinding = function() {
-    console.log("waiting");
-    if (a.state == "waiting_on_receptor") {
-      console.log("arrived!")
-      transformReceptor();
-    } else {
-      model.setTimeout(waitingForBinding, 200)
-    }
-  }
-
-  model.setTimeout(waitingForBinding, 200)
+function sendHexToReceptor() {
+  bindingAgent = model.world.createAgent(model.world.species.hexagon);
+  bindingAgent.state = "heading_to_receptor";
 }

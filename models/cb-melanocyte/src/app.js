@@ -69,8 +69,6 @@ Organelle.createModel({
   },
   species: [
     "organelles/melanosome.yml",
-    // "organelles/hexagon.yml",
-    // "organelles/triangle.yml",
     "organelles/dots.yml"
   ],
   hotStart: 1500,
