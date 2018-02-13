@@ -1,0 +1,46 @@
+---
+name: hexagon
+image: assets/hexagon.svg
+spawn:
+  'on':
+    selector: "#intercellular-paths path"
+    which: random
+  every: 30
+  # never: true
+dieWhenExitingWorld: false
+properties:
+  size: 1
+initialState: flowing
+rules:
+  flowing:
+  - follow:
+      selector: "#intercellular-paths path"
+      which: nearest
+      direction: forward
+      finally:
+        die: true
+  heading_to_receptor:
+  - follow:
+      selector: "#intercellular-path-to-receptor path"
+      which: nearest
+      direction: forward
+      finally:
+        switch_state: waiting_on_receptor
+  waiting_on_receptor:
+  - set:
+      world.hormone_bound: true
+  - notify: "bound"
+  - wait:
+      for: 500
+      finally:
+        switch_state: heading_away_from_receptor
+  heading_away_from_receptor:
+  - set:
+      world.hormone_bound: false
+  - notify: "unbound"
+  - follow:
+      selector: "#intercellular-path-away-from-receptor path"
+      which: nearest
+      direction: forward
+      finally:
+        die: true

@@ -1,28 +1,24 @@
-import PropertiesHolder from "./properties-holder"
+import PropertiesHolder from "./properties-holder";
+import AgentView from "./agent-view";
 import rules from './rules'
-const { runRules, getEntityAndProp } = rules
+const { runRules } = rules
 
 export default class Agent extends PropertiesHolder {
-  /**
-   * image       image to load, if any
-   * selector    selector in image
-   */
-  constructor(species, world, listener) {
+  
+  constructor(species, world) {
     let properties = species.properties || {},
 
         defaultProperties = {
           x: 0,
           y: 0,
           size: 1,
-          speed: 1,
-          direction: 0
+          speed: 1
         }
 
     super({ properties, defaultProperties })
 
     this.species = species
     this.world = world
-    this.listener = listener
 
     this.references = {}
     this.taggedFacts = {}
@@ -39,9 +35,8 @@ export default class Agent extends PropertiesHolder {
 
     this.state = species.initialState || "initialization"
 
-    this.stateChangeCount = 0     // updates each time we change state
+    this.view = new AgentView(this, this.world)
 
-    // really?
     this.step()
   }
 
@@ -55,30 +50,26 @@ export default class Agent extends PropertiesHolder {
       this.dead = true
     }
 
-    return
+    return;
   }
 
   doTask(task) {
     if (task.debugger) {
       debugger
     }
-    if (task.switch_state) {
-      if (this.species.rules[task.switch_state]) {
-        this.state = task.switch_state
-        this.stateChangeCount++
-      } else {
-        throw Error(`Can't switch state to "${task.switch_state}", requested by ${this.species.name} rules`)
+    if (task.set) {
+      for (let prop of Object.keys(task.set)) {
+        this.props[prop] = task.set[prop]
       }
+    }
+    if (task.switch_state) {
+      this.state = task.switch_state
     }
     for (let taskName of Object.keys(task)) {
       if (this["task_"+taskName] && typeof this["task_"+taskName] === "function") {
         let complete = this["task_"+taskName](task[taskName])
         if (complete && task[taskName].finally) {
           this.doTask(task[taskName].finally)
-        }
-      } else {
-        if (taskName !== "debugger" && taskName !== "set" && taskName !== "switch_state") {
-          throw Error(`"${taskName}" is not a known agent task, requested by ${this.species.name} rules`)
         }
       }
     }
@@ -93,35 +84,22 @@ export default class Agent extends PropertiesHolder {
   }
 
   task_change(val) {
-    const by = this.getNumber(val.by)
     if (typeof val.until === "number") {
-      let complete = by > 0 ? this.props[val.prop] >= val.until : this.props[val.prop] <= val.until
+      let complete = val.by > 0 ? this.props[val.prop] >= val.until : this.props[val.prop] <= val.until
       if (!complete) {
-        let bounds = by > 0 ? Math.min : Math.max
-        this.props[val.prop] = bounds(this.props[val.prop] + by, val.until)
+        let bounds = val.by > 0 ? Math.min : Math.max
+        this.props[val.prop] = bounds(this.props[val.prop] + val.by, val.until)
       } else {
         return true
       }
     } else {
-      this.props[val.prop] += by
-    }
-  }
-
-  /**
-   * set:
-   *   size: 0.5
-   *   world.some_boolean: false
-   */
-  task_set(val) {
-    for (let prop of Object.keys(val)) {
-      const { entity, prop: propName } = getEntityAndProp(prop, this.world, this);
-      entity.setProperty(propName, val[prop])
+      this.props[val.prop] += val.by
     }
   }
 
   task_move_to(val) {
-    let key = this.stateChangeCount + JSON.stringify(val),
-        x, y
+    let key = JSON.stringify(val),
+        x, y;
     if (this.references[key]) {
       ({x, y} = this.references[key])
     } else {
@@ -138,10 +116,10 @@ export default class Agent extends PropertiesHolder {
   }
 
   task_follow(val) {
-    let key = this.stateChangeCount + JSON.stringify(val),
+    let key = JSON.stringify(val),
         speed = this.getNumber(this.props.speed, 1),
         direction = val.direction === "backward" ? -1 : 1,
-        pathInfo
+        pathInfo;
     if (this.references[key]) {
       pathInfo = this.references[key].pathInfo
     } else {
@@ -169,22 +147,13 @@ export default class Agent extends PropertiesHolder {
     return arrived
   }
 
-  task_notify(message) {
-    const key = this.stateChangeCount + message
-    if (this.references[key]) {
-      return
-    }
-    this.references[key] = true
-    this.listener.notify(this, message)
-  }
-
   travelTo({x, y}) {
     let dx = x - this.props.x,
         dy = y - this.props.y,
         distSq = (dx * dx) + (dy * dy),
         speed = this.getNumber(this.props.speed, 1),
         speedSq = speed * speed,
-        direction = Math.atan2(dy, dx)
+        direction = Math.atan2(dy, dx);
 
     speed = (distSq > speedSq) ? speed : Math.sqrt(distSq)
 
@@ -197,14 +166,14 @@ export default class Agent extends PropertiesHolder {
     return (this.props.x === x && this.props.y === y)
   }
 
-  task_set_image_selector(selector) {
-    this.props.image_selector = selector
+  task_set_attr(val) {
+    // FIXME
+    this.view.setAttr(val)
   }
 
   task_wait(val) {
-    let key = this.stateChangeCount + JSON.stringify(val),
+    let key = JSON.stringify(val),
         waitTime
-    if (val === "forever") return
     if (this.references[key]) {
       waitTime = this.references[key]
     } else {
@@ -221,11 +190,26 @@ export default class Agent extends PropertiesHolder {
 
   task_die(val) {
     if (val) {
-      this.die()
+      this.dead = true
     }
   }
 
-  die() {
-    this.dead = true
+  destroy() {
+    this.view.destroy()
+  }
+
+  // utils, refactor
+  getNumber(val, defaultVal) {
+    let num
+    if (typeof val === "number") {
+      num = val
+    } else if (Array.isArray(val)) {
+      let range = val[1] - val[0],
+          floor = val[0]
+      num = floor + Math.random() * range
+    } else {
+      num = defaultVal
+    }
+    return num
   }
 }

@@ -1,59 +1,55 @@
-var Snap = require("snapsvg")
-require("./lib/snap-plugins")
 import PropertiesHolder from "./properties-holder"
 import Agent from "./agent"
+import util from './util'
 
-module.exports = class World extends PropertiesHolder {
+export default class World extends PropertiesHolder {
   constructor(options) {
     super(options)
 
-    let {element, background, species, clickHandlers} = options
+    this.worldSvgModel = util.parseSVG(options.worldSvgString)
 
-    this.snap = Snap("#"+element)
+    this.bounds = options.bounds || util.parseViewbox(this.worldSvgModel)
+    this.bounds.right = this.bounds.left + this.bounds.width
+    this.bounds.bottom = this.bounds.top + this.bounds.height
 
-    let vb = this.snap.node.viewBox.baseVal
-    this.left   = vb.x
-    this.top    = vb.y
-    this.right  = vb.x + vb.width
-    this.bottom = vb.y + vb.height
+    const b = this.bounds
+    const viewBox = [b.left, b.top, b.width, b.height].join(' ')
+
+    this.worldSvgModel.setAttribute("viewBox", viewBox)
 
     this.tick = 0
-    this.species = species
+    this.speciesArr = options.species
+    this.species = {}
     this.agents = []
+    this.deadAgents = []
 
-
+    for (let kind of this.speciesArr) {
+      this.species[kind.name] = kind
+    }
 
     this.creationTimes = {}
 
-    if (background && background.file) {
-      Snap.load(background.file, (img) => {
-        window.snapAppend(this.snap, img, background.selector)
-
-        // refactor this into a spawning helper
-        for (let kind of species) {
-          if (kind.spawn.every) {
-            this.creationTimes[kind.name] = {}
-            this.creationTimes[kind.name].nextCreation = kind.spawn.every
-          }
-        }
-
-        for (let handler of clickHandlers) {
-          this.snap.selectAll(handler.selector).forEach( (sel) => {sel.click( () => {
-            handler.action(Snap, this.snap, sel)
-          })})
-        }
-
-        for (let i=0; i<1500; i++) {
-          this.step()
-        }
-      });
+    // refactor this into a spawning helper
+    for (let kind of this.speciesArr) {
+      if (kind.spawn.every) {
+        this.creationTimes[kind.name] = {}
+        this.creationTimes[kind.name].nextCreation = kind.spawn.every
+      } else if (kind.spawn.start) {
+        this.creationTimes[kind.name] = {}
+        this.creationTimes[kind.name].nextCreation = 0
+      }
     }
+
+    this._agentNotified = this._agentNotified.bind(this)
+    this.notify = options.notify
+
+    this._pathCacheIdIndex = 0
+    this._cachedPathPoints = {}
   }
 
   step() {
     this.tick++
-
-    for (let kind of this.species) {
+    for (let kind of this.speciesArr) {
       if (this.creationTimes[kind.name] && this.creationTimes[kind.name].nextCreation < this.tick) {
         this.creationTimes[kind.name].nextCreation = this.tick + kind.spawn.every
         this.createAgent(kind)
@@ -66,42 +62,44 @@ module.exports = class World extends PropertiesHolder {
 
     for (let agent of this.agents) {
       if (agent.dead) {
-        agent.destroy()
+        // does this make sense? view needs to know which agent images to remove
+        this.deadAgents.push(agent)
       }
     }
+
+    this.agents = this.agents.filter( (a) => !a.dead)
 
     if (this.tick % 10 === 0) {
       this.updateCalculatedProperties()
     }
-
-    this.agents = this.agents.filter( (a) => !a.dead)
-  }
-
-  render() {
-    for (let agent of this.agents) {
-      agent.view.render()
-    }
   }
 
   createAgent(kind) {
-    let agent = new Agent(kind, this)
+    let agent = new Agent(kind, this, {notify: this._agentNotified})
     this.agents.push(agent)
     return agent
   }
 
-  append(img, selector, fromCache) {
-    return window.snapAppend(this.snap, img, selector, fromCache)
+  clearDeadAgents() {
+    this.deadAgents = []
   }
 
   isInWorld({x, y}) {
-    return x >= this.left && x <= this.right &&
-        y >= this.top && y <= this.bottom
+    return x >= this.bounds.left && x <= this.bounds.right &&
+        y >= this.bounds.top && y <= this.bounds.bottom
+  }
+
+  _agentNotified(agent, message) {
+    const evtName = `${agent.species.name}.notify${typeof message === 'string' ? '.' + message : ''}`
+    this.notify(evtName, {agent: agent, message: message})
   }
 
   getPath(props, {x: agent_x, y: agent_y}) {
-    let matches = this.snap.selectAll(props.selector),
-        selection;
-    if (props.which === "random") {
+    let matches = this.worldSvgModel.querySelectorAll(props.selector),
+        selection
+    if (typeof props.which === "number") {
+      selection = matches[props.which]
+    } else if (props.which === "random") {
       selection = matches[Math.floor(Math.random() * matches.length)]
     } else if (props.which === "nearest" || (props.which && props.which.any_of_nearest) || props.within) {
       let numNearest = (props.which && props.which.any_of_nearest) ? props.which.any_of_nearest : 1,
@@ -109,7 +107,7 @@ module.exports = class World extends PropertiesHolder {
           withinSq = (props.within * props.within) || Infinity
 
       matches.forEach( m => {
-        let {x, y} = this.getPercentAlongPath(m.node, props.at)
+        let {x, y} = this.getLocationOfNode(m, props.at)
         let dx = agent_x - x,
             dy = agent_y - y,
             sqDistance = dx * dx + dy * dy
@@ -118,8 +116,8 @@ module.exports = class World extends PropertiesHolder {
           leastSqDistance[numNearest-1] = {path: m, dist: sqDistance}
           // re-sort array from nearest to furthest
           leastSqDistance.sort(function(a, b) {
-            return a.dist - b.dist;
-          });
+            return a.dist - b.dist
+          })
         }
       })
       selection = leastSqDistance[Math.floor(Math.random() * numNearest)].path
@@ -138,7 +136,7 @@ module.exports = class World extends PropertiesHolder {
     let loc = {}
     if (props.selector) {
       let path = this.getPath(props, {x, y}).path
-      loc = this.getPercentAlongPath(path.node, props.at)
+      loc = this.getLocationOfNode(path, props.at)
     }
     if (typeof props.x === "number") {
       loc.x = props.x
@@ -153,22 +151,60 @@ module.exports = class World extends PropertiesHolder {
     return loc
   }
 
-  getPercentAlongPath(path, perc) {
-    if (perc === "random") {
-      perc = Math.random()
-    } else if (typeof perc !== "number") {
-      perc = 0
+  getLocationOfNode(node, percentageAlongPath) {
+    if (node.tagName === "circle") {
+      return {x: node.cx.baseVal.value, y: node.cy.baseVal.value}
+    } else if (node.tagName === "rect") {
+      const x = node.x.baseVal.value
+      const y = node.y.baseVal.value
+      const width = node.width.baseVal.value
+      const height = node.height.baseVal.value
+      return {x: x + width / 2, y: y + height / 2}
+    } else if (node.tagName === "path") {
+      if (percentageAlongPath === "random") {
+        percentageAlongPath = Math.random()
+      } else if (typeof percentageAlongPath !== "number") {
+        percentageAlongPath = 0
+      }
+      let distanceAlong = (percentageAlongPath && node.getTotalLength) ? node.getTotalLength() * percentageAlongPath : 0
+      return this.getPointAlongPath(node, distanceAlong)
     }
-    let distanceAlong = (perc && path.getTotalLength) ? path.getTotalLength() * perc : 0
-    return this.getPointAlongPath(path, distanceAlong)
+    return {x: 0, y: 0}
   }
 
+  /**
+   * If passed a path, this returns a point on the path at distance dist.
+   *
+   * If passed another SVG shape, it just returns the x,y location of the bounding box (for now).
+   *
+   * The native SVG method path.getPointAtLength(dist) is fairly slow. To reduce the time spent
+   * on this in a model with a lot of path following, we cache every result we find.
+   *
+   * In the basic Geniventure Melanocyte model, with about 30 followable paths, this allows a ~10x
+   * speed increase, and results in ~14,000 points cached, weighing about 7MB.
+   *
+   * @param {SVG Element} path
+   * @param {number} dist Optional distance measured in SVG units. Default 0.
+   */
   getPointAlongPath(path, dist) {
+    if (!path.cacheId) {
+      path.cacheId = ++this._pathCacheIdIndex
+    }
+    // use toFixed so as not to cache dist = 20 and dist = 20.00001 separately
+    const cacheStr = path.cacheId + "." + dist.toFixed()
+    if (this._cachedPathPoints[cacheStr]) {
+      return this._cachedPathPoints[cacheStr]
+    }
+    let val
     if (path.getPointAtLength) {
       dist = Math.max(0, dist)
-      return path.getPointAtLength(dist)
+      val = path.getPointAtLength(dist)
     } else {
-      return path.getBBox()
+      val = path.getBBox()
     }
+    // cache just the x and y, which is a (tiny) bit lighter than the SVGPoint returned above
+    const ret = {x: val.x, y: val.y}
+    this._cachedPathPoints[cacheStr] = ret
+    return ret
   }
 }

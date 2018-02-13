@@ -1,6 +1,7 @@
 ---
-name: zoomedMelanosome
+name: fake-melanosome
 image: assets/melanosome.svg
+selector: "#melanosome"
 spawn:
   'on':
     selector: "#golgi_x5F_apparatus path"
@@ -8,18 +9,19 @@ spawn:
   never: true
 properties:
   size: 0.1
-  image_selector: melanosome_1
 initialState: growing
 rules:
   growing:
   - if:
       fact: world.albino
     then:
-      grow:
+    - set_attr:
+        selector: "#Layer1_0_FILL"
+        set:
+          fill: url(#_Radial1)
+    - grow:
         by: 0.005
         until: 0.4
-        finally:
-          switch_state: grown
   - if:
       all:
         - fact:
@@ -27,25 +29,32 @@ rules:
         - fact: world.working_tyr1
     then:
     - grow:
-        by: 0.005
+        by: 0.004
         until: 1
-        finally:
-          switch_state: grown
     - if:
         fact: size
         between: [0.5, 0.7]
       then:
-        set_image_selector: melanosome_2
+        set_attr:
+          selector: "#Layer1_0_FILL"
+          set:
+            fill: url(#_Radial2)
     - if:
         fact: size
         between: [0.7, 0.9]
       then:
-        set_image_selector: melanosome_3
+        set_attr:
+          selector: "#Layer1_0_FILL"
+          set:
+            fill: url(#_Radial3)
     - if:
         fact: size
         greaterThan: 0.9
       then:
-        set_image_selector: melanosome_4
+        set_attr:
+          selector: "#Layer1_0_FILL"
+          set:
+            fill: url(#_Radial4)
   - if:
       all:
         - fact:
@@ -54,10 +63,10 @@ rules:
             not: world.working_tyr1
     then:
       grow:
-        by: 0.005
-        until: 0.6
+        by: 0.004
+        until: 0.65
         finally:
-          set_image_selector: melanosome_2
-          switch_state: grown
-  grown:
-    notify: "grown"
+          set_attr:
+            selector: "#Layer1_0_FILL"
+            set:
+              fill: url(#_Radial2)

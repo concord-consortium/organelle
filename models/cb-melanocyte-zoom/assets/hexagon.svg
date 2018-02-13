@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 12 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;">
+    <g id="hexagon">
+        <path id="bits2_0_Layer0_0_FILL" d="M4.305,7.823L7.296,6.387L7.54,3.052L4.793,1.154L1.799,2.632L1.555,5.967L4.305,7.823Z" style="fill:rgb(0,204,153);fill-rule:nonzero;"/>
+        <path id="bits2_0_Layer0_0_1_STROKES" d="M4.305,7.823L1.555,5.967L1.799,2.632L4.793,1.154L7.54,3.052L7.296,6.387L4.305,7.823Z" style="fill:none;stroke:rgb(102,102,255);stroke-width:0.84px;"/>
+    </g>
+</svg>

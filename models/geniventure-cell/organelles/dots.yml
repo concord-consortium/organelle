@@ -1,0 +1,27 @@
+---
+name: dot
+image:
+  shape: rect
+  props:
+    height: 3
+    width: 3
+    fill: rgb(0,204,153)
+spawn:
+  'on':
+    selector: "#intercellular-paths path"
+    which: random
+  every: 20
+  # never: true
+dieWhenExitingWorld: false
+properties:
+  speed: 1.2
+  size: 1
+initialState: flowing
+rules:
+  flowing:
+  - follow:
+      selector: "#intercellular-paths path"
+      which: nearest
+      direction: forward
+      finally:
+        die: true

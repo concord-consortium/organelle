@@ -18,7 +18,7 @@
     </fieldset>
     <fieldset style="float: left; padding: 10px">
       <legend>Following paths</legend>
-      <svg id="follow-model" viewBox="-20 -20 600 300" width="600px" height="300px" style="display: inline-block;"></svg>
+      <div id="follow-model" style="display: inline-block;"></svg>
     </fieldset>
     <fieldset style="position: absolute; top: 411px; left: 457px;">
       <legend>World props</legend>
@@ -35,7 +35,7 @@
 `---
 name: melanosome
 image: assets/melanosome.svg
-selector: "#melanosome"
+dieWhenExitingWorld: false
 spawn:
   on:
     selector: "#golgi_x5F_apparatus path"
@@ -84,18 +84,18 @@ rules:
       var model;
 
       function loadModel(ymlString) {
-        console.log(ymlString)
         if (model && model.stop) {
           model.stop();
           document.getElementById("follow-model").innerHTML = "";
         }
 
         Organelle.createModel({
-          element: "follow-model",
-          background: {
-            file: "assets/golgi-and-microtubules.svg",
-            selector: "#model"
+          container: {
+            elId: "follow-model",
+            width: 600,
+            height: 300
           },
+          modelSvg: "assets/golgi-and-microtubules.svg",
           properties: {
             working_tyr1: true
           },
@@ -103,7 +103,7 @@ rules:
           species: [
             ymlString
           ]
-        }).then(function(m) { model = m });
+        }).then(function(m) { model = m; model.run() });
       }
 
       loadModel(agentYml);
