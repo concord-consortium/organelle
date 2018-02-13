@@ -8,6 +8,23 @@
     "build": "webpack",
     "test": "mocha --compilers js:babel-core/register -r jsdom-global/register"
   },
+  "main": "src/app.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/concord-consortium/organelle.git"
+  },
+  "keywords": [
+    "agent",
+    "abm"
+  ],
+  "author": "Sam Fentress",
+  "bugs": {
+    "url": "https://github.com/concord-consortium/organelle/issues"
+  },
+  "homepage": "https://github.com/concord-consortium/organelle#readme",
   "dependencies": {
     "babel-polyfill": "^6.16.0",
     "js-yaml": "^3.8.4",
