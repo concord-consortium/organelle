@@ -302,12 +302,12 @@ class Model {
   }
 }
 
+function createModel(options) {
+  const model = new Model(options)
+  return model.creationPromise
+}
 
-module.exports = {
-  Model: Model,
-
-  createModel(options) {
-    const model = new Model(options)
-    return model.creationPromise
-  }
+export {
+  Model,
+  createModel
 }

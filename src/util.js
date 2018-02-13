@@ -16,10 +16,10 @@ fabric.StaticCanvas.prototype.zoomToPoint = function (point, value) {
     this._objects[i].setCoords();
   }
   return this;
-};
+}
 
 
-module.exports = {
+export default {
   parseSVG(svgString) {
     let doc
     if (typeof DOMParser !== 'undefined') {
@@ -39,7 +39,7 @@ module.exports = {
     return {left: vb.x, top: vb.y, width: vb.width, height: vb.height}
   },
 
-  preventInteraction (fabricObj) {
+  preventInteraction(fabricObj) {
     fabricObj.selectable = false
     fabricObj.hoverCursor = 'default'
   },

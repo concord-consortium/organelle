@@ -176,7 +176,7 @@ function runRules (world, agent) {
   return consequences
 }
 
-module.exports = {
+export default {
   runRules,
   getValue,
   checkExpression,
