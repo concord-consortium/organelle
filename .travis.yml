@@ -1,0 +1,14 @@
+sudo: false
+language: node_js
+node_js: node
+install:
+- travis_retry gem install s3_website -v 3.4.0
+- travis_retry pip install awscli --upgrade --user
+- travis_retry yarn
+before_script: npm run build
+script: ./s3_deploy.sh
+cache:
+  bundler: true
+  yarn: true
+  directories:
+    - node_modules
