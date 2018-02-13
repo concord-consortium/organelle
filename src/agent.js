@@ -86,7 +86,8 @@ export default class Agent extends PropertiesHolder {
 
   task_grow(val) {
     if (val.by) {
-      return this.task_change({prop: "size", ...val})
+      const changeProps = Object.assign({}, val, {prop: "size"})    // rm object spread: {prop: "size", ...val}
+      return this.task_change(changeProps)
     } else {
       return this.task_change({prop: "size", by: val})
     }

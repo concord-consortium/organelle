@@ -164,7 +164,7 @@ module.exports = {
    * e.g. setWithMultiples(obj, {opacity: "*0.5"}) will set opacity to half the current value
    */
   setWithMultiples(fabricObject, _props) {
-    const props = {..._props}
+    const props = Object.assign({}, _props)
     // update the prop values, but still do one single `set` call, in case that is optimized in fabricjs
     for (let key in props) {
       let changeValue = props[key]

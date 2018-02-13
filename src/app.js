@@ -257,7 +257,7 @@ class Model {
 
   _onViewHover(evt) {
     if (this.lastTargetHovered && this.lastTargetHovered !== evt.target) {
-      const offEvt = {...evt}
+      const offEvt = Object.assign({}, evt)
       offEvt.target = this.lastTargetHovered
       this._notifyViewEvent(events.VIEW_HOVER_EXIT, offEvt)
     }

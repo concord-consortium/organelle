@@ -206,7 +206,7 @@ export default class View {
   setPropertiesOnObject(o, props, isTemporary) {
     if (isTemporary) {
       if (!o._organelle) o._organelle = {}
-      o._organelle.oldProps = {...props}
+      o._organelle.oldProps = Object.assign({}, props)
       for (let key in props) {
         o._organelle.oldProps[key] = o.get(key)
       }
