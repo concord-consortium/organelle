@@ -27,19 +27,6 @@ export default class World extends PropertiesHolder {
       this.species[kind.name] = kind
     }
 
-    this.creationTimes = {}
-
-    // refactor this into a spawning helper
-    for (let kind of this.speciesArr) {
-      if (kind.spawn.every) {
-        this.creationTimes[kind.name] = {}
-        this.creationTimes[kind.name].nextCreation = kind.spawn.every
-      } else if (kind.spawn.start) {
-        this.creationTimes[kind.name] = {}
-        this.creationTimes[kind.name].nextCreation = 0
-      }
-    }
-
     this._agentNotified = this._agentNotified.bind(this)
     this.notify = options.notify
 
@@ -50,8 +37,7 @@ export default class World extends PropertiesHolder {
   step() {
     this.tick++
     for (let kind of this.speciesArr) {
-      if (this.creationTimes[kind.name] && this.creationTimes[kind.name].nextCreation < this.tick) {
-        this.creationTimes[kind.name].nextCreation = this.tick + kind.spawn.every
+      if ((kind.spawn.start && this.tick === 1) || (kind.spawn.every && this.tick % kind.spawn.every === 0)) {
         this.createAgent(kind)
       }
     }
