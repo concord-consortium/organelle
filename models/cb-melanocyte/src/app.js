@@ -9,9 +9,10 @@ Organelle.createModel({
   modelSvg: "assets/melanocyte.svg",
   properties: {
     albino: false,
-    working_tyr1: false,
+    working_tyr1: true,
     working_myosin_5a: true,
-    open_gates: true
+    open_gates: false,
+    activated_g_protein: 20
   },
   calculatedProperties: {
     saturation: {
@@ -189,4 +190,9 @@ function zoomToReceptor() {
     zoomed = false
   }
 
+}
+
+let gproteinSlider = document.getElementById("activated_g_protein")
+gproteinSlider.oninput = function() {
+  model.world.setProperty("activated_g_protein", this.value)
 }

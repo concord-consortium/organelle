@@ -9,6 +9,7 @@ function getEntityAndProp(expression, world, agent, baseEntity) {
 }
 
 function getFactValue(fact, world, agent, baseEntity) {
+  if (typeof fact !== 'string') return fact
   let factName = fact.not || fact,
       { entity, prop } = getEntityAndProp(factName, world, agent, baseEntity),
       val = entity.getProperty(prop)
@@ -90,16 +91,17 @@ function getTag(antecedent) {
 
 function checkExpression(expression, world, agent, baseEntity) {
   let val = getValue(expression, world, agent, baseEntity),
+      getComparatorVal = (expression) => getFactValue(expression, world, agent, baseEntity),
       res
 
   if (expression.hasOwnProperty("equals")) {
-    res = val == expression.equals
+    res = val == getComparatorVal(expression.equals)
   } else if (expression.lessThan) {
-    res = val < expression.lessThan
+    res = val < getComparatorVal(expression.lessThan)
   } else if (expression.greaterThan) {
-    res = val > expression.greaterThan
+    res = val > getComparatorVal(expression.greaterThan)
   } else if (expression.between) {
-    res = val >= expression.between[0] && val < expression.between[1]
+    res = val >= getComparatorVal(expression.between[0]) && val < getComparatorVal(expression.between[1])
   } else {
     // cast to bool
     res = !!val

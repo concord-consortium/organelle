@@ -5,12 +5,13 @@ spawn:
   'on':
     selector: "#golgi_x5F_apparatus path"
     at: random
-  every: 50
+  every: 25
 dieWhenExitingWorld: false
 properties:
   size: 0.1
   speed: 1.5
   image_selector: melanosome_1
+  g_protein_to_grow: [1, 100]
 initialState: growing
 rules:
   growing:
@@ -26,7 +27,8 @@ rules:
       all:
         - fact:
             not: world.albino
-        - fact: world.working_tyr1
+        - fact: world.activated_g_protein
+          greaterThan: g_protein_to_grow
     then:
     - grow:
         by: 0.005
@@ -52,8 +54,8 @@ rules:
       all:
         - fact:
             not: world.albino
-        - fact:
-            not: world.working_tyr1
+        - fact: world.activated_g_protein
+          lessThan: g_protein_to_grow
     then:
       grow:
         by: 0.005
@@ -212,7 +214,8 @@ rules:
           switch_state: dying
   - if:
       all:
-      - fact: world.working_tyr1
+      - fact: world.activated_g_protein
+        greaterThan: g_protein_to_grow
       - state: [waiting_on_actin_terminal, waiting_on_nuclear_actin_terminal]
       - fact: size
         lessThan: 0.9
@@ -223,8 +226,8 @@ rules:
           switch_state: dying
   - if:
       all:
-      - fact:
-          not: world.working_tyr1
+      - fact: world.activated_g_protein
+        lessThan: g_protein_to_grow
       - fact: size
         greaterThan: 0.9
     then:
