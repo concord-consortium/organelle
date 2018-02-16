@@ -37,7 +37,8 @@ export default class World extends PropertiesHolder {
   step() {
     this.tick++
     for (let kind of this.speciesArr) {
-      if ((kind.spawn.start && this.tick === 1) || (kind.spawn.every && this.tick % kind.spawn.every === 0)) {
+      let spawnPeriod = this.getValueOrWorldProp(kind.spawn.every)
+      if ((kind.spawn.start && this.tick === 1) || (spawnPeriod && this.tick % spawnPeriod === 0)) {
         this.createAgent(kind)
       }
     }
@@ -192,5 +193,32 @@ export default class World extends PropertiesHolder {
     const ret = {x: val.x, y: val.y}
     this._cachedPathPoints[cacheStr] = ret
     return ret
+  }
+
+  /**
+   * Allows primitive values to be optionally defined by world properties.
+   *
+   * Used in cases where we can only use a world property, not an agent property. E.g. the species
+   * spawn period may be a number or a world property, but not an agent property, as it is global
+   * and not related to any individual agent.
+   *
+   * When requesting a property, can pass in either `property_name` or `world.property_name` for
+   * clarity.
+   *
+   * @param {*} val Either a primitive number or boolean, or a string referring to a world property
+   * @returns {*} Value of the property
+   */
+  getValueOrWorldProp(val) {
+    if (typeof val !== "string") {
+      return val
+    }
+    let split = val.split(".")
+    if (split.length === 1) {
+      return this.getProperty(val)
+    }
+    if (split[0] !== "world"){
+      throw Error(`Error getting property ${val} from World`)
+    }
+    return this.getProperty(split[1])
   }
 }

@@ -1,16 +1,16 @@
 ---
-name: dot
+name: red-dot
 image:
   shape: rect
   props:
-    height: 2
-    width: 2
-    fill: rgb(0,204,153)
+    height: 3
+    width: 3
+    fill: rgb(255,60,60)
 spawn:
   'on':
     selector: "#intercellular-paths path"
     which: random
-  every: 30
+  every: world.hormone_spawn_period
   # never: true
 dieWhenExitingWorld: false
 properties:

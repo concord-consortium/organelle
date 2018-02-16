@@ -12,7 +12,8 @@ Organelle.createModel({
     working_tyr1: true,
     working_myosin_5a: true,
     open_gates: false,
-    activated_g_protein: 20
+    activated_g_protein: 20,
+    hormone_spawn_period: 0
   },
   calculatedProperties: {
     saturation: {
@@ -70,7 +71,8 @@ Organelle.createModel({
   },
   species: [
     "organelles/melanosome.yml",
-    "organelles/dots.yml"
+    "organelles/dots.yml",
+    "organelles/red-dots.yml"
   ],
   hotStart: 1500,
   clickHandlers: [
@@ -195,4 +197,25 @@ function zoomToReceptor() {
 let gproteinSlider = document.getElementById("activated_g_protein")
 gproteinSlider.oninput = function() {
   model.world.setProperty("activated_g_protein", this.value)
+}
+
+let hormoneSpawnSlider = document.getElementById("hormone_level")
+hormoneSpawnSlider.oninput = function() {
+  let rate = this.value * 1
+  let period = rate === 0 ? 0 : Math.floor(500 / rate)
+  console.log(period)
+  model.world.setProperty("hormone_spawn_period", period)
+}
+
+function hormonePulse() {
+  model.world.setProperty("hormone_spawn_period", 5)
+  document.getElementById("hormone_level").value = 100
+  model.setTimeout( () => {
+    model.world.setProperty("hormone_spawn_period", 20)
+    document.getElementById("hormone_level").value = 25
+  }, 2000)
+  model.setTimeout( () => {
+    model.world.setProperty("hormone_spawn_period", 0)
+    document.getElementById("hormone_level").value = 0
+  }, 2400)
 }
