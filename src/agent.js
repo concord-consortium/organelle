@@ -133,7 +133,7 @@ export default class Agent extends PropertiesHolder {
     let arrived = this.travelTo({x, y})
 
     if (arrived) {
-      this.references[key] = null
+      delete this.references[key]
     }
     return arrived
   }
@@ -141,30 +141,36 @@ export default class Agent extends PropertiesHolder {
   task_follow(val) {
     let key = this.stateChangeCount + JSON.stringify(val),
         speed = this.getNumber(this.props.speed, 1),
-        direction = val.direction === "backward" ? -1 : 1,
-        pathInfo
+        pathInfo, direction, distance, until
     if (this.references[key]) {
-      pathInfo = this.references[key].pathInfo
+      ({pathInfo, direction, distance, until} = this.references[key])
     } else {
       pathInfo = this.world.getPath(val, this.props)
-      // for now, just assume we're at the ends
-      let initialPos = direction === 1 ? 0 : pathInfo.length,
-          untilPerc = this.getNumber(val.until, direction === 1 ? 1 : 0),
-          until = pathInfo.length * untilPerc
 
-      this.references[key] = {pathInfo: pathInfo, distance: initialPos, until: until}
+      direction = val.direction === "backward" ? -1 :
+                  val.direction === "random" ? (Math.round(Math.random()) - 0.5) * 2 :
+                  1
+      // if we passed in `at`, use the location returned by `getPath`. Otherwise look at the
+      // direction and assume we start at one end
+      distance = val.at ? pathInfo.length * pathInfo.percentAlongPath :
+                  direction === 1 ? 0 : pathInfo.length
+      let untilPerc = this.getNumber(val.until, direction === 1 ? 1 : 0)
+      until = pathInfo.length * untilPerc
+
+      this.references[key] = {pathInfo, direction, distance, until}
     }
 
-    this.references[key].distance += (speed * direction)
+    distance += (speed * direction)
+    this.references[key].distance = distance
 
-    let {x, y} = this.world.getPointAlongPath(pathInfo.path, this.references[key].distance)
+    let {x, y} = this.world.getPointAlongPath(pathInfo.path, distance)
 
     this.props.x = x
     this.props.y = y
 
-    let arrived = direction === 1 ? this.references[key].distance >= this.references[key].until : this.references[key].distance <= this.references[key].until
+    let arrived = direction === 1 ? distance >= until : distance <= until
     if (arrived) {
-      this.references[key] = null
+      delete this.references[key]
     }
 
     return arrived
@@ -215,7 +221,7 @@ export default class Agent extends PropertiesHolder {
       this.references[key] =  waitTime
     }
     if (this.world.tick >= (waitTime.start + waitTime.duration)) {
-      this.references[key] = null
+      delete this.references[key]
       return true
     }
   }

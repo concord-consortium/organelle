@@ -261,6 +261,13 @@ export default class View {
     this._zoomCenter = c
   }
 
+  transformToWorldCoordinates(viewPoint) {
+    return {
+      x: this.world.bounds.left + viewPoint.x / this.scale,
+      y: this.world.bounds.top + viewPoint.y / this.scale
+    }
+  }
+
   render() {
     if (!this.loaded) return
 

@@ -10,7 +10,7 @@ spawn:
   'on':
     selector: "#intercellular-paths path"
     which: random
-  every: 30
+  every: 18
   # never: true
 dieWhenExitingWorld: false
 properties:
@@ -22,6 +22,6 @@ rules:
   - follow:
       selector: "#intercellular-paths path"
       which: nearest
-      direction: forward
+      direction: random
       finally:
         die: true

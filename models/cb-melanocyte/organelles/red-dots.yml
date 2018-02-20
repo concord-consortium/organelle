@@ -14,7 +14,7 @@ spawn:
   # never: true
 dieWhenExitingWorld: false
 properties:
-  speed: 1.2
+  speed: [0.4, 0.9]
   size: 1
 initialState: flowing
 rules:
@@ -22,6 +22,21 @@ rules:
   - follow:
       selector: "#intercellular-paths path"
       which: nearest
-      direction: forward
+      direction: random
+      finally:
+        die: true
+  find_path_from_anywhere:
+  - move_to:
+      selector: "#intercellular-paths path"
+      at: nearest
+      which: nearest
+      finally:
+        switch_state: flowing_from_anywhere
+  flowing_from_anywhere:
+  - follow:
+      selector: "#intercellular-paths path"
+      which: nearest
+      at: nearest
+      direction: random
       finally:
         die: true

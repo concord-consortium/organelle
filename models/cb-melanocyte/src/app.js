@@ -77,12 +77,8 @@ Organelle.createModel({
   hotStart: 1500,
   clickHandlers: [
     {
-      selector: '#melanocyte_x5F_cell, #microtubules_x5F_grouped',
-      action: sayHiCytoplasm
-    },
-    {
-      species: "melanosome",
-      action: sayHiMelanosome
+      selector: '#intercell',
+      action: clickIntercell
     }
   ]
 }).then(function(m) {
@@ -218,4 +214,21 @@ function hormonePulse() {
     model.world.setProperty("hormone_spawn_period", 0)
     document.getElementById("hormone_level").value = 0
   }, 2400)
+}
+
+function clickIntercell(evt) {
+  const loc = model.view.transformToWorldCoordinates({x: evt.e.offsetX, y: evt.e.offsetY})
+  let added = 0;
+  function addHormone() {
+    for (let i = 0; i < 3; i++) {
+      const a = model.world.createAgent(model.world.species["red-dot"])
+      a.state = "find_path_from_anywhere"
+      a.setProperties(loc)
+    }
+    added++
+    if (added < 8) {
+      model.setTimeout(addHormone, 250)
+    }
+  }
+  addHormone()
 }

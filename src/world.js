@@ -82,48 +82,52 @@ export default class World extends PropertiesHolder {
   }
 
   getPath(props, {x: agent_x, y: agent_y}) {
-    let matches = this.worldSvgModel.querySelectorAll(props.selector),
-        selection
+    let matchingPaths = this.worldSvgModel.querySelectorAll(props.selector),
+        path, initialLocation, percentAlongPath
     if (typeof props.which === "number") {
-      selection = matches[props.which]
+      path = matchingPaths[props.which]
     } else if (props.which === "random") {
-      selection = matches[Math.floor(Math.random() * matches.length)]
+      path = matchingPaths[Math.floor(Math.random() * matchingPaths.length)]
     } else if (props.which === "nearest" || (props.which && props.which.any_of_nearest) || props.within) {
       let numNearest = (props.which && props.which.any_of_nearest) ? props.which.any_of_nearest : 1,
           leastSqDistance = Array(numNearest).fill({dist: Infinity}),
           withinSq = (props.within * props.within) || Infinity
 
-      matches.forEach( m => {
-        let {x, y} = this.getLocationOfNode(m, props.at)
-        let dx = agent_x - x,
-            dy = agent_y - y,
+      matchingPaths.forEach( p => {
+        let {point, percentAlongPath} = this.getLocationOfNode(p, props.at, {x: agent_x, y: agent_y})
+        let dx = agent_x - point.x,
+            dy = agent_y - point.y,
             sqDistance = dx * dx + dy * dy
         // bump furthest
         if (sqDistance < withinSq && sqDistance < leastSqDistance[numNearest-1].dist) {
-          leastSqDistance[numNearest-1] = {path: m, dist: sqDistance}
+          leastSqDistance[numNearest-1] = {path: p, dist: sqDistance, initialLocation: point, percentAlongPath}
           // re-sort array from nearest to furthest
           leastSqDistance.sort(function(a, b) {
             return a.dist - b.dist
           })
         }
       })
-      selection = leastSqDistance[Math.floor(Math.random() * numNearest)].path
+
+      let selection = leastSqDistance[Math.floor(Math.random() * numNearest)]
+      ;({path, initialLocation, percentAlongPath} = selection)
     } else {
-      selection = matches[0]
+      path = matchingPaths[0]
     }
-    if (!selection) {
+    if (!path) {
       return null
     } else {
-      let length = selection.getTotalLength ? selection.getTotalLength() : 0
-      return { path: selection, length: length }
+      let length = path.getTotalLength ? path.getTotalLength() : 0
+      if (!initialLocation) {
+        ({point: initialLocation, percentAlongPath} = this.getLocationOfNode(path, props.at, {x: agent_x, y: agent_y}))
+      }
+      return { path, length, initialLocation, percentAlongPath }
     }
   }
 
   getLocation(props, {x, y}) {
     let loc = {}
     if (props.selector) {
-      let path = this.getPath(props, {x, y}).path
-      loc = this.getLocationOfNode(path, props.at)
+      loc = this.getPath(props, {x, y}).initialLocation
     }
     if (typeof props.x === "number") {
       loc.x = props.x
@@ -138,25 +142,55 @@ export default class World extends PropertiesHolder {
     return loc
   }
 
-  getLocationOfNode(node, percentageAlongPath) {
+  /**
+   * Returns an {x, y} location given an SVG node, and an option definition for a location on that node.
+   * Also returns the distance along the SVG node that point represents (for <path> nodes).
+   *
+   * @param {SVGnode} node An SVG element. If a <circle> or a <rect> is passed in, we will return the center point
+   * If a <path> is passed in, we will either return the first point or a point defined by @param at
+   * @param {(string|number)} at Defines which point along a <path> we should return. If we pass a number, from
+   * 0 to 1, it will return the point at that percentage along the path. If we pass "random" it will return a random
+   * point. If we pass "nearest" as well as @param fromPoint, it will return the nearest point to @param fromPoint
+   * @param {Object} fromPoint {x, y} location of point to measure @param at "nearest" from
+   * @returns {Object} {point: {x, y}, percentAlongPath}
+   */
+  getLocationOfNode(node, at, fromPoint) {
     if (node.tagName === "circle") {
-      return {x: node.cx.baseVal.value, y: node.cy.baseVal.value}
+      return {
+        point: {x: node.cx.baseVal.value, y: node.cy.baseVal.value},
+        percentAlongPath: 0
+      }
     } else if (node.tagName === "rect") {
       const x = node.x.baseVal.value
       const y = node.y.baseVal.value
       const width = node.width.baseVal.value
       const height = node.height.baseVal.value
-      return {x: x + width / 2, y: y + height / 2}
-    } else if (node.tagName === "path") {
-      if (percentageAlongPath === "random") {
-        percentageAlongPath = Math.random()
-      } else if (typeof percentageAlongPath !== "number") {
-        percentageAlongPath = 0
+      return {
+        point: {x: x + width / 2, y: y + height / 2},
+        percentAlongPath: 0
       }
-      let distanceAlong = (percentageAlongPath && node.getTotalLength) ? node.getTotalLength() * percentageAlongPath : 0
-      return this.getPointAlongPath(node, distanceAlong)
+    } else if (node.tagName === "path") {
+      if (at === "nearest") {
+        return util.closestPoint(node, fromPoint)
+      }
+      let percentAlongPath
+      if (at === "random") {
+        percentAlongPath = Math.random()
+      } else if (typeof at !== "number") {
+        percentAlongPath = 0
+      } else {
+        percentAlongPath = at
+      }
+      let distanceAlong = node.getTotalLength ? node.getTotalLength() * percentAlongPath : 0
+      return {
+        point: this.getPointAlongPath(node, distanceAlong),
+        percentAlongPath
+      }
     }
-    return {x: 0, y: 0}
+    return {
+      point: {x: 0, y: 0},
+      percentAlongPath: 0
+    }
   }
 
   /**
