@@ -30,7 +30,11 @@
 
     <fieldset id="buttons">
       <legend>Demo buttons</legend>
-      <button id="button-transparent" onClick="sendHexToReceptor()">Show binding</button>
+      <button onClick="toggleBrokenReceptor()">Toggle receptor</button><br/>
+      <button onClick="showContinuousBinding()">Show continuous binding</button><br/>
+      <button onClick="manualMode()">Manual mode</button><br/>
+      <button onClick="sendSingleHex()">Send single hormone</button><br/>
+      <button onClick="sendSingleGP()">Send single G Protein</button>
     </fieldset>
 
     <script type="text/javascript" src="src/app.js"></script>

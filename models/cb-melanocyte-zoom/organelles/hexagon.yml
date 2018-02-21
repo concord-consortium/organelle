@@ -25,19 +25,28 @@ rules:
       which: nearest
       direction: forward
       finally:
-        switch_state: waiting_on_receptor
+        switch_state: check_if_bound
+  check_if_bound:
+  - if:
+      fact: world.hormone_bound
+    then:
+      switch_state: heading_away_from_receptor
+    else:
+      switch_state: waiting_on_receptor
   waiting_on_receptor:
   - set:
       world.hormone_bound: true
   - notify: "bound"
   - wait:
-      for: 500
+      for: 300
       finally:
-        switch_state: heading_away_from_receptor
-  heading_away_from_receptor:
+        switch_state: unbind
+  unbind:
   - set:
       world.hormone_bound: false
   - notify: "unbound"
+  - switch_state: heading_away_from_receptor
+  heading_away_from_receptor:
   - follow:
       selector: "#intercellular-path-away-from-receptor path"
       which: nearest

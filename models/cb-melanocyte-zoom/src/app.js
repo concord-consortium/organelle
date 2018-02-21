@@ -1,4 +1,6 @@
-var model;
+var model,
+    continuousBinding = false,
+    oldHexSpawnDef;
 
 Organelle.createModel({
   container: {
@@ -18,6 +20,7 @@ Organelle.createModel({
     working_tyr1: false,
     working_myosin_5a: true,
     open_gates: true,
+    working_receptor: true,
     hormone_bound: false,
     g_protein_bound: false
   },
@@ -83,17 +86,7 @@ Organelle.createModel({
     "organelles/g-protein-body.yml",
     "organelles/g-protein-part.yml"
   ],
-  hotStart: 1500,
-  clickHandlers: [
-    {
-      selector: '#melanocyte_x5F_cell, #microtubules_x5F_grouped',
-      action: sayHiCytoplasm
-    },
-    {
-      species: "melanosome",
-      action: sayHiMelanosome
-    }
-  ]
+  hotStart: 1500
 }).then(function(m) {
   window.model = m
   model = m
@@ -147,7 +140,7 @@ Organelle.createModel({
 
   model.on("hexagon.notify", evt => {
     transformReceptor()
-    if (!model.world.getProperty("hormone_bound")) {
+    if (!model.world.getProperty("hormone_bound") && continuousBinding) {
       sendHexToReceptor()
     }
   })
@@ -168,62 +161,85 @@ Organelle.createModel({
   })
 });
 
-function makeTransparent() {
-  makeEverythingTransparentExcept({})
-
-  model.on("view.hover", evt => {
-    if (evt.target) console.log(evt.target.id)
-  })
-
-  model.on("view.hover.enter", evt => {
-    const highlightClasses = [
-      ".gate-a",
-      ".gate-b",
-      ".gate-c",
-      ".gate-d",
-      "#golgi_x5F_apparatus",
-      "#nucleus"
-    ].join(",")
-    let matches = evt.target._organelle.matches({selector: highlightClasses});
-    if (matches) {
-      makeEverythingOpaque()
-      makeEverythingTransparentExcept({selector: matches})
-    }
-  })
-
-  model.on("view.hover.exit", evt => {
-    makeEverythingOpaque()
-    makeEverythingTransparentExcept({})
-  })
-}
-
-function makeEverythingTransparentExcept(skip) {
-  model.view.setPropertiesOnAllObjects({opacity: "*0.2"}, true, skip, true)
-}
-
-function makeEverythingOpaque() {
-  model.view.resetPropertiesOnAllObjects()
-}
-
-function sayHiCytoplasm() {
-  console.log("cytoplasm says hi")
-}
-
-function sayHiMelanosome(evt) {
-  console.log("melansome says hi", evt.agent)
-}
-
 function transformReceptor() {
-  if (model.world.getProperty("hormone_bound")) {
-    model.view.hide("#receptor_x5F_protein", true)
-    model.view.show("#receptor_x5F_protein_bound", true)
+  if (model.world.getProperty("working_receptor")) {
+    model.view.hide("#receptor_x5F_protein_broken", true)
+    if (model.world.getProperty("hormone_bound")) {
+      model.view.hide("#receptor_x5F_protein", true)
+      model.view.show("#receptor_x5F_protein_bound", true)
+    } else {
+      model.view.show("#receptor_x5F_protein", true)
+      model.view.hide("#receptor_x5F_protein_bound", true)
+    }
   } else {
-    model.view.show("#receptor_x5F_protein", true)
+    model.view.hide("#receptor_x5F_protein", true)
     model.view.hide("#receptor_x5F_protein_bound", true)
+    model.view.show("#receptor_x5F_protein_broken", true)
   }
 }
 
 function sendHexToReceptor() {
   bindingAgent = model.world.createAgent(model.world.species.hexagon);
   bindingAgent.state = "heading_to_receptor";
+}
+
+function showContinuousBinding() {
+  continuousBinding = true
+  // add new g-proteins removed by manual mode
+  let gCount = model.world.agents.filter(a => a.species.name === "gProtein").length
+  // allow new hexes to be born
+  if (oldHexSpawnDef) {
+    model.world.species.hexagon.spawn.every = oldHexSpawnDef
+  }
+  for (var i=0; i < 3-gCount; i++) {
+    model.world.createAgent(model.world.species.gProtein)
+  }
+  function sendHexToReceptorOccasionally() {
+    sendHexToReceptor()
+    var nextTime = Math.floor(Math.random() * 10000)
+    model.setTimeout(sendHexToReceptorOccasionally, nextTime)
+  }
+  sendHexToReceptorOccasionally()
+}
+
+function manualMode() {
+  continuousBinding = false
+  // don't create any new hexes
+  oldHexSpawnDef = model.world.species.hexagon.spawn.every
+  model.world.species.hexagon.spawn.every = 0
+  // kill all existing hexes and gProteins
+  for (agent of model.world.agents) {
+    if (agent.species.name === "gProtein" || agent.species.name === "hexagon") {
+      agent.die()
+    }
+  }
+  model.setTimeout(() => {
+    model.world.setProperty("g_protein_bound", false)
+    model.world.setProperty("hormone_bound", false)
+    console.log("after timeout", model.world.getProperty("hormone_bound"))
+  }, 1);
+}
+
+function sendSingleHex() {
+  sendHexToReceptor()
+}
+
+function sendSingleGP() {
+  model.world.createAgent(model.world.species.gProtein)
+}
+
+function toggleBrokenReceptor() {
+  const wasWorking = model.world.getProperty("working_receptor")
+  model.world.setProperty("working_receptor", !wasWorking)
+  transformReceptor()
+
+  // knock off any existing proteins.
+  // (this could also be in agent def, but seems specific to this toggle button)
+  if (wasWorking) {
+    for (agent of model.world.agents) {
+      if (agent.species.name === "gProtein" && (agent.state === "bound" || agent.state === "waiting_to_break")) {
+        agent.state = "away"
+      }
+    }
+  }
 }
