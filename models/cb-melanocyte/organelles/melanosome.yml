@@ -5,11 +5,11 @@ spawn:
   'on':
     selector: "#golgi_x5F_apparatus path"
     at: random
-  every: 25
+  every: 15
 dieWhenExitingWorld: false
 properties:
   size: 0.1
-  speed: 1.5
+  speed: 1.6
   image_selector: melanosome_1
   g_protein_to_grow: [1, 100]
 initialState: growing
@@ -59,7 +59,7 @@ rules:
   - if:
       all:
       - fact: world.working_myosin_5a
-      - random: 0.5
+      - random: 0.8
     then:
       follow:
         selector: "#microtubules_x5F_grouped path"
@@ -154,17 +154,17 @@ rules:
         switch_state: waiting_on_nuclear_actin_terminal
   waiting_on_actin_terminal:
   - wait:
-      for: 6000
+      for: 1500
       finally:
         switch_state: dying
   waiting_on_nuclear_actin_terminal:
   - wait:
-      for: 6000
+      for: 1500
       finally:
         switch_state: dying
   waiting_on_scale_actin_terminal:
   - wait:
-      for: 8000
+      for: 1500
       finally:
         switch_state: dying
   - if:
@@ -174,7 +174,7 @@ rules:
       switch_state: dying
   dying:
   - grow:
-      by: -0.02
+      by: -0.04
       until: 0.01
       finally:
         die: true
@@ -185,7 +185,7 @@ rules:
       - state: waiting_on_nuclear_actin_terminal
     then:
       wait:
-        for: [400, 900]
+        for: [400, 700]
         finally:
           switch_state: dying
   - if:
@@ -195,7 +195,7 @@ rules:
       - state: waiting_on_actin_terminal
     then:
       wait:
-        for: [500, 1100]
+        for: [500, 500]
         finally:
           switch_state: dying
   - if:
@@ -207,7 +207,7 @@ rules:
         lessThan: 0.9
     then:
       wait:
-        for: [200, 600]
+        for: [200, 300]
         finally:
           switch_state: dying
   - if:
@@ -218,13 +218,13 @@ rules:
         greaterThan: 0.9
     then:
       wait:
-        for: [200, 600]
+        for: [200, 300]
         finally:
           switch_state: dying
   - if:
       fact: world.albino
     then:
       wait:
-        for: [200, 400]
+        for: [200, 200]
         finally:
           switch_state: dying
