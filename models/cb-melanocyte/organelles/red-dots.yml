@@ -29,7 +29,8 @@ rules:
   - move_to:
       selector: "#intercellular-paths path"
       at: nearest
-      which: nearest
+      which:
+        any_of_nearest: 2
       finally:
         switch_state: flowing_from_anywhere
   flowing_from_anywhere:

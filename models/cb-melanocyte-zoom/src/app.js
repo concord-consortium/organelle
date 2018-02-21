@@ -1,4 +1,6 @@
 var model,
+    addingHormone = false,
+    addingGProtein = false,
     continuousBinding = false,
     hormoneSpawnPeriod = 30;
 
@@ -135,11 +137,13 @@ Organelle.createModel({
   model.on("view.click", evt => {
     console.log("click!", evt.target.id)
 
-    if (evt.target._organelle.matches({selector: ".gate"})) {
-      console.log("clicked a gate", evt.target)
-    }
-    if (evt.target._organelle.matches({species: "melanosome"})) {
-      console.log("clicked a melanosome", evt.target._organelle.agent)
+    const loc = model.view.transformToWorldCoordinates({x: evt.e.offsetX, y: evt.e.offsetY})
+    if (evt.target._organelle.matches({selector: "#intercell"})) {
+      clickIntercell(loc)
+    } else if (evt.target._organelle.matches({selector: "#gprotein-paths-to-receptor, #intercell_zoom_bounds_bottom"})) {
+      clickInsideCell(loc)
+    } else if (evt.target._organelle.matches({selector: "#intercell_zoom_bounds_top"})) {
+      clickTopCell(loc)
     }
   })
 
@@ -240,4 +244,97 @@ hormoneSpawnSlider.oninput = function() {
   let period = rate === 0 ? 0 : Math.floor(500 / rate)
   console.log(period)
   model.world.setProperty("hormone_spawn_period", period)
+}
+
+document.getElementById('select-none').addEventListener('click', function(e) {
+  addingHormone = false
+  addingGProtein = false
+});
+document.getElementById('select-add-hormone').addEventListener('click', function(e) {
+  addingHormone = true
+  addingGProtein = false
+});
+document.getElementById('select-add-g-protein').addEventListener('click', function(e) {
+  addingHormone = false
+  addingGProtein = true
+});
+
+function addAgent(species, state, props, number) {
+  for (let i = 0; i < number; i++) {
+    const a = model.world.createAgent(model.world.species[species])
+    a.state = state
+    a.setProperties(props)
+  }
+}
+
+function clickIntercell(loc) {
+  if (addingHormone) {
+    let added = 0;
+    function addHormone() {
+      addAgent("hexagon", "enter_from_click", loc, 1)
+      added++
+      if (added < 8) {
+        model.setTimeout(addHormone, 150)
+      }
+    }
+    addHormone()
+  } else if (addingGProtein) {
+    let added = 0;
+    function addHormone() {
+      addAgent("gProteinPart", "find_flowing_path", loc, 1)
+      added++
+      if (added < 8) {
+        model.setTimeout(addHormone, 150)
+      }
+    }
+    addHormone()
+  }
+}
+
+function clickInsideCell(loc) {
+  if (addingHormone) {
+    let added = 0;
+    function addHormone() {
+      addAgent("hexagon", "diffuse", {speed: 0.4, x: loc.x, y: loc.y}, 2)
+      added++
+      if (added < 6) {
+        model.setTimeout(addHormone, 150)
+      }
+    }
+    addHormone()
+  } else if (addingGProtein) {
+    let added = 0;
+    function addHormone() {
+      addAgent("gProteinPart", "in_cell_from_click", loc, 1)
+      added++
+      if (added < 8) {
+        model.setTimeout(addHormone, 300)
+      }
+    }
+    addHormone()
+  }
+}
+
+function clickTopCell(loc) {
+  if (addingHormone) {
+    let added = 0;
+    function addHormone() {
+      addAgent("hexagon", "diffuse", {speed: 0.4, x: loc.x, y: loc.y}, 2)
+      added++
+      if (added < 6) {
+        model.setTimeout(addHormone, 150)
+      }
+    }
+    addHormone()
+  } else if (addingGProtein) {
+    let added = 0;
+    function addHormone() {
+      addAgent("gProteinPart", "diffuse", loc, 1)
+      added++
+      if (added < 8) {
+        model.setTimeout(addHormone, 250)
+      }
+    }
+    addHormone()
+  }
 }
