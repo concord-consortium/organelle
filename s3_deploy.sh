@@ -1,5 +1,5 @@
 #!/bin/sh
-SRC_DIR='dist'
+SRC_DIR='lib'
 DISTRIBUTION_ID='E4133Z9DVQKDD'
 
 # this will deploy the current public folder to a subfolder in the s3 bucket
