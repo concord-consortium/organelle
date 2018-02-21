@@ -91,6 +91,10 @@ Organelle.createModel({
   window.model = m
   model = m
 
+  model.on("view.loaded", () => {
+    transformReceptor()
+  })
+
   model.setTimeout( () => {
     for (var i=0; i < 3; i++) {
       model.world.createAgent(model.world.species.gProtein)

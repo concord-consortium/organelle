@@ -2,7 +2,7 @@ import { fabric } from 'fabric'
 import util from './util'
 
 export default class View {
-  constructor(world, elId, width, height, onClick, onHover) {
+  constructor(world, elId, width, height, onLoaded, onClick, onHover) {
     this.world = world
     this.container = document.getElementById(elId)
     if (!this.container) {
@@ -22,6 +22,7 @@ export default class View {
 
     this.width = width
     this.height = height
+    this.onLoaded = onLoaded
     this.onClick = onClick
     this.onHover = onHover
 
@@ -73,6 +74,7 @@ export default class View {
       this.background.scale(this.scale)
 
       this.loaded = true
+      this.onLoaded()
       this.canvas.remove(this.loadingText)
     });
   }

@@ -7,6 +7,7 @@ import util from './util'
 
 const events = {
   MODEL_STEP: "model.step",
+  VIEW_LOADED: "view.loaded",
   VIEW_CLICK: "view.click",
   VIEW_HOVER: "view.hover",
   VIEW_HOVER_ENTER: "view.hover.enter",
@@ -51,12 +52,13 @@ class Model {
     this._currentZoom = 1
     this._targetZoom = 1
 
+    this._onViewLoaded = this._onViewLoaded.bind(this)
     this._onViewClick = this._onViewClick.bind(this)
     this._onViewHover = this._onViewHover.bind(this)
     this._onWorldEvent = this._onWorldEvent.bind(this)
 
     // initialize loading view
-    this.view = new View(null, elId, width, height, this._onViewClick, this._onViewHover)
+    this.view = new View(null, elId, width, height, this._onViewLoaded, this._onViewClick, this._onViewHover)
 
     // load model SVG
     const loadModelSvg = new Promise(resolve => {
@@ -236,6 +238,10 @@ class Model {
       this.listeners[event] = []
     }
     this.listeners[event].push(listener)
+  }
+
+  _onViewLoaded() {
+    this._notifyListeners(events.VIEW_LOADED)
   }
 
   _onViewClick(evt) {
