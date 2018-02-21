@@ -1,0 +1,145 @@
+<html>
+  <head>
+    <script type="text/javascript" src="../../organelle.js" charset="utf-8"></script>
+    <script src="lib/codemirror.js"></script>
+    <link rel="stylesheet" href="lib/codemirror.css">
+    <script src="lib/yaml.js"></script>
+    <style rel="stylesheet">
+      .CodeMirror {
+        height: 500px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Organelle demos</h1>
+    <fieldset style="float: left; padding: 10px">
+      <legend>Agent rules</legend>
+      <textarea id="agent-code"></textarea>
+    </fieldset>
+    <fieldset style="float: left; padding: 10px">
+      <legend>Following paths</legend>
+      <div id="follow-model" style="display: inline-block;"></svg>
+    </fieldset>
+    <fieldset style="position: absolute; top: 411px; left: 457px;">
+      <legend>World props</legend>
+      <input id="working_tyr1" type="checkbox" checked="checked" />working_tyr1
+    </fieldset>
+    <button id="reload" style="position: absolute; font-size: 1.1em; left: 459px; top: 580px;">Reload</button>
+
+
+    <button id="start-stop" style="position: absolute; font-size: 1.1em; left: 459px; top: 550px;">Pause</button>
+    <button id="fast" style="position: absolute; font-size: 1.1em; left: 531px; top: 550px;">Fast</button>
+
+    <script>
+      var agentYml =
+`---
+name: melanosome
+image: assets/melanosome.svg
+dieWhenExitingWorld: false
+spawn:
+  on:
+    selector: "#golgi_x5F_apparatus path"
+    at: random
+  every: 90
+rules:
+  initialization:
+  - set:
+      size: 0.1
+      speed: 1
+    switch_state: growing
+  growing:
+  - if:
+      fact: world.working_tyr1
+    then:
+    - grow:
+        by: 0.005
+        until: 1
+        finally:
+          switch_state: seeking_microtuble
+    else:
+      grow:
+        by: 0.005
+        until: 0.6
+        finally:
+          switch_state: seeking_microtuble
+  seeking_microtuble:
+  - move_to:
+      selector: "#microtubules_x5F_grouped path"
+      which: random
+      finally:
+        switch_state: following_microtuble_outwards
+  following_microtuble_outwards:
+  - follow:
+      selector: "#microtubules_x5F_grouped path"
+      which: nearest
+      direction: forward
+      finally:
+        die: true`
+
+      var textArea = document.getElementById("agent-code");
+      textArea.innerHTML = agentYml;
+
+      var myCodeMirror = CodeMirror.fromTextArea(textArea);
+
+      var model;
+
+      function loadModel(ymlString) {
+        if (model && model.stop) {
+          model.stop();
+          document.getElementById("follow-model").innerHTML = "";
+        }
+
+        Organelle.createModel({
+          container: {
+            elId: "follow-model",
+            width: 600,
+            height: 300
+          },
+          modelSvg: "assets/golgi-and-microtubules.svg",
+          properties: {
+            working_tyr1: true
+          },
+          clickHandlers: [],
+          species: [
+            ymlString
+          ]
+        }).then(function(m) { model = m; model.run() });
+      }
+
+      loadModel(agentYml);
+
+      document.getElementById("reload").onclick = function() {
+        var text = myCodeMirror.getValue();
+        loadModel(text);
+      }
+
+      var running = true;
+      document.getElementById("start-stop").onclick = function() {
+        if (running) {
+          model.stop();
+          document.getElementById("start-stop").innerHTML = "Run";
+        } else {
+          model.run();
+          document.getElementById("start-stop").innerHTML = "Pause";
+        }
+        running = !running;
+      }
+
+      var slow = true;
+      document.getElementById("fast").onclick = function() {
+        if (slow) {
+          model.setSpeed(300);
+          document.getElementById("fast").innerHTML = "Slow";
+        } else {
+          model.setSpeed(100);
+          document.getElementById("fast").innerHTML = "Fast";
+        }
+        slow = !slow;
+      }
+
+      document.getElementById("working_tyr1").onclick = function() {
+        model.world.setProperty("working_tyr1", document.getElementById("working_tyr1").checked)
+      }
+    </script>
+  </body>
+</html>

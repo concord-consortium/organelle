@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <script type="text/javascript" src="../../organelle.js" charset="utf-8"></script>
+    <style media="screen" type="text/css">
+      svg {
+        background-color: white;
+      }
+
+      .model {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        transform: translate(-50%, 0);
+        height: 100vh;
+        width: 160vh;
+        opacity: 1;
+        -webkit-transition: opacity 6s;
+        transition: opacity 6s;
+      }
+
+      #buttons {
+        position: absolute;
+        right: 0;
+        bottom: 1vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="model" class="model"></div>
+
+    <fieldset id="buttons">
+      <legend>Demo buttons</legend>
+      <button id="button-transparent" onClick="makeTransparent()">Show transparent hover</button><br />
+      <button id="button-zoom" onClick="zoomToReceptor()">Zoom to receptor</button><br/>
+      <hr/>
+      Activated G Protein:<br/>
+      <input id="activated_g_protein" type="range" min="0" max="100" value="20"><br/>
+      Hormone level:<br/>
+      <input id="hormone_level" type="range" min="0" max="100" value="0"><br/>
+      <button id="button-hormone-pulse" onClick="hormonePulse()">Hormone pulse</button><br/>
+      <hr/>
+      <input id="select-add-hormone" type="checkbox">
+      <label for="select-add-hormone">Add hormone</label><br/>
+    </fieldset>
+
+    <script type="text/javascript" src="src/app.js"></script>
+  </body>
+</html>

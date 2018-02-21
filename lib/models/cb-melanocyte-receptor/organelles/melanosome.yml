@@ -1,0 +1,241 @@
+---
+name: melanosome
+image: assets/melanosome.svg
+spawn:
+  'on':
+    selector: "#golgi_x5F_apparatus path"
+    at: random
+  every: 50
+dieWhenExitingWorld: false
+properties:
+  size: 0.1
+  speed: 1.5
+  image_selector: melanosome_1
+initialState: growing
+rules:
+  growing:
+  - if:
+      fact: world.albino
+    then:
+      grow:
+        by: 0.005
+        until: 0.4
+        finally:
+          switch_state: seeking_microtuble
+  - if:
+      all:
+        - fact:
+            not: world.albino
+        - fact: world.working_tyr1
+    then:
+    - grow:
+        by: 0.005
+        until: 1
+        finally:
+          switch_state: seeking_microtuble
+    - if:
+        fact: size
+        between: [0.5, 0.7]
+      then:
+        set_image_selector: melanosome_2
+    - if:
+        fact: size
+        between: [0.7, 0.9]
+      then:
+        set_image_selector: melanosome_3
+    - if:
+        fact: size
+        greaterThan: 0.9
+      then:
+        set_image_selector: melanosome_4
+  - if:
+      all:
+        - fact:
+            not: world.albino
+        - fact:
+            not: world.working_tyr1
+    then:
+      grow:
+        by: 0.005
+        until: 0.6
+        finally:
+          set_image_selector: melanosome_2
+          switch_state: seeking_microtuble
+  seeking_microtuble:
+  - move_to:
+      selector: "#microtubules_x5F_grouped path"
+      which: random
+      finally:
+        switch_state: following_microtuble_outwards
+  following_microtuble_outwards:
+  - if:
+      all:
+      - fact: world.working_myosin_5a
+      - random: 0.5
+    then:
+      follow:
+        selector: "#microtubules_x5F_grouped path"
+        which: nearest
+        direction: forward
+        until: [0.2, 0.9]
+        finally:
+          switch_state: find_actin_terminal
+    else:
+      follow:
+        selector: "#microtubules_x5F_grouped path"
+        which: nearest
+        direction: forward
+        finally:
+          switch_state: at_edge_of_cell
+  at_edge_of_cell:
+    - if:
+        all:
+        - fact: world.open_gates
+        - exists:
+            selector: "#gate_exits circle"
+            within: 100
+      then:
+        switch_state: moving_through_gate
+      else:
+        switch_state: following_microtuble_inwards
+  moving_through_gate:
+  - move_to:
+      selector: "#gate_exits circle"
+      which: nearest
+      finally:
+        switch_state: moving_to_scale_actin_terminal
+  - set:
+      speed: 0.5
+  - if:
+      fact: size
+      greaterThan: 0.9
+    then:
+      set:
+        size: 0.8
+  moving_to_scale_actin_terminal:
+  - set:
+      speed: 1.5
+  - if:
+      fact: size
+      equals: 0.8
+    then:
+      set:
+        size: 1
+  - move_to:
+      selector: "#scale_actin_terminals circle"
+      which:
+        any_of_nearest: 10
+      random_offset: 10
+      finally:
+        switch_state: waiting_on_scale_actin_terminal
+  following_microtuble_inwards:
+  - if:
+      fact: world.working_myosin_5a
+    then:
+      follow:
+        selector: "#microtubules_x5F_grouped path"
+        which: nearest
+        at: 1
+        direction: backward
+        until: [0.2, 0.9]
+        finally:
+          switch_state: find_actin_terminal
+    else:
+      follow:
+        selector: "#microtubules_x5F_grouped path"
+        which: nearest
+        at: 1
+        direction: backward
+        finally:
+          switch_state: find_nuclear_actin_terminal
+  find_actin_terminal:
+  - move_to:
+      selector: "#actin_terminals circle"
+      which:
+        any_of_nearest: 6
+      random_offset: 10
+      finally:
+        switch_state: waiting_on_actin_terminal
+  find_nuclear_actin_terminal:
+  - move_to:
+      selector: "#nuclear_actin_terminals circle"
+      which:
+        any_of_nearest: 5
+      random_offset: 3
+      finally:
+        switch_state: waiting_on_nuclear_actin_terminal
+  waiting_on_actin_terminal:
+  - wait:
+      for: 6000
+      finally:
+        switch_state: dying
+  waiting_on_nuclear_actin_terminal:
+  - wait:
+      for: 6000
+      finally:
+        switch_state: dying
+  waiting_on_scale_actin_terminal:
+  - wait:
+      for: 8000
+      finally:
+        switch_state: dying
+  - if:
+      fact:
+        not: world.open_gates
+    then:
+      switch_state: dying
+  dying:
+  - grow:
+      by: -0.02
+      until: 0.01
+      finally:
+        die: true
+  always:
+  - if:
+      all:
+      - fact: world.working_myosin_5a
+      - state: waiting_on_nuclear_actin_terminal
+    then:
+      wait:
+        for: [400, 900]
+        finally:
+          switch_state: dying
+  - if:
+      all:
+      - fact:
+          not: world.working_myosin_5a
+      - state: waiting_on_actin_terminal
+    then:
+      wait:
+        for: [500, 1100]
+        finally:
+          switch_state: dying
+  - if:
+      all:
+      - fact: world.working_tyr1
+      - state: [waiting_on_actin_terminal, waiting_on_nuclear_actin_terminal]
+      - fact: size
+        lessThan: 0.9
+    then:
+      wait:
+        for: [200, 600]
+        finally:
+          switch_state: dying
+  - if:
+      all:
+      - fact:
+          not: world.working_tyr1
+      - fact: size
+        greaterThan: 0.9
+    then:
+      wait:
+        for: [200, 600]
+        finally:
+          switch_state: dying
+  - if:
+      fact: world.albino
+    then:
+      wait:
+        for: [200, 400]
+        finally:
+          switch_state: dying

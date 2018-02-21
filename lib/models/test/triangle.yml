@@ -1,0 +1,24 @@
+---
+name: triangle
+image: triangle.svg
+selector: "#triangle"
+spawn:
+  'on':
+    selector: "#intercellular-paths path"
+    which: random
+  every: 30
+  # never: true
+  # start: true
+dieWhenExitingWorld: false
+properties:
+  speed: 1.2
+  size: 1
+initialState: flowing
+rules:
+  flowing:
+  - follow:
+      selector: "#intercellular-paths path"
+      which: nearest
+      direction: forward
+      finally:
+        die: true
