@@ -5,7 +5,7 @@ module.exports = {
     'app': './src/app.js',
   },
   output: {
-    path: __dirname + "/dist",
+    path: __dirname + "/lib",
     filename: "organelle.js",
     library: 'Organelle'
   },

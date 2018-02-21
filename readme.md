@@ -38,10 +38,10 @@ var Organelle = require('organelle')
     yarn
     npm start
 
-    // view the contents of /dist in your browser.
+    // view the contents of /lib in your browser.
     // e.g. using live-server, in another tab:
     npm install -g live-server
-    live-server dist
+    live-server lib
 
 ## Goals for 1.0 release:
 

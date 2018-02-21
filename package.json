@@ -3,12 +3,12 @@
   "version": "0.0.5",
   "description": "An agent-based modeling library based on SVG and declarative rules.",
   "license": "MIT",
-  "main": "dist/organelle.js",
+  "main": "lib/organelle.js",
   "scripts": {
     "start": "webpack --watch",
     "build": "webpack",
     "test": "mocha --compilers js:babel-core/register -r jsdom-global/register",
-    "compile": "rimraf dist/* && npm run build",
+    "compile": "rimraf lib/* && npm run build",
     "prepublish": "npm run compile"
   },
   "directories": {
