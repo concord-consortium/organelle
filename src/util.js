@@ -20,6 +20,11 @@ fabric.StaticCanvas.prototype.zoomToPoint = function (point, value) {
 
 
 export default {
+
+
+  _pathCacheIdIndex: 0,
+  _cachedPathPoints: {},
+
   parseSVG(svgString) {
     let doc
     if (typeof DOMParser !== 'undefined') {
@@ -187,7 +192,7 @@ export default {
 
   // from https://bl.ocks.org/mbostock/8027637
   closestPoint(pathNode, point) {
-    var pathLength = pathNode.getTotalLength(),
+    var pathLength = this.getLengthOfPath(pathNode),
         precision = 16,
         best,
         bestLength,
@@ -195,7 +200,7 @@ export default {
 
     // linear scan for coarse approximation
     for (var scan, scanLength = 0, scanDistance; scanLength <= pathLength; scanLength += precision) {
-      if ((scanDistance = distance2(scan = pathNode.getPointAtLength(scanLength))) < bestDistance) {
+      if ((scanDistance = distance2(scan = this.getPointAlongPath(pathNode, scanLength))) < bestDistance) {
         best = scan, bestLength = scanLength, bestDistance = scanDistance
       }
     }
@@ -228,5 +233,111 @@ export default {
           dy = p.y - point.y
       return dx * dx + dy * dy
     }
+  },
+
+  /**
+   * Caches `pathEl.getTotalLength` as the native SVG method is slow
+   *
+   * @param {SVGGeometryElement} pathEl
+   */
+  getLengthOfPath(pathEl) {
+    if (pathEl._length) {
+      return pathEl._length
+    }
+    pathEl._length = pathEl.getTotalLength()
+    return pathEl._length
+  },
+
+  /**
+   * If passed a path, this returns a point on the path at distance dist.
+   *
+   * If passed another SVG shape, it just returns the x,y location of the bounding box (for now).
+   *
+   * The native SVG method path.getPointAtLength(dist) is fairly slow. To reduce the time spent
+   * on this in a model with a lot of path following, we cache every result we find.
+   *
+   * In the basic Geniventure Melanocyte model, with about 30 followable paths, this allows a ~10x
+   * speed increase, and results in ~14,000 points cached, weighing about 7MB.
+   *
+   * @param {SVGGeometryElement} path
+   * @param {number} dist Optional distance measured in SVG units. Default 0.
+   */
+  getPointAlongPath(pathEl, dist) {
+    if (!pathEl._cacheId) {
+      pathEl._cacheId = ++this._pathCacheIdIndex
+    }
+    // use toFixed so as not to cache dist = 20 and dist = 20.00001 separately
+    const cacheStr = pathEl._cacheId + "." + dist.toFixed()
+    if (this._cachedPathPoints[cacheStr]) {
+      return this._cachedPathPoints[cacheStr]
+    }
+    let val
+    if (pathEl.getPointAtLength) {
+      dist = Math.max(0, dist)
+      val = pathEl.getPointAtLength(dist)
+    } else {
+      val = pathEl.getBBox()
+    }
+    // cache just the x and y, which is a (tiny) bit lighter than the SVGPoint returned above
+    const ret = {x: val.x, y: val.y}
+    this._cachedPathPoints[cacheStr] = ret
+    return ret
+  },
+
+  isBetween(a, b1, b2) {
+    if ((a >= b1) && (a <= b2)) { return true; }
+    if ((a >= b2) && (a <= b1)) { return true; }
+    return false;
+  },
+
+  /**
+   * Tests if two lines intersect.
+   *
+   * @param {Object} line1 Line formatted as {x1, y1, x2, y2}
+   * @param {Object} line1 Line formatted as {x1, y1, x2, y2}
+   * @returns {x, y} point of intersection, or false
+   */
+  testLineLineIntersection(line1, line2) {
+    var x1 = line1.x1, x2 = line1.x2, x3 = line2.x1, x4 = line2.x2;
+    var y1 = line1.y1, y2 = line1.y2, y3 = line2.y1, y4 = line2.y2;
+    var pt_denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+    var pt_x_num = (x1*y2 - y1*x2) * (x3 - x4) - (x1 - x2) * (x3*y4 - y3*x4);
+    var pt_y_num = (x1*y2 - y1*x2) * (y3 - y4) - (y1 - y2) * (x3*y4 - y3*x4);
+    if (pt_denom == 0) {
+      // parallel
+      return false
+    }
+    else {
+      var pt = {'x': pt_x_num / pt_denom, 'y': pt_y_num / pt_denom};
+      if (this.isBetween(pt.x, x1, x2) && this.isBetween(pt.y, y1, y2) && this.isBetween(pt.x, x3, x4) && this.isBetween(pt.y, y3, y4)) { return pt; }
+      else {
+        // misses
+        return false
+      }
+    }
+  },
+
+  /**
+   * Tests if a path and a line intersect.
+   *
+   * @param {SVGPath} pathEl SVG Path
+   * @param {Object} line Line formatted as {x1, y1, x2, y2}
+   * @returns true if intersects
+   */
+  testPathLineIntersection(pathEl, line) {
+    var n_segments = 40
+    var pathLength = this.getLengthOfPath(pathEl)
+    for (var i=0; i<n_segments; i++) {
+      var pos1 = this.getPointAlongPath(pathEl, pathLength * i / n_segments)
+      var pos2 = this.getPointAlongPath(pathEl, pathLength * (i+1) / n_segments)
+      var line1 = {x1: pos1.x, x2: pos2.x, y1: pos1.y, y2: pos2.y}
+      var pt = this.testLineLineIntersection(line1, line)
+      if (pt) {
+        // return bool immediately. If ever needed, we could instead add each
+        // intersection to an array and pass that back
+        return true
+      }
+    }
+    return false
   }
 }

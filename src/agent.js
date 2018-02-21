@@ -1,6 +1,9 @@
-import PropertiesHolder from "./properties-holder"
+import PropertiesHolder from './properties-holder'
 import rules from './rules'
+import util from './util'
 const { runRules, getEntityAndProp } = rules
+const two_pi = Math.PI * 2
+const half_pi = Math.PI / 2
 
 export default class Agent extends PropertiesHolder {
   /**
@@ -163,7 +166,7 @@ export default class Agent extends PropertiesHolder {
     distance += (speed * direction)
     this.references[key].distance = distance
 
-    let {x, y} = this.world.getPointAlongPath(pathInfo.path, distance)
+    let {x, y} = util.getPointAlongPath(pathInfo.path, distance)
 
     this.props.x = x
     this.props.y = y
@@ -195,17 +198,71 @@ export default class Agent extends PropertiesHolder {
 
     speed = (distSq > speedSq) ? speed : Math.sqrt(distSq)
 
-    let vx = Math.cos(direction) * speed,
-        vy = Math.sin(direction) * speed
-
-    this.props.x += vx
-    this.props.y += vy
+    this.travel({speed, direction})
 
     return (this.props.x === x && this.props.y === y)
   }
 
+  /**
+   *  returns the next location given a speed and direction, without actually going there.
+   */
+  nextLoc({speed, direction}) {
+    let vx = Math.cos(direction) * speed,
+        vy = Math.sin(direction) * speed
+    return {
+      x: this.props.x + vx,
+      y: this.props.y + vy
+    }
+  }
+
+  travel({speed, direction}) {
+    this.setProperties(this.nextLoc({speed, direction}))
+  }
+
   task_set_image_selector(selector) {
     this.props.image_selector = selector
+  }
+
+  task_diffuse(val) {
+    const key = this.stateChangeCount + JSON.stringify(val)
+    let direction, boundingPaths, endTime
+    if (this.references[key]) {
+      ({direction, boundingPaths, endTime} = this.references[key])
+    } else {
+      direction = Math.random() * two_pi
+      if (val.bounding_paths) {
+        boundingPaths = []
+        val.bounding_paths.forEach((selector) => boundingPaths = boundingPaths.concat(this.world.findNodes(selector)))
+      }
+      if (val.for) {
+        endTime = this.world.tick + this.getNumber(val.for)
+      }
+      this.references[key] = {direction, boundingPaths, endTime}
+    }
+    if (Math.random() < 0.1) {
+      direction += (Math.random() * half_pi) - (half_pi/2)
+    }
+
+    if (endTime && this.world.tick >= endTime) {
+      delete this.references[key]
+      return true
+    }
+
+    let nextLoc,
+        crosses = true,
+        maxAttempts = 3
+    while (crosses && --maxAttempts) {
+      nextLoc = this.nextLoc({speed: this.props.speed, direction})
+      let line = {x1: this.props.x, y1: this.props.y, x2: nextLoc.x, y2: nextLoc.y}
+      crosses = boundingPaths.some((path) => util.testPathLineIntersection(path, line))
+      if (crosses) {
+        direction += (Math.random() * Math.PI) - (half_pi)
+      }
+    }
+    if (!crosses) {
+      this.references[key].direction = direction
+      this.setProperties(nextLoc)
+    }
   }
 
   task_wait(val) {

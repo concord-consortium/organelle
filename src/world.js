@@ -29,9 +29,6 @@ export default class World extends PropertiesHolder {
 
     this._agentNotified = this._agentNotified.bind(this)
     this.notify = options.notify
-
-    this._pathCacheIdIndex = 0
-    this._cachedPathPoints = {}
   }
 
   step() {
@@ -81,8 +78,12 @@ export default class World extends PropertiesHolder {
     this.notify(evtName, {agent: agent, message: message})
   }
 
+  findNodes(selector) {
+    return Array.from(this.worldSvgModel.querySelectorAll(selector))
+  }
+
   getPath(props, {x: agent_x, y: agent_y}) {
-    let matchingPaths = this.worldSvgModel.querySelectorAll(props.selector),
+    let matchingPaths = this.findNodes(props.selector),
         path, initialLocation, percentAlongPath
     if (typeof props.which === "number") {
       path = matchingPaths[props.which]
@@ -116,7 +117,7 @@ export default class World extends PropertiesHolder {
     if (!path) {
       return null
     } else {
-      let length = path.getTotalLength ? path.getTotalLength() : 0
+      let length = path.getTotalLength ? util.getLengthOfPath(path) : 0
       if (!initialLocation) {
         ({point: initialLocation, percentAlongPath} = this.getLocationOfNode(path, props.at, {x: agent_x, y: agent_y}))
       }
@@ -181,9 +182,9 @@ export default class World extends PropertiesHolder {
       } else {
         percentAlongPath = at
       }
-      let distanceAlong = node.getTotalLength ? node.getTotalLength() * percentAlongPath : 0
+      let distanceAlong = node.getTotalLength ? util.getLengthOfPath(node) * percentAlongPath : 0
       return {
-        point: this.getPointAlongPath(node, distanceAlong),
+        point: util.getPointAlongPath(node, distanceAlong),
         percentAlongPath
       }
     }
@@ -191,42 +192,6 @@ export default class World extends PropertiesHolder {
       point: {x: 0, y: 0},
       percentAlongPath: 0
     }
-  }
-
-  /**
-   * If passed a path, this returns a point on the path at distance dist.
-   *
-   * If passed another SVG shape, it just returns the x,y location of the bounding box (for now).
-   *
-   * The native SVG method path.getPointAtLength(dist) is fairly slow. To reduce the time spent
-   * on this in a model with a lot of path following, we cache every result we find.
-   *
-   * In the basic Geniventure Melanocyte model, with about 30 followable paths, this allows a ~10x
-   * speed increase, and results in ~14,000 points cached, weighing about 7MB.
-   *
-   * @param {SVG Element} path
-   * @param {number} dist Optional distance measured in SVG units. Default 0.
-   */
-  getPointAlongPath(path, dist) {
-    if (!path.cacheId) {
-      path.cacheId = ++this._pathCacheIdIndex
-    }
-    // use toFixed so as not to cache dist = 20 and dist = 20.00001 separately
-    const cacheStr = path.cacheId + "." + dist.toFixed()
-    if (this._cachedPathPoints[cacheStr]) {
-      return this._cachedPathPoints[cacheStr]
-    }
-    let val
-    if (path.getPointAtLength) {
-      dist = Math.max(0, dist)
-      val = path.getPointAtLength(dist)
-    } else {
-      val = path.getBBox()
-    }
-    // cache just the x and y, which is a (tiny) bit lighter than the SVGPoint returned above
-    const ret = {x: val.x, y: val.y}
-    this._cachedPathPoints[cacheStr] = ret
-    return ret
   }
 
   /**

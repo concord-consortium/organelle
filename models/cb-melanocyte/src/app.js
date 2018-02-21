@@ -1,4 +1,5 @@
-var model;
+var model,
+    addingHormone = false;
 
 Organelle.createModel({
   container: {
@@ -74,13 +75,7 @@ Organelle.createModel({
     "organelles/dots.yml",
     "organelles/red-dots.yml"
   ],
-  hotStart: 1500,
-  clickHandlers: [
-    {
-      selector: '#intercell',
-      action: clickIntercell
-    }
-  ]
+  hotStart: 1500
 }).then(function(m) {
   window.model = m
   model = m;
@@ -118,11 +113,11 @@ Organelle.createModel({
   model.on("view.click", evt => {
     console.log("click!", evt.target.id)
 
-    if (evt.target._organelle.matches({selector: ".gate"})) {
-      console.log("clicked a gate", evt.target)
-    }
-    if (evt.target._organelle.matches({species: "melanosome"})) {
-      console.log("clicked a melanosome", evt.target._organelle.agent)
+    const loc = model.view.transformToWorldCoordinates({x: evt.e.offsetX, y: evt.e.offsetY})
+    if (evt.target._organelle.matches({selector: "#intercell"})) {
+      clickIntercell(loc)
+    } else {
+      clickElsewhere(loc)
     }
   })
 });
@@ -216,18 +211,39 @@ function hormonePulse() {
   }, 2400)
 }
 
-function clickIntercell(evt) {
-  const loc = model.view.transformToWorldCoordinates({x: evt.e.offsetX, y: evt.e.offsetY})
+function addAgent(species, state, props, number) {
+  for (let i = 0; i < number; i++) {
+    const a = model.world.createAgent(model.world.species[species])
+    a.state = state
+    a.setProperties(props)
+  }
+}
+
+document.getElementById('select-add-hormone').addEventListener('click', function(e) {
+  addingHormone = this.checked
+});
+
+function clickIntercell(loc) {
+  if (!addingHormone) return
   let added = 0;
   function addHormone() {
-    for (let i = 0; i < 3; i++) {
-      const a = model.world.createAgent(model.world.species["red-dot"])
-      a.state = "find_path_from_anywhere"
-      a.setProperties(loc)
-    }
+    addAgent("red-dot", "find_path_from_anywhere", loc, 3)
     added++
     if (added < 8) {
-      model.setTimeout(addHormone, 250)
+      model.setTimeout(addHormone, 150)
+    }
+  }
+  addHormone()
+}
+
+function clickElsewhere(loc) {
+  if (!addingHormone) return
+  let added = 0;
+  function addHormone() {
+    addAgent("red-dot", "diffuse", {speed: 0.4, x: loc.x, y: loc.y}, 2)
+    added++
+    if (added < 6) {
+      model.setTimeout(addHormone, 150)
     }
   }
   addHormone()

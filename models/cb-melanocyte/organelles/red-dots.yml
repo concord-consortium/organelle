@@ -40,3 +40,10 @@ rules:
       direction: random
       finally:
         die: true
+  diffuse:
+  - diffuse:
+      for: 300
+      bounding_paths:
+        - "#surrounding_x5F_cells path"
+      finally:
+        die: true
