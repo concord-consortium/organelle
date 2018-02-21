@@ -55,6 +55,6 @@ rules:
   - wait: forever
   waiting_to_break:
   - wait:
-      for: 40
+      for: 30
       finally:
         notify: "break_time"

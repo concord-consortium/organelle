@@ -1,6 +1,6 @@
 var model,
     continuousBinding = false,
-    oldHexSpawnDef;
+    hormoneSpawnPeriod = 30;
 
 Organelle.createModel({
   container: {
@@ -22,7 +22,8 @@ Organelle.createModel({
     open_gates: true,
     working_receptor: true,
     hormone_bound: false,
-    g_protein_bound: false
+    g_protein_bound: false,
+    hormone_spawn_period: hormoneSpawnPeriod
   },
   calculatedProperties: {
     saturation: {
@@ -142,13 +143,6 @@ Organelle.createModel({
     }
   })
 
-  model.on("hexagon.notify", evt => {
-    transformReceptor()
-    if (!model.world.getProperty("hormone_bound") && continuousBinding) {
-      sendHexToReceptor()
-    }
-  })
-
   model.on("gProtein.notify.break_time", evt => {
     let proteinToBreak = evt.agent;
     var body = model.world.createAgent(model.world.species.gProteinBody);
@@ -188,26 +182,18 @@ function sendHexToReceptor() {
 }
 
 function showContinuousBinding() {
-  continuousBinding = true
-  // add new g-proteins removed by manual mode
-  let gCount = model.world.agents.filter(a => a.species.name === "gProtein").length
   // allow new hexes to be born
   if (oldHexSpawnDef) {
     model.world.species.hexagon.spawn.every = oldHexSpawnDef
   }
+  // add new g-proteins removed by manual mode
+  let gCount = model.world.agents.filter(a => a.species.name === "gProtein").length
   for (var i=0; i < 3-gCount; i++) {
     model.world.createAgent(model.world.species.gProtein)
   }
-  function sendHexToReceptorOccasionally() {
-    sendHexToReceptor()
-    var nextTime = Math.floor(Math.random() * 10000)
-    model.setTimeout(sendHexToReceptorOccasionally, nextTime)
-  }
-  sendHexToReceptorOccasionally()
 }
 
 function manualMode() {
-  continuousBinding = false
   // don't create any new hexes
   oldHexSpawnDef = model.world.species.hexagon.spawn.every
   model.world.species.hexagon.spawn.every = 0
@@ -220,7 +206,6 @@ function manualMode() {
   model.setTimeout(() => {
     model.world.setProperty("g_protein_bound", false)
     model.world.setProperty("hormone_bound", false)
-    console.log("after timeout", model.world.getProperty("hormone_bound"))
   }, 1);
 }
 
@@ -246,4 +231,13 @@ function toggleBrokenReceptor() {
       }
     }
   }
+}
+
+let hormoneSpawnSlider = document.getElementById("hormone_level")
+hormoneSpawnSlider.value = 500 / hormoneSpawnPeriod
+hormoneSpawnSlider.oninput = function() {
+  let rate = this.value * 1
+  let period = rate === 0 ? 0 : Math.floor(500 / rate)
+  console.log(period)
+  model.world.setProperty("hormone_spawn_period", period)
 }

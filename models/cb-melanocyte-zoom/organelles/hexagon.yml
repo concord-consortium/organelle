@@ -5,17 +5,27 @@ spawn:
   'on':
     selector: "#intercellular-paths path"
     which: random
-  every: 30
+    at: 0.15
+  every: world.hormone_spawn_period
   # never: true
 dieWhenExitingWorld: false
 properties:
   size: 1
-initialState: flowing
+  rand: [0, 100]
 rules:
+  initialization:
+  - if:
+      fact: rand
+      greaterThan: 90
+    then:
+      switch_state: heading_to_receptor
+    else:
+      switch_state: flowing
   flowing:
   - follow:
       selector: "#intercellular-paths path"
       which: nearest
+      at: 0.15
       direction: forward
       finally:
         die: true
@@ -23,6 +33,7 @@ rules:
   - follow:
       selector: "#intercellular-path-to-receptor path"
       which: nearest
+      at: 0.6
       direction: forward
       finally:
         switch_state: check_if_bound
