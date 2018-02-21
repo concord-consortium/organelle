@@ -30,26 +30,12 @@ rules:
         - fact: world.activated_g_protein
           greaterThan: g_protein_to_grow
     then:
-    - grow:
+      grow:
         by: 0.005
-        until: 1
+        until: 0.75
         finally:
+          set_image_selector: melanosome_4
           switch_state: seeking_microtuble
-    - if:
-        fact: size
-        between: [0.5, 0.7]
-      then:
-        set_image_selector: melanosome_2
-    - if:
-        fact: size
-        between: [0.7, 0.9]
-      then:
-        set_image_selector: melanosome_3
-    - if:
-        fact: size
-        greaterThan: 0.9
-      then:
-        set_image_selector: melanosome_4
   - if:
       all:
         - fact:
@@ -59,7 +45,7 @@ rules:
     then:
       grow:
         by: 0.005
-        until: 0.6
+        until: 0.7
         finally:
           set_image_selector: melanosome_2
           switch_state: seeking_microtuble

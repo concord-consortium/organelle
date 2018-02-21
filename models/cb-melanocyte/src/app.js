@@ -53,7 +53,7 @@ Organelle.createModel({
             ],
             rules: {
               fact: "size",
-              greaterThan: 0.7
+              greaterThan: 0.71
             }
           }
         },
@@ -63,7 +63,7 @@ Organelle.createModel({
             state: ["waiting_on_actin_terminal", "waiting_on_nuclear_actin_terminal"],
             rules: {
               fact: "size",
-              lessThan: 0.7
+              lessThan: 0.71
             }
           }
         }
