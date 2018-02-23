@@ -7,6 +7,7 @@ module.exports = {
   output: {
     path: __dirname + "/lib",
     filename: "organelle.js",
+    libraryTarget: "umd",
     library: 'Organelle'
   },
   module: {

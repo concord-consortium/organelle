@@ -11,6 +11,9 @@
     "compile": "rimraf lib/* && npm run build",
     "prepublish": "npm run compile"
   },
+  "files": [
+    "lib/organelle.js"
+  ],
   "directories": {
     "test": "test"
   },

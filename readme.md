@@ -10,6 +10,8 @@ An agent-based modeling library based on SVG and declarative rules.
 
 ## Installation
 
+Organelle can be used both as a library installed with NPM, or by including the script file directly.
+
 ### NPM
 
 ```
@@ -17,9 +19,11 @@ npm install organelle
 ```
 
 ```js
-import Organelle from 'organelle'
+import * as Organelle from 'organelle'
 // or
 var Organelle = require('organelle')
+
+Organelle.createModel({...})
 ```
 
 ### Script
