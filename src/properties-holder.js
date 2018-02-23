@@ -69,8 +69,9 @@ export default class PropertiesHolder {
   }
 
   updateCalculatedProperties() {
-    let world = this.constructor.name === "World" ? this : this.world,
-        agent = this.constructor.name === "World" ? null : this
+    // duck-typing, but TODO work out a better system
+    let world = this.world ? this.world : this,
+        agent = this.world ? this : null
 
     for (let prop in this.calcProps) {
       this.setProperty(prop, getValue(this.calcProps[prop], world, agent, this))
