@@ -71,6 +71,7 @@
           alleles,
           numStars,
           gameType = "size", // "gate", "nucleus"
+          missionId,
           isNucleusGame = false,
           nucleusGenes,
           gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand=10111111&initial-state=size&target-color=lava",
@@ -185,6 +186,8 @@
             numStars = urlParams.numStars
 
             gameType = urlParams.game || "size"
+
+            missionId = urlParams.missionId || null
 
             nucleusGenes = urlParams.nucleusGenes || null
             isNucleusGame = !!nucleusGenes
@@ -477,6 +480,8 @@
       function setGameUrl(initial, final, forceNewShorthand) {
         let alleleShorthand, stars
 
+        let missionQuery = missionId ? "mission=" + missionId + "&" : ""
+
         if (alleles && !forceNewShorthand) {
           alleleShorthand = alleles
         } else {
@@ -499,7 +504,7 @@
         }
 
 
-        gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand="+alleleShorthand+"&initial-state="+gameType+"&target-color="+final+stars+nucleusString
+        gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?"+missionQuery+"allele-shorthand="+alleleShorthand+"&initial-state="+gameType+"&target-color="+final+stars+nucleusString
       }
 
       parentPhone = iframePhone.getIFrameEndpoint()
