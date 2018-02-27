@@ -306,6 +306,25 @@ class Model {
       eventParts.pop()
     }
   }
+
+  // FIXME: there should be a cleaner way to do this, but for now this gets rid of various
+  // references that prevent garbage collection
+  destroy() {
+    this.stop();
+    this.step = () => 0;
+    this.listeners = [];
+    delete this.view.onLoaded;
+    delete this.view.onHover;
+    delete this.view.onClick;
+    delete this.view;
+    delete this._onViewLoaded;
+    delete this._onViewHover;
+    delete this._onViewClick;
+    delete this.creationPromise;
+    delete this.world.notify;
+    delete this.world;
+    delete this._onWorldEvent;
+  }
 }
 
 function createModel(options) {
