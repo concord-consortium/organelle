@@ -9,25 +9,27 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
 	exit 0
 fi
 
-if [ "$TRAVIS_BRANCH" = 'master' ]; then
-  mv $SRC_DIR _site
-  INVAL_PATH="/index.html"
+# the 2> is to prevent error messages when no match is found
+CURRENT_TAG=`git describe --tags --exact-match $TRAVIS_COMMIT 2> /dev/null`
+if [ "$TRAVIS_BRANCH" = "$CURRENT_TAG" ]; then
+  # this is a tag build
+  mkdir -p _site/version
+  DEPLOY_DIR=version/$TRAVIS_BRANCH
+  INVAL_PATH="/version/$TRAVIS_BRANCH/index.html"
+  mv $SRC_DIR _site/$DEPLOY_DIR
+  export DEPLOY_DIR
 else
-  # the 2> is to prevent error messages when no match is found
-  CURRENT_TAG=`git describe --tags --exact-match $TRAVIS_COMMIT 2> /dev/null`
-  if [ "$TRAVIS_BRANCH" = "$CURRENT_TAG" ]; then
-    # this is a tag build
-    mkdir -p _site/version
-    DEPLOY_DIR=version/$TRAVIS_BRANCH
-    INVAL_PATH="/version/$TRAVIS_BRANCH/index.html"
+  if [ "$TRAVIS_BRANCH" = 'master' ]; then
+    mv $SRC_DIR _site
+    INVAL_PATH="/index.html"
   else
     # this is a branch build
     mkdir -p _site/branch
     DEPLOY_DIR=branch/$TRAVIS_BRANCH
     INVAL_PATH="/branch/$TRAVIS_BRANCH/index.html"
+    mv $SRC_DIR _site/$DEPLOY_DIR
+    export DEPLOY_DIR
   fi
-  mv $SRC_DIR _site/$DEPLOY_DIR
-  export DEPLOY_DIR
 fi
 s3_website push --site _site
 # explicit CloudFront invalidation to workaround s3_website gem invalidation bug
