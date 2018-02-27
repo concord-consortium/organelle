@@ -1,6 +1,6 @@
 {
   "name": "organelle",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "An agent-based modeling library based on SVG and declarative rules.",
   "license": "MIT",
   "main": "lib/organelle.js",
