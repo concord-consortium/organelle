@@ -24,11 +24,14 @@ rules:
         switch_state: check_if_bound
   check_if_bound:
   - if:
-      fact: world.g_protein_bound
+      all:
+      - fact: world.working_receptor
+      - fact:
+          not: world.g_protein_bound
     then:
-      switch_state: away
-    else:
       switch_state: bind_to_receptor
+    else:
+      switch_state: away
   away:
   - follow:
       selector: "#gprotein-paths-to-receptor path"

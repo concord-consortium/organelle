@@ -161,6 +161,8 @@ Organelle.createModel({
 
     model.world.createAgent(model.world.species.gProtein)
   })
+
+  model.on("hexagon.notify", transformReceptor)
 });
 
 function transformReceptor() {
