@@ -9,7 +9,7 @@ function getEntityAndProp(expression, world, agent, baseEntity) {
 }
 
 function getFactValue(fact, world, agent, baseEntity) {
-  if (typeof fact !== 'string') return fact
+  if (typeof fact !== 'string' && typeof fact !== 'object') return fact
   let factName = fact.not || fact,
       { entity, prop } = getEntityAndProp(factName, world, agent, baseEntity),
       val = entity.getProperty(prop)
