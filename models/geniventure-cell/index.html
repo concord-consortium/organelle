@@ -75,7 +75,8 @@
           isNucleusGame = false,
           nucleusGenes,
           gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand=10111111&initial-state=size&target-color=lava",
-          parentPhone
+          parentPhone,
+          staging
 
       Organelle.createModel({
         element: "model",
@@ -181,6 +182,8 @@
             urlParams = {}
             while (match = search.exec(query))
                urlParams[decode(match[1])] = decode(match[2])
+
+            staging = urlParams.staging
 
             alleles = urlParams.alleles
             numStars = urlParams.numStars
@@ -503,8 +506,9 @@
           nucleusString = "&nucleus=true&relevant-gene-shorthand="+nucleusGenes
         }
 
+        let urlBase = staging ? "http://geniverse2.fablevision-dev.com/protein_game_2/index.html?" : "https://www.fablevision.com/geniverse_proteins/index.html?"
 
-        gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?"+missionQuery+"allele-shorthand="+alleleShorthand+"&initial-state="+gameType+"&target-color="+final+stars+nucleusString
+        gameUrl = urlBase+missionQuery+"allele-shorthand="+alleleShorthand+"&initial-state="+gameType+"&target-color="+final+stars+nucleusString
       }
 
       parentPhone = iframePhone.getIFrameEndpoint()
