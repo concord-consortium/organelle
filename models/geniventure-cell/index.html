@@ -506,7 +506,10 @@
           nucleusString = "&nucleus=true&relevant-gene-shorthand="+nucleusGenes
         }
 
-        let urlBase = staging ? "http://geniverse2.fablevision-dev.com/protein_game_2/index.html?" : "https://www.fablevision.com/geniverse_proteins/index.html?"
+        let fvStaging = "https://geniverse2.fablevision-dev.com/protein_game_2/index.html?"
+        let fvLive = "https://www.fablevision.com/geniverse_proteins/index.html?"
+        // update once FV staging server is set up for https
+        let urlBase = fvLive //staging ? fvStaging : fvLive
 
         gameUrl = urlBase+missionQuery+"allele-shorthand="+alleleShorthand+"&initial-state="+gameType+"&target-color="+final+stars+nucleusString
       }
