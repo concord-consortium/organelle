@@ -62,9 +62,13 @@ class Model {
 
     // load model SVG
     const loadModelSvg = new Promise(resolve => {
-      fetch(modelSvgPath).then(response => {
-        resolve(response.text())
-      })
+      if (~modelSvgPath.indexOf('.svg')) {
+        fetch(modelSvgPath).then(response => {
+          resolve(response.text())
+        })
+      } else {
+        resolve(modelSvgPath)
+      }
     })
 
     // load species definitions

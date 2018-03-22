@@ -6,10 +6,7 @@ const two_pi = Math.PI * 2
 const half_pi = Math.PI / 2
 
 export default class Agent extends PropertiesHolder {
-  /**
-   * image       image to load, if any
-   * selector    selector in image
-   */
+
   constructor(species, world, listener) {
     let properties = species.properties || {},
 
