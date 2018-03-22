@@ -1,7 +1,7 @@
 import PropertiesHolder from './properties-holder'
 import rules from './rules'
 import util from './util'
-const { runRules, getEntityAndProp } = rules
+const { runRules, getEntityAndProp, getFactValue } = rules
 const two_pi = Math.PI * 2
 const half_pi = Math.PI / 2
 
@@ -77,7 +77,7 @@ export default class Agent extends PropertiesHolder {
           this.doTask(task[taskName].finally)
         }
       } else {
-        if (taskName !== "debugger" && taskName !== "set" && taskName !== "switch_state") {
+        if (taskName !== "debugger" && taskName !== "switch_state") {
           throw Error(`"${taskName}" is not a known agent task, requested by ${this.species.name} rules`)
         }
       }
@@ -116,7 +116,8 @@ export default class Agent extends PropertiesHolder {
   task_set(val) {
     for (let prop of Object.keys(val)) {
       const { entity, prop: propName } = getEntityAndProp(prop, this.world, this);
-      entity.setProperty(propName, val[prop])
+      const value = getFactValue(val[prop], this.world, this, this)
+      entity.setProperty(propName, value)
     }
   }
 

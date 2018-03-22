@@ -180,6 +180,7 @@ function runRules (world, agent) {
 
 export default {
   runRules,
+  getFactValue,
   getValue,
   checkExpression,
   getEntityAndProp
