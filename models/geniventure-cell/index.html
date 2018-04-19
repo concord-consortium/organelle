@@ -61,6 +61,7 @@
         background-color: black;
         -webkit-transition: opacity 1s;
         transition: opacity 1s;
+        pointer-events: none;
       }
 
       #video-wrapper {
@@ -71,6 +72,92 @@
         height: 100vh;
         width: 151vh;
         padding-right: 7vh;
+        pointer-events: none;
+      }
+
+      video {
+        pointer-events: none;
+      }
+
+      #skip-button {
+        pointer-events: all;
+        display: none;
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, 0);
+        top: 86vh;
+        margin-left: 58vh;
+      }
+
+      .button {
+        display: inline-block;
+        min-width: 23vh;
+        font-family: sans-serif;
+        -webkit-font-smoothing: antialiased;
+        position: relative;
+        padding: 2vh 4vh;
+        padding-right: 13vh;
+        background: #009ED8;
+        border: none;
+        color: white;
+        transition: .2s;
+        font-size: 3vh;
+        font-weight: bold;
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      .button:before,
+      .button:after {
+        position: absolute;
+        top: -2vh;
+        bottom: 0;
+        right: 0;
+        padding-top: inherit;
+        padding-bottom: inherit;
+        width: 7vh;
+        content: "\00a0";
+        font-size: 6vh;
+        text-align: center;
+        transition: .2s;
+        transform-origin: 50% 60%;
+        transition: .2s;
+        transform-origin: 50% 60%;
+      }
+      .button:before {
+        background: rgba(0, 0, 0, 0.1);
+      }
+      .button:hover {
+        background: #0079a5;
+      }
+      .button:active,
+      .button:focus {
+        background: #002e3f;
+        outline: none;
+      }
+      .button:after {
+        content: "\00bb";
+      }
+      .button:hover:after {
+        -webkit-animation: bounceright .3s alternate ease infinite;
+        animation: bounceright .3s alternate ease infinite;
+      }
+
+      @keyframes bounceright {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(3px);
+        }
+      }
+
+      @-webkit-keyframes bounceright {
+        from {
+          -webkit-transform: translateX(0);
+        }
+        to {
+          -webkit-transform: translateX(3px);
+        }
       }
 
     </style>
@@ -82,6 +169,7 @@
             <source src="" type="video/mp4">
           </video>
       </div>
+      <button class="button" id="skip-button">Skip</button>
     </div>
     <svg id="model" viewBox="0 0 1280 800" class="model">
     </svg>
@@ -112,6 +200,7 @@
           parentPhone,
           staging
           videoName,
+          skip,
           urlParams;
 
       (window.onpopstate = function () {
@@ -138,18 +227,34 @@
           isNucleusGame = !!nucleusGenes
 
           challenge = urlParams.chal;
+          skip = urlParams.skip || false;
 
           videoName = urlParams.video || null;
       })();
 
       if (videoName) {
+        var video = document.getElementById('video');
+        if (skip) {
+          video.addEventListener('loadeddata', function() {
+            document.getElementById('skip-button').style.display = 'block';
+          }, false);
+        }
+
         // cellzoom4_copper_sml
         var videoSrc = "https://s3.amazonaws.com/models-resources/geniblocks/resources/fablevision/video/"+videoName+".mp4";
         document.querySelector("#video > source").src = videoSrc;
-        document.getElementById('video').addEventListener('ended', function() {
+        video.load();
+
+        var endVideo = function() {
           document.getElementById('black-overlay').style.opacity = 0;
           model.run();
-        }, false);
+          setTimeout(function() {
+            document.getElementById('black-overlay').remove();
+          }, 1000);
+        }
+
+        document.getElementById('skip-button').onclick = endVideo;
+        video.addEventListener('ended', endVideo, false);
       } else {
         document.getElementById('black-overlay').style.opacity = 0;
       }
