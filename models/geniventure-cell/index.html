@@ -100,7 +100,7 @@
         background: #009ED8;
         border: none;
         color: white;
-        transition: .2s;
+        transition: background .2s;
         font-size: 3vh;
         font-weight: bold;
         border-radius: 6px;
@@ -165,7 +165,7 @@
   <body>
     <div id="black-overlay">
       <div id="video-wrapper">
-          <video id="video" width="100%" autoplay>
+          <video id="video" width="100%">
             <source src="" type="video/mp4">
           </video>
       </div>
@@ -240,10 +240,17 @@
           }, false);
         }
 
-        // cellzoom4_copper_sml
         var videoSrc = "https://s3.amazonaws.com/models-resources/geniblocks/resources/fablevision/video/"+videoName+".mp4";
         document.querySelector("#video > source").src = videoSrc;
         video.load();
+
+        if (video.readyState > 3) {
+          video.play();
+        } else {
+          video.addEventListener('canplaythrough', function() {
+            video.play();
+          }, false);
+        }
 
         var endVideo = function() {
           document.getElementById('black-overlay').style.opacity = 0;
