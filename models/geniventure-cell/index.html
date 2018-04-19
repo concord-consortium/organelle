@@ -3,6 +3,10 @@
     <script type="text/javascript" src="../../organelle.js" charset="utf-8"></script>
     <script type="text/javascript" src="lib/iframe-phone.js" charset="utf-8"></script>
     <style media="screen" type="text/css">
+      body {
+        background-color: black;
+      }
+
       svg {
         background-color: white;
       }
@@ -47,9 +51,38 @@
         cursor: pointer;
       }
 
+      #black-overlay {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+        background-color: black;
+        -webkit-transition: opacity 1s;
+        transition: opacity 1s;
+      }
+
+      #video-wrapper {
+        position: absolute;
+        left: 50%;
+        top: 10vh;
+        transform: translate(-50%, 0);
+        height: 100vh;
+        width: 151vh;
+        padding-right: 7vh;
+      }
+
     </style>
   </head>
   <body>
+    <div id="black-overlay">
+      <div id="video-wrapper">
+          <video id="video" width="100%" autoplay>
+            <source src="" type="video/mp4">
+          </video>
+      </div>
+    </div>
     <svg id="model" viewBox="0 0 1280 800" class="model">
     </svg>
     <div id="protein-game-wrapper" class="model hidden-iframe">
@@ -74,9 +107,53 @@
           missionId,
           isNucleusGame = false,
           nucleusGenes,
+          challenge,
           gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand=10111111&initial-state=size&target-color=lava",
           parentPhone,
           staging
+          videoName,
+          urlParams;
+
+      (window.onpopstate = function () {
+          var match,
+              pl     = /\+/g,  // Regex for replacing addition symbol with a space
+              search = /([^&=]+)=?([^&]*)/g,
+              decode = function (s) { return decodeURIComponent(s.replace(pl, " ")) },
+              query  = window.location.search.substring(1)
+
+          urlParams = {}
+          while (match = search.exec(query))
+              urlParams[decode(match[1])] = decode(match[2])
+
+          staging = urlParams.staging
+
+          alleles = urlParams.alleles
+          numStars = urlParams.numStars
+
+          gameType = urlParams.game || "size"
+
+          missionId = urlParams.missionId || null
+
+          nucleusGenes = urlParams.nucleusGenes || null
+          isNucleusGame = !!nucleusGenes
+
+          challenge = urlParams.chal;
+
+          videoName = urlParams.video || null;
+      })();
+
+      if (videoName) {
+        // cellzoom4_copper_sml
+        var videoSrc = "https://s3.amazonaws.com/models-resources/geniblocks/resources/fablevision/video/"+videoName+".mp4";
+        document.querySelector("#video > source").src = videoSrc;
+        document.getElementById('video').addEventListener('ended', function() {
+          document.getElementById('black-overlay').style.opacity = 0;
+          model.run();
+        }, false);
+      } else {
+        document.getElementById('black-overlay').style.opacity = 0;
+      }
+
 
       Organelle.createModel({
         element: "model",
@@ -165,44 +242,18 @@
       }).then(function(m) {
         model = m;
 
-        // setTimeout( () => {
-          model.stop()
-          model.step(1000)
-        // // }, 2000)
-        model.run()
+        if (challenge) {
+          initialDrakeColor = challenge.split("-")[0]
+          finalDrakeColor = challenge.split("-")[1]
+          setCellPhenotype(initialDrakeColor)
+          setGameUrl(initialDrakeColor, finalDrakeColor)
+        }
 
-        var urlParams
-        (window.onpopstate = function () {
-            var match,
-                pl     = /\+/g,  // Regex for replacing addition symbol with a space
-                search = /([^&=]+)=?([^&]*)/g,
-                decode = function (s) { return decodeURIComponent(s.replace(pl, " ")) },
-                query  = window.location.search.substring(1)
-
-            urlParams = {}
-            while (match = search.exec(query))
-               urlParams[decode(match[1])] = decode(match[2])
-
-            staging = urlParams.staging
-
-            alleles = urlParams.alleles
-            numStars = urlParams.numStars
-
-            gameType = urlParams.game || "size"
-
-            missionId = urlParams.missionId || null
-
-            nucleusGenes = urlParams.nucleusGenes || null
-            isNucleusGame = !!nucleusGenes
-
-            let challenge = urlParams.chal
-            if (challenge) {
-              initialDrakeColor = challenge.split("-")[0]
-              finalDrakeColor = challenge.split("-")[1]
-              setCellPhenotype(initialDrakeColor)
-              setGameUrl(initialDrakeColor, finalDrakeColor)
-            }
-        })();
+        model.stop();
+        model.step(1000);
+        if (!videoName) {
+          model.run();
+        }
 
         function glow(bool) {
           let els = Array.from(document.getElementsByClassName(gameType+"-glow")),
@@ -244,7 +295,6 @@
             } else {
               document.getElementById("backcell_x5F_color").style["fill-opacity"] = 1
               document.getElementById("backcell_x5F_color").style["fill"] = "rgb(180,180,180)"
-
             }
           }
         })
