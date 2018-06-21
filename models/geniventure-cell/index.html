@@ -460,7 +460,7 @@
             console.log("win!")
             setTimeout(exitProteinGame, 1000)
             setCellPhenotype(finalDrakeColor)
-            model.setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 4000)
+            model.setTimeout( () => {console.log("win!!!", content); parentPhone.post('challengeWin', content)}, 4000)
           })
           phone.addListener('activityLoaded', function (content) {
             console.log("loaded!", content)
