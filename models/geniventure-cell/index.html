@@ -198,6 +198,7 @@
           challenge,
           gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand=10111111&initial-state=size&target-color=lava",
           parentPhone,
+          phone,
           staging,
           videoName,
           skip,
@@ -265,7 +266,6 @@
       } else {
         document.getElementById('black-overlay').style.opacity = 0;
       }
-
 
       Organelle.createModel({
         element: "model",
@@ -451,7 +451,7 @@
           createdAgent = model.world.createAgent(model.world.species[1])
         }, zoomDelay)
         model.setTimeout( () => {
-          var phone = new iframePhone.ParentEndpoint(iframe)
+          phone = new iframePhone.ParentEndpoint(iframe)
           phone.addListener('activityExit', function (content) {
             console.log("exit")
             setTimeout(exitProteinGame, 1000)
@@ -461,6 +461,20 @@
             setTimeout(exitProteinGame, 1000)
             setCellPhenotype(finalDrakeColor)
             model.setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 4000)
+          })
+          phone.addListener('activityLoaded', function (content) {
+            console.log("loaded!", content)
+            // pass loading details up to parent once connection has been made - this
+            // could include data on whether the activity includes a tutorial that can be toggled.
+            setupPhoneConnections(content)
+            // setTimeout(exitProteinGame, 1000)
+            // setCellPhenotype(finalDrakeColor)
+            // model.setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 4000)
+          })
+          phone.addListener('stats', (stats) => {
+            // Once user has won the challenge, these should be sent as part of activityWin
+            // but we could call this manually if we wanted
+            parentPhone.post('stats', stats)
           })
 
           removeClass(wrapper, "hidden-iframe")
@@ -475,7 +489,6 @@
           )
         }
       }
-
 
       function exitProteinGame() {
         addClass(wrapper, "temp-iframe");
@@ -523,7 +536,7 @@
         //   createdAgent = model.world.createAgent(model.world.species[1])
         // }, zoomDelay)
         model.setTimeout( () => {
-          var phone = new iframePhone.ParentEndpoint(iframe)
+          phone = new iframePhone.ParentEndpoint(iframe)
           phone.addListener('activityExit', function (content) {
             setTimeout(exitProteinGame, 1000)
           })
@@ -568,7 +581,7 @@
         //   createdAgent = model.world.createAgent(model.world.species[1])
         // }, zoomDelay)
         model.setTimeout( () => {
-          var phone = new iframePhone.ParentEndpoint(iframe)
+          phone = new iframePhone.ParentEndpoint(iframe)
           phone.addListener('activityExit', function (content) {
             setCellPhenotype(content.resultingGeneticColor)
             setGameUrl(content.resultingGeneticColor, finalDrakeColor, true)
@@ -670,15 +683,43 @@
 
         let fvStaging = "https://fablevision.com/geniverse_proteins_dev/index.html?"
         let fvLive = "https://www.fablevision.com/geniverse_proteins/index.html?"
-        // update once FV staging server is set up for https
+        let fvDev = "http://geniverse2.fablevision-dev.com/protein_game_2/index.html?"
+        // fvDev only used locally for testing, won't work with portal since it does not support https
         let urlBase = staging ? fvStaging : fvLive
 
         gameUrl = urlBase+missionQuery+"allele-shorthand="+alleleShorthand+"&initial-state="+gameType+"&target-color="+final+stars+nucleusString
       }
-
       parentPhone = iframePhone.getIFrameEndpoint()
       parentPhone.initialize()
 
+      function setupPhoneConnections(data){
+        parentPhone.addListener('togglePopups', function(){
+          if (phone){
+            phone.post('showTutorial');
+          }
+        })
+
+        parentPhone.addListener('getStats', function(){
+          if (phone){
+            phone.post('getActionStats');
+          }
+        })
+
+        parentPhone.addListener('showStats', function(){
+          if (phone){
+            phone.post('showActionStats');
+          }
+        })
+
+        parentPhone.addListener('hideStats', function(){
+          if (phone){
+            phone.post('hideActionStats');
+          }
+        })
+        // once listeners are set up, send message to parent with details of whether activity has
+        // tutorials (or any other data we choose to support later)
+        parentPhone.post('activityLoaded', data)
+      }
     </script>
   </body>
 </html>
