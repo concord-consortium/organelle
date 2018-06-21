@@ -1,0 +1,463 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none" x="0px" y="0px" width="1920px" height="1080px" viewBox="0 0 1920 1080">
+<defs>
+<radialGradient id="Gradient_1" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="321.30000000000007" fx="0" fy="0" gradientTransform="matrix( 0.9999999999999999, 0, 0, 0.9999999999999999, 309.85,311.05) " spreadMethod="pad">
+<stop  offset="0%" stop-color="#C4C6C1"/>
+
+<stop  offset="97.6470588235294%" stop-color="#FFCEB4" stop-opacity="0.10980392156862745"/>
+</radialGradient>
+
+<radialGradient id="Gradient_2" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="321.30000000000007" fx="0" fy="0" gradientTransform="matrix( 0.9999999999999999, 0, 0, 0.9999999999999999, 309.85,311.05) " spreadMethod="pad">
+<stop  offset="0%" stop-color="#58605C"/>
+
+<stop  offset="100%" stop-color="#FFCEB4" stop-opacity="0.10980392156862745"/>
+</radialGradient>
+
+<radialGradient id="Gradient_3" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="357.475" fx="0" fy="0" gradientTransform="matrix( 0.9999999999999999, 0, 0, 0.9999999999999999, 309.85,311.05) " spreadMethod="pad">
+<stop  offset="0%" stop-color="#FD4D11"/>
+
+<stop  offset="100%" stop-color="#FFCEB4" stop-opacity="0.10980392156862745"/>
+</radialGradient>
+
+<filter id="Filter_1" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+<feColorMatrix in="SourceGraphic" type="matrix" values="0.37 0 0 0 0.21568627450980393 0 0.37 0 0 0.23529411764705882 0 0 0.37 0 0.22745098039215686 0 0 0 1 0" result="result1"/>
+</filter>
+
+<filter id="Filter_2" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+<feColorMatrix in="SourceGraphic" type="matrix" values="0.37 0 0 0 0.6235294117647059 0 0.37 0 0 0.19215686274509805 0 0 0.37 0 0.043137254901960784 0 0 0 1 0" result="result1"/>
+</filter>
+
+<g id="Layer0_0_FILL">
+<path fill="url(#Gradient_1)" stroke="none" d="
+M 619.75 310.3
+Q 614.8 144.05 511.6 67.55 424.8 -12.55 309.45 2.35 271.25 4.8 236.4 12.3 224.1 15 211.9 17.9 102.8 45.05 44.45 141.5 -0.35 215.8 0 311.75 5.45 444.45 92.3 531.95 181.45 618.05 319.25 622.1 385.95 618.4 449.75 582.8 511.7 549.1 551.05 506.5 620.15 432.55 619.75 310.3 Z"/>
+</g>
+
+<g id="gearnubs_0_Layer0_0_FILL">
+<path fill="#76EEEE" stroke="none" d="
+M 38 86.1
+L 39.1 92.6 32.3 90.7
+Q 27.7 92.1 25.3 96.4 23.05 100.7 24.45 105.25
+L 31.1 108.8 23.65 112.7
+Q 21.3 116.95 22.7 121.6 24.05 126.2 28.3 128.5
+L 36.5 128.5 33 134.2
+Q 34.4 138.9 38.55 141.25 42.95 143.55 47.55 142.15
+L 51.75 135.35 54.85 143
+Q 59.15 145.35 63.75 143.95 68.5 142.55 70.8 138.3
+L 68.65 130.65 76.5 133.6
+Q 81.2 132.2 83.5 127.95 85.75 123.7 84.35 119
+L 76.9 113.7 85.1 111.65
+Q 87.5 107.4 86.15 102.8 84.75 98.15 80.45 95.85
+L 73.85 97.35 75.8 90.05
+Q 74.4 85.5 70.25 83.1 65.95 80.75 61.25 82.15
+L 57.9 87.85 53.95 81.4
+Q 49.7 79.1 44.95 80.5 40.35 81.9 38 86.1 Z"/>
+</g>
+
+<g id="gearnubs_0_Layer0_1_FILL">
+<path fill="#76EEEE" stroke="none" d="
+M 81.8 36.8
+L 89.35 26.85
+Q 89.35 19.5 84.2 14.4 79.05 9.4 71.7 9.4
+L 60.95 17.8 61.6 5.15
+Q 56.5 0 49.3 0 42.1 0 37 5.15
+L 36.3 15.25 26.7 9.4
+Q 19.55 9.4 14.4 14.4 9.25 19.5 9.25 26.85
+L 15.95 34.05 5 36.95
+Q 0 42.1 0 49.45 0 56.65 5 61.8
+L 14.75 62.95 9.25 71.85
+Q 9.25 79.05 14.4 84.35 19.55 89.3 26.7 89.3
+L 34.6 81.3 37 93.6
+Q 42.1 98.75 49.3 98.75 56.5 98.75 61.6 93.6
+L 65.05 81.95 71.7 89.3
+Q 79.05 89.3 84.2 84.35 89.35 79.05 89.35 71.85
+L 81.3 62.95 93.6 61.8
+Q 98.75 56.65 98.75 49.45 98.75 42.1 93.6 36.95
+L 81.8 36.8 Z"/>
+</g>
+
+<g id="Layer0_5_FILL">
+<path fill="url(#Gradient_2)" stroke="none" d="
+M 619.75 310.3
+Q 614.8 144.05 511.6 67.55 424.8 -12.55 309.45 2.35 271.25 4.8 236.4 12.3 224.1 15 211.9 17.9 102.8 45.05 44.45 141.5 -0.35 215.8 0 311.75 5.45 444.45 92.3 531.95 181.45 618.05 319.25 622.1 385.95 618.4 449.75 582.8 511.7 549.1 551.05 506.5 620.15 432.55 619.75 310.3 Z"/>
+</g>
+
+<g id="disc_0_Layer0_0_FILL">
+<path fill="#D1AB90" stroke="none" d="
+M -23.65 138.25
+L -59 77.05 -129.65 77.05 -165 138.25 -129.65 199.4 -59 199.4 -23.65 138.25 Z"/>
+</g>
+
+<g id="Layer0_28_FILL">
+<path fill="url(#Gradient_3)" stroke="none" d="
+M 619.75 310.3
+Q 614.8 144.05 511.6 67.55 424.8 -12.55 309.45 2.35 271.25 4.8 236.4 12.3 224.1 15 211.9 17.9 102.8 45.05 44.45 141.5 -0.35 215.8 0 311.75 5.45 444.45 92.3 531.95 181.45 618.05 319.25 622.1 385.95 618.4 449.75 582.8 511.7 549.1 551.05 506.5 620.15 432.55 619.75 310.3 Z"/>
+</g>
+
+<path id="Layer0_0_1_STROKES" stroke="#FFFFFF" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" fill="none" d="
+M 834.288346862793 472.0366180419922
+Q 834.3047653198242 477.054508972168 831.4684768676758 480.0898712158203 829.8533111572266 481.83843688964845 827.3105026245117 483.22169189453126 824.6917587280274 484.6829345703125 821.9539810180664 484.8348052978516 816.2978225708008 484.66856842041017 812.638558959961 481.1344955444336 809.0737014770508 477.54295806884767 808.85 472.0961349487305 808.8356338500977 468.1577575683594 810.6745010375977 465.1080291748047 813.0695434570313 461.14912872314454 817.5476776123047 460.03472595214845 818.0484405517578 459.9156921386719 818.5533081054688 459.80486755371095 819.9837661743164 459.497021484375 821.5517288208008 459.3964584350586 826.2864013671875 458.78487091064454 829.8492065429688 462.07266693115236 834.0851684570313 465.2126968383789 834.288346862793 472.0366180419922 Z"/>
+
+<path id="Layer0_5_1_STROKES" stroke="#FFFFFF" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" fill="none" d="
+M 958.605377960205 466.93067169189453
+Q 958.6317146301269 474.9798164367676 954.082054901123 479.8488082885742 951.4911849975585 482.6536636352539 947.4122932434082 484.8725280761719 943.2115943908691 487.21649169921875 938.8199546813964 487.4601058959961 929.7469718933105 487.1934471130371 923.8771865844726 481.5244789123535 918.1588371276855 475.76333236694336 917.8 467.0261421203613 917.7769554138183 460.70863342285156 920.7266624450683 455.8165969848633 924.5685241699218 449.4661674499512 931.7518508911132 447.6785659790039 932.5551193237304 447.4876251220703 933.3649719238281 447.30985260009766 935.6595542907714 446.8160400390625 938.1747062683105 446.654727935791 945.7695434570312 445.6736869812012 951.4846008300781 450.94760513305664 958.2794616699218 455.98449325561523 958.605377960205 466.93067169189453 Z"/>
+
+<path id="Layer0_28_1_STROKES" stroke="#FFFFFF" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" fill="none" d="
+M 897.4280532836914 468.9645904541016
+Q 897.4521133422851 476.31794586181644 893.2957382202148 480.76604919433595 890.9288299560546 483.3284454345703 887.2025283813476 485.3555053710937 883.3649490356445 487.4968505859375 879.3529342651367 487.7194061279297 871.0642440795898 487.47579803466795 865.7018585205078 482.29687042236327 860.4778182983398 477.03373260498046 860.15 469.0518081665039 860.1289474487304 463.28040161132816 862.8236740112304 458.8112457275391 866.3334350585938 453.0097640991211 872.895816040039 451.37668762207034 873.6296478271485 451.20225219726564 874.3694946289062 451.03984680175785 876.4657272338867 450.58872070312503 878.7634628295898 450.4413528442383 885.7017822265625 449.5451156616211 890.9228149414063 454.36314239501957 897.1303100585938 458.96462860107425 897.4280532836914 468.9645904541016 Z"/>
+</defs>
+
+<g transform="matrix( 0.041046142578125, 0, 0, 0.041046142578125, 808.85,459.3) ">
+<use xlink:href="#Layer0_0_FILL"/>
+
+<use xlink:href="#Layer0_0_1_STROKES" transform="matrix( 24.362823486328125, 0, 0, 24.362823486328125, -19705.85,-11189.8) "/>
+</g>
+
+<g transform="matrix( 0.041229248046875, 0, 0, 0.041229248046875, 806,469.2) ">
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_0_FILL"/>
+</g>
+
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_1_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.041229248046875, 0, 0, -0.041229248046875, 832.6,475.15) ">
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_0_FILL"/>
+</g>
+
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_1_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0, 0.041229248046875, -0.041229248046875, 0, 824.3,456.55) ">
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_0_FILL"/>
+</g>
+
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_1_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0, 0.041229248046875, 0.041229248046875, 0, 818.35,483.1) ">
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_0_FILL"/>
+</g>
+
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_1_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0658416748046875, 0, 0, 0.0658416748046875, 917.8,446.5) ">
+<use xlink:href="#Layer0_5_FILL"/>
+
+<use xlink:href="#Layer0_5_1_STROKES" transform="matrix( 15.187942504882812, 0, 0, 15.187942504882812, -13939.5,-6781.4) "/>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 913.25,462.35) ">
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_0_FILL"/>
+</g>
+
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_1_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, -0.0661163330078125, 955.95,471.9) ">
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_0_FILL"/>
+</g>
+
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_1_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0, 0.0661163330078125, -0.0661163330078125, 0, 942.65,442.1) ">
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_0_FILL"/>
+</g>
+
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_1_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0, 0.0661163330078125, 0.0661163330078125, 0, 933.1,484.65) ">
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_0_FILL"/>
+</g>
+
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_1_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 934.55,468.55) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 940.1,467.1) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 929.8,464.5) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 928.35,459) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 930.65,453.6) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 936.45,452.45) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 942.1,452) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 946.05,456.25) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 949.5,460.75) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 948.2,466.7) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 945.9,472.05) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 941.7,476.85) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 935.45,477.4) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 929.5,476.7) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 925.15,472.5) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 921.65,467.1) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 938.05,461.6) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0661163330078125, 0, 0, 0.0661163330078125, 921.5,460.75) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_1)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.060150146484375, 0, 0, 0.060150146484375, 860.15,450.3) ">
+<use xlink:href="#Layer0_28_FILL"/>
+
+<use xlink:href="#Layer0_28_1_STROKES" transform="matrix( 16.62506103515625, 0, 0, 16.62506103515625, -14300,-7486.25) "/>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 855.95,464.8) ">
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_0_FILL"/>
+</g>
+
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_1_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, -0.0604095458984375, 895,473.55) ">
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_0_FILL"/>
+</g>
+
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_1_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0, 0.0604095458984375, -0.0604095458984375, 0, 882.8,446.3) ">
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_0_FILL"/>
+</g>
+
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_1_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0, 0.0604095458984375, 0.0604095458984375, 0, 874.1,485.15) ">
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_0_FILL"/>
+</g>
+
+<g transform="matrix( 1, 0, 0, 1, 0,0) ">
+<use xlink:href="#gearnubs_0_Layer0_1_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 875.45,470.45) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 880.5,469.15) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 871.1,466.75) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 869.75,461.7) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 871.9,456.8) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 877.2,455.75) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 882.35,455.35) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 885.95,459.2) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 889.1,463.3) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 887.9,468.75) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 885.8,473.65) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 881.95,478.05) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 876.25,478.55) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 870.8,477.9) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 866.85,474.05) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 863.65,469.15) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 878.65,464.1) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+
+<g transform="matrix( 0.0604095458984375, 0, 0, 0.0604095458984375, 863.5,463.3) ">
+<g transform="matrix( 0, 0.6056365966796875, -0.6056365966796875, 0, 120.75,99.95) ">
+<use filter="url(#Filter_2)" xlink:href="#disc_0_Layer0_0_FILL"/>
+</g>
+</g>
+</svg>
