@@ -4,7 +4,7 @@ image: assets/melanosome.svg
 selector: "#melanosome"
 spawn:
   'on':
-    selector: "#golgi_x5F_apparatus path"
+    selector: "#golgi path"
     at: random
   every: 90
 properties:
@@ -74,7 +74,7 @@ rules:
           switch_state: seeking_microtuble
   seeking_microtuble:
   - move_to:
-      selector: "#microtubules_x5F_grouped path"
+      selector: "#microtubules path"
       which: random
       finally:
         switch_state: following_microtuble_outwards
@@ -85,7 +85,7 @@ rules:
       - random: 0.5
     then:
       follow:
-        selector: "#microtubules_x5F_grouped path"
+        selector: "#microtubules path"
         which: nearest
         direction: forward
         until: [0.2, 0.9]
@@ -93,7 +93,7 @@ rules:
           switch_state: find_actin_terminal
     else:
       follow:
-        selector: "#microtubules_x5F_grouped path"
+        selector: "#microtubules path"
         which: nearest
         direction: forward
         finally:
@@ -144,7 +144,7 @@ rules:
       fact: world.working_myosin_5a
     then:
       follow:
-        selector: "#microtubules_x5F_grouped path"
+        selector: "#microtubules path"
         which: nearest
         at: 1
         direction: backward
@@ -153,7 +153,7 @@ rules:
           switch_state: find_actin_terminal
     else:
       follow:
-        selector: "#microtubules_x5F_grouped path"
+        selector: "#microtubules path"
         which: nearest
         at: 1
         direction: backward
