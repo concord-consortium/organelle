@@ -8,7 +8,7 @@
       }
 
       svg {
-        background-color: white;
+        background: center no-repeat url("assets/cell-background.png")
       }
 
       .model {
@@ -171,7 +171,7 @@
       </div>
       <button class="button" id="skip-button">Skip</button>
     </div>
-    <svg id="model" viewBox="0 0 1280 800" class="model">
+    <svg id="model" viewBox="0 50 1920 1080" class="model">
     </svg>
     <div id="protein-game-wrapper" class="model hidden-iframe">
       <iframe id="protein-game"></iframe>
@@ -187,7 +187,7 @@
 
     <script>
       var model,
-          initialDrakeColor = "lava",
+          initialDrakeColor = "ash",
           finalDrakeColor = "charcoal",
           alleles,
           numStars,
@@ -279,60 +279,6 @@
           working_myosin_5a: true,
           open_gates: true
         },
-        calculatedProperties: {
-          saturation: {
-            ratio: {
-              numerator: {
-                count: {
-                  species: "melanosome",
-                  state: [
-                    "waiting_on_actin_terminal",
-                    "waiting_on_nuclear_actin_terminal"
-                  ],
-                }
-              },
-              denominator: 20
-            }
-          },
-          lightness: {
-            ratio: {
-              numerator: {
-                count: {
-                  species: "melanosome",
-                  state: "waiting_on_nuclear_actin_terminal"
-                }
-              },
-              denominator: 10
-            }
-          },
-          grayness: {
-            ratio: {
-              numerator: {
-                count: {
-                  species: "melanosome",
-                  state: [
-                    "waiting_on_actin_terminal",
-                    "waiting_on_nuclear_actin_terminal"
-                  ],
-                  rules: {
-                    fact: "size",
-                    greaterThan: 0.7
-                  }
-                }
-              },
-              denominator: {
-                count: {
-                  species: "melanosome",
-                  state: ["waiting_on_actin_terminal", "waiting_on_nuclear_actin_terminal"],
-                  rules: {
-                    fact: "size",
-                    lessThan: 0.7
-                  }
-                }
-              }
-            }
-          }
-        },
         species: [
           "organelles/melanosome.yml",
           "organelles/zoomed-melanosome.yml"
@@ -380,36 +326,6 @@
         }
 
         glow(true)
-
-        model.addListener( () => {
-          let saturation = Math.min(model.world.getProperty("saturation"), 1) || 0,
-              lightness = Math.min(model.world.getProperty("lightness"), 1),
-              grayness = Math.min(model.world.getProperty("grayness"), 1)
-
-          if (isNaN(lightness)) {
-            lightness = 0
-          }
-          if (isNaN(grayness)) {
-            grayness = 1
-          }
-
-          let gray = [123,116,110],
-              orange = [200, 147, 107],
-              color = gray.map( (g, i) => Math.floor(((g * grayness) + (orange[i] * (1-grayness))) + lightness * 30) ),
-              colorStr = "rgb("+color.join()+")"
-
-          if (document.getElementById("cellshape_0_Layer0_0_FILL")) {
-            document.getElementById("cellshape_0_Layer0_0_FILL").style["fill-opacity"] = saturation
-            document.getElementById("cellshape_0_Layer0_0_FILL").style["fill"] = colorStr
-            if (model.world.getProperty("open_gates") && !model.world.getProperty("albino")) {
-              document.getElementById("backcell_x5F_color").style["fill-opacity"] = Math.max(0.5, saturation)
-              document.getElementById("backcell_x5F_color").style["fill"] = colorStr
-            } else {
-              document.getElementById("backcell_x5F_color").style["fill-opacity"] = 1
-              document.getElementById("backcell_x5F_color").style["fill"] = "rgb(180,180,180)"
-            }
-          }
-        })
       });
 
       function addClass(el, className) {
@@ -607,6 +523,7 @@
         document.getElementById(prop).onclick = function() {
           let val = document.getElementById(prop).checked
           model.world.setProperty(prop, val)
+          setCellColor
           if (callback) {
             callback(val)
           }
@@ -640,6 +557,38 @@
         setPropCheckbox("working_tyr1", colorProps[color][1])
         setPropCheckbox("working_myosin_5a", colorProps[color][2])
         setPropCheckbox("open_gates", colorProps[color][3])
+
+        setCellColor(color);
+      }
+
+      function setCellColor(color) {
+        if (!document.getElementById("Layer0_0_FILL")) {
+          setTimeout(function() {setCellColor(color)}, 50);
+          return;
+        }
+        let colorValues = {
+          frost:    {cell: '#B4B5B2', border: '#C4C6C1', outer: false},
+          charcoal: {cell: '#58605C', border: '#878C86', outer: true},
+          steel:    {cell: '#58605C', border: '#878C86', outer: false},
+          ash:      {cell: '#FD4D11', border: '#D1AA90', outer: true},
+          silver:   {cell: '#FD4D11', border: '#D1AA90', outer: false},
+          lava:     {cell: '#FD4D11', border: '#D1AA90', outer: true},
+          copper:   {cell: '#FD4D11', border: '#D1AA90', outer: false},
+          sand:     {cell: '#FD4D11', border: '#D1AA90', outer: true},
+          gold:     {cell: '#FD4D11', border: '#D1AA90', outer: false}
+        }
+
+        const colorValue = colorValues[color];
+
+        document.getElementById("Layer0_0_FILL").style["fill"] = colorValue.cell;
+        document.getElementById("Layer0_0_1_STROKES").style['stroke'] = colorValue.border;
+        if (colorValue.outer) {
+          document.querySelector("#Layer0_0_FILL_1_ path").style["fill"] = colorValue.cell;
+          document.getElementById("shine").style["visibility"] = "hidden";
+        } else {
+          document.querySelector("#Layer0_0_FILL_1_ path").style["fill"] = 'url("#_Radial1")';
+          document.getElementById("shine").style["visibility"] = "visible"
+        }
       }
 
       function setGameUrl(initial, final, forceNewShorthand) {
