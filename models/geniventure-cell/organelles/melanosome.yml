@@ -10,6 +10,7 @@ spawn:
 properties:
   size: 0.1
   speed: 1.5
+dieWhenExitingWorld: false
 initialState: growing
 rules:
   growing:
@@ -103,35 +104,50 @@ rules:
         all:
         - fact: world.open_gates
         - exists:
-            selector: "#gate_exits circle"
-            within: 100
+            selector: "#gate_exits path"
+            within: 300
       then:
-        switch_state: moving_through_gate
+        switch_state: moving_towards_gate
       else:
         switch_state: following_microtuble_inwards
-  moving_through_gate:
+  moving_towards_gate:
   - move_to:
-      selector: "#gate_exits circle"
-      which: nearest
+      selector: "#gate_exits path"
+      which:
+        any_of_nearest: 3
       finally:
-        switch_state: moving_to_scale_actin_terminal
+        switch_state: moving_through_gate
   - set:
-      speed: 0.5
+      speed: 0.6
   - if:
       fact: size
       greaterThan: 0.9
     then:
       set:
         size: 0.8
+  moving_through_gate:
+  - follow:
+      selector: "#gate_exits path"
+      which: nearest
+      finally:
+        switch_state: moving_to_scale_actin_terminal
+  - set:
+      speed: 0.5
+  - set:
+      size: 0.6
   moving_to_scale_actin_terminal:
+  - if:
+      fact: world.working_tyr1
+    then:
+    - grow:
+        by: 0.02
+        until: 1
+    else:
+    - grow:
+        by: 0.02
+        until: 0.7
   - set:
       speed: 1.5
-  - if:
-      fact: size
-      equals: 0.8
-    then:
-      set:
-        size: 1
   - move_to:
       selector: "#scale_actin_terminals circle"
       which:
