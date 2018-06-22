@@ -444,7 +444,7 @@
             // iframeDelay = initialDrakeColor === "albino" ? 1800 : initialDrakeColor === "lava" ? 2300 : 2800,
             modelStopDelay = 2000
         let {x, y} = el.node.getBBox()
-        Snap.animate(svg.attr("viewBox").vb.split(" "), [x-15, y-5, 192, 120],
+        Snap.animate(svg.attr("viewBox").vb.split(" "), [x-15, y-5, 240, 150],
           function (vals) { svg.attr("viewBox", vals.join(" ")); }, zoomDelay
         );
 
@@ -470,7 +470,7 @@
         }, modelStopDelay)
 
         reverseZoom = function() {
-          Snap.animate(svg.attr("viewBox").vb.split(" "), [0, 0, 1280, 800],
+          Snap.animate(svg.attr("viewBox").vb.split(" "), [0, 15, 1920, 1080],
             function (vals) { svg.attr("viewBox", vals.join(" ")); }, 1500
           )
         }
@@ -514,7 +514,7 @@
         }, modelStopDelay)
 
         reverseZoom = function() {
-          Snap.animate(svg.attr("viewBox").vb.split(" "), [0, 0, 1280, 800],
+          Snap.animate(svg.attr("viewBox").vb.split(" "), [0, 15, 1920, 1080],
             function (vals) { svg.attr("viewBox", vals.join(" ")); }, 1500
           )
         }
