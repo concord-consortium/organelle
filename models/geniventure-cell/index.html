@@ -400,7 +400,7 @@
         }, modelStopDelay)
 
         reverseZoom = function() {
-          Snap.animate(svg.attr("viewBox").vb.split(" "), [0, 0, 1280, 800],
+          Snap.animate(svg.attr("viewBox").vb.split(" "), [0, 15, 1920, 1080],
             function (vals) { svg.attr("viewBox", vals.join(" ")); }, 1500
           )
         }
@@ -576,7 +576,7 @@
 
       function setCellColor(color) {
         if (!document.getElementById("Layer0_0_FILL")) {
-          setTimeout(function() {setCellColor(color)}, 50);
+          setTimeout(function() {setCellColor(color)}, 20);
           return;
         }
         let colorValues = {
