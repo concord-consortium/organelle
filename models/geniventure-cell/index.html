@@ -285,15 +285,15 @@
         ],
         clickHandlers: [
           {
-            selector: "#golgi_x5F_apparatus",
+            selector: "#golgi",
             action: enterSizeGame
           },
           {
-            selector: ".gate",
+            selector: "#clickable-gate",
             action: enterGatesGame
           },
           {
-            selector: "#nucleus_x5F_A",
+            selector: "#nucelus01",
             action: enterNucleusGame
           }
         ]
@@ -359,7 +359,7 @@
         let zoomDelay = 1300,
             iframeDelay = initialDrakeColor === "frost" ? 1800 : initialDrakeColor === "lava" ? 2300 : 2800,
             modelStopDelay = 4000
-        Snap.animate(svg.attr("viewBox").vb.split(" "), [391, 518, 72, 45],
+        Snap.animate(svg.attr("viewBox").vb.split(" "), [659, 741, 56, 35],
           function (vals) { svg.attr("viewBox", vals.join(" ")); }, zoomDelay
         );
 
@@ -431,7 +431,7 @@
             // iframeDelay = initialDrakeColor === "albino" ? 1800 : initialDrakeColor === "lava" ? 2300 : 2800,
             modelStopDelay = 2000
         let {x, y} = el.node.getBBox()
-        Snap.animate(svg.attr("viewBox").vb.split(" "), [x-15, y-5, 72, 45],
+        Snap.animate(svg.attr("viewBox").vb.split(" "), [x-15, y-5, 192, 120],
           function (vals) { svg.attr("viewBox", vals.join(" ")); }, zoomDelay
         );
 

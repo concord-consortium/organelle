@@ -19,7 +19,7 @@ rules:
     then:
       grow:
         by: 0.005
-        until: 0.5
+        until: 0.4
         finally:
           switch_state: seeking_microtuble
   - if:

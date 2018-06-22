@@ -5,7 +5,7 @@ selector: "#melanosome"
 spawn:
   'on':
     selector: "#golgi path"
-    at: 0.588
+    at: 0.29
   never: true
 properties:
   size: 0.1
