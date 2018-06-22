@@ -6,7 +6,7 @@ spawn:
   'on':
     selector: "#golgi path"
     at: random
-  every: 90
+  every: 70
 properties:
   size: 0.1
   speed: 1.5
@@ -19,9 +19,17 @@ rules:
     then:
       grow:
         by: 0.005
-        until: 0.4
+        until: 0.5
         finally:
           switch_state: seeking_microtuble
+  - if:
+      fact:
+        not: world.albino
+    then:
+      set_attr:
+        selector: '#melanin'
+        set:
+          visibility: 'visible'
   - if:
       all:
         - fact:
@@ -38,25 +46,17 @@ rules:
         between: [0.5, 0.7]
       then:
         set_attr:
-          selector: "#Layer1_0_FILL"
+          selector: "#Layer0_28_FILL"
           set:
-            fill: url(#_Radial2)
+            fill: url(#red)
     - if:
         fact: size
-        between: [0.7, 0.9]
+        greaterThan: 0.7
       then:
         set_attr:
-          selector: "#Layer1_0_FILL"
+          selector: "#Layer0_28_FILL"
           set:
-            fill: url(#_Radial3)
-    - if:
-        fact: size
-        greaterThan: 0.9
-      then:
-        set_attr:
-          selector: "#Layer1_0_FILL"
-          set:
-            fill: url(#_Radial4)
+            fill: url(#gray)
   - if:
       all:
         - fact:
@@ -69,9 +69,9 @@ rules:
         until: 0.6
         finally:
           set_attr:
-            selector: "#Layer1_0_FILL"
+            selector: "#Layer0_28_FILL"
             set:
-              fill: url(#_Radial2)
+              fill: url(#red)
           switch_state: seeking_microtuble
   seeking_microtuble:
   - move_to:

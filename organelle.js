@@ -10154,8 +10154,8 @@ module.exports = function (_PropertiesHolder) {
     _this.references = {};
     _this.taggedFacts = {};
 
-    // default true for now
-    _this.dieWhenExitingWorld = true;
+    // hand-code fix
+    _this.dieWhenExitingWorld = species.dieWhenExitingWorld !== undefined ? species.dieWhenExitingWorld : true;
 
     if (species.spawn && species.spawn.on) {
       var _this$world$getLocati = _this.world.getLocation(species.spawn.on, _this.props),

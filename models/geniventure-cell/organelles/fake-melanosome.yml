@@ -4,7 +4,7 @@ image: assets/melanosome.svg
 selector: "#melanosome"
 spawn:
   'on':
-    selector: "#golgi_x5F_apparatus path"
+    selector: "#golgi path"
     at: 0.588
   never: true
 rules:
@@ -14,7 +14,24 @@ rules:
     switch_state: growing
   growing:
   - if:
-      fact: world.working_tyr1
+      fact: world.albino
+    then:
+      grow:
+        by: 0.004
+        until: 0.4
+  - if:
+      fact:
+        not: world.albino
+    then:
+      set_attr:
+        selector: '#melanin'
+        set:
+          visibility: 'visible'
+  - if:
+      all:
+        - fact:
+            not: world.albino
+        - fact: world.working_tyr1
     then:
     - grow:
         by: 0.004
@@ -24,31 +41,30 @@ rules:
         between: [0.5, 0.7]
       then:
         set_attr:
-          selector: "#Layer1_0_FILL"
+          selector: "#Layer0_28_FILL"
           set:
-            fill: url(#_Radial2)
+            fill: url(#red)
     - if:
         fact: size
-        between: [0.7, 0.9]
+        greaterThan: 0.7
       then:
         set_attr:
-          selector: "#Layer1_0_FILL"
+          selector: "#Layer0_28_FILL"
           set:
-            fill: url(#_Radial3)
-    - if:
-        fact: size
-        greaterThan: 0.9
-      then:
-        set_attr:
-          selector: "#Layer1_0_FILL"
-          set:
-            fill: url(#_Radial4)
-    else:
+            fill: url(#gray)
+  - if:
+      all:
+        - fact:
+            not: world.albino
+        - fact:
+            not: world.working_tyr1
+    then:
       grow:
         by: 0.004
         until: 0.6
         finally:
           set_attr:
-            selector: "#Layer1_0_FILL"
+            selector: "#Layer0_28_FILL"
             set:
-              fill: url(#_Radial2)
+              fill: url(#red)
+
