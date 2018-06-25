@@ -19,19 +19,15 @@ rules:
           by: 0.005
           until: 0.4
     - if:
-        fact:
-          not: world.albino
-      then:
-        set_attr:
-          selector: '#melanin'
-          set:
-            visibility: 'visible'
-    - if:
         all:
           - fact:
               not: world.albino
           - fact: world.working_tyr1
       then:
+      - set_attr:
+          selector: '#melanin-gray'
+          set:
+            visibility: 'visible'
       - grow:
           by: 0.005
           until: 1
@@ -58,7 +54,11 @@ rules:
           - fact:
               not: world.working_tyr1
       then:
-        grow:
+      - set_attr:
+          selector: '#melanin-red'
+          set:
+            visibility: 'visible'
+      - grow:
           by: 0.005
           until: 0.6
           finally:
