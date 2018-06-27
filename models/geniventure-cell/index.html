@@ -253,6 +253,10 @@
           }, false);
         }
 
+        var ffVideo = function() {
+          video.playbackRate = 3.0;
+        }
+
         var endVideo = function() {
           document.getElementById('black-overlay').style.opacity = 0;
           model.run();
@@ -261,7 +265,7 @@
           }, 1000);
         }
 
-        document.getElementById('skip-button').onclick = endVideo;
+        document.getElementById('skip-button').onclick = ffVideo;
         video.addEventListener('ended', endVideo, false);
       } else {
         document.getElementById('black-overlay').style.opacity = 0;
