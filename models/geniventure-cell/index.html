@@ -511,6 +511,15 @@
             }
           })
 
+          phone.addListener('activityWin', function (content) {
+            setCellPhenotype(content.resultingGeneticColor)
+            setGameUrl(content.resultingGeneticColor, finalDrakeColor, true)
+            setTimeout(exitProteinGame, 500)
+            if (content.resultingGeneticColor === finalDrakeColor) {
+              model.setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 4000)
+            }
+          })
+
           removeClass(wrapper, "hidden-iframe")
         }, iframeDelay)
         model.setTimeout( () => {
