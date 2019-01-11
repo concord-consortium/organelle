@@ -568,11 +568,10 @@
             setCellPhenotype(content.resultingGeneticColor)
             setGameUrl(content.resultingGeneticColor, finalDrakeColor, true)
             setTimeout(exitProteinGame, 500)
-            console.log(">>>> ", content.resultingGeneticColor)
-            console.log(">>>> ", finalDrakeColor)
-            console.log(content.resultingGeneticColor === finalDrakeColor)
             if (content.resultingGeneticColor === finalDrakeColor) {
               model.setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 4000)
+            } else {
+              model.setTimeout( () => {console.log("fail!"); parentPhone.post('challengeFail')}, 4000)
             }
           })
 
