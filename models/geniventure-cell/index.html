@@ -570,9 +570,11 @@
             setTimeout(exitProteinGame, 500)
             if (content.resultingGeneticColor === finalDrakeColor) {
               model.setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 4000)
-            } else {
-              model.setTimeout( () => {console.log("fail!"); parentPhone.post('challengeFail')}, 4000)
             }
+            // remove for now
+            // else if (content.resultingGeneticColor !== initialDrakeColor) {
+            //   model.setTimeout( () => {console.log("fail!"); parentPhone.post('challengeFail')}, 4000)
+            // }
           })
 
           removeClass(wrapper, "hidden-iframe")
