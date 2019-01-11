@@ -1,3 +1,48 @@
+<!--
+  Cell URL Parameters:
+
+  ?chal=charcoal-lava&alleles=10111111&game=size&missionId=3.2.3&video=charcoal&skip=true
+
+  chal=charoal-lava
+    initial and goal colors. Sets `initialDrakeColor` and `finalDrakeColor`
+    Sets `alleleShorthand` in FV_URL if `alleles` not set
+    Sets `target-color` in FV_URL
+  alleles=10111111
+    Sets `alleleShorthand` in FV_URL
+  game=size
+    Sets flash location
+    Sets `initial-state` in FV_URL if `fvInitialState` is not set
+  fvInitialState=gates
+    Optional, sets `initial-state` in FV_URL. If ommitted, `game` value is used
+  missionID=3.2.3
+    Sets `mission` in FV_URL
+  numStars
+    Sets `num-stars` in FV_URL
+  nucleusGenes
+    Sets &nucleus=true&relevant-gene-shorthand=[nucleusGenes]
+  boss=true
+    Sets `boss` in FV_URL
+  preAlleles
+    Sets `pre-alleles` in FV_URL
+  preTargetColor
+    Sets pre-target-color in FV_URL
+  staging=true
+    Whether to use FV Staging url
+  video=charcoal&skip=true
+    Sets zoom-in video to be shown and whether FF controls are visible
+
+  NEW FV Protein Game URL Parameters:
+
+  ?mission=3.2.1&allele-shorthand=11111111&initial-state=size&target-color=charcoal&num-stars=0
+  ?mission=3.2.2&allele-shorthand=00111111&initial-state=size&target-color=charcoal
+  ?mission=3.2.4&allele-shorthand=00111111&initial-state=size&target-color=charcoal&nucleus=true&relevant-gene-shorthand=11000000&boss=true
+
+  Cell url:
+    ?chal=lava-steel&alleles=00111111&game=nucleus&fvInitialState=gate&missionId=3.4.3&nucleusGenes=11000011&boss=true&preAlleles=11111111&preTargetColor=charcoal&numStars=13
+  FV url:
+    ?mission=3.4.3&allele-shorthand=00111111&initial-state=gate&target-color=steel&nucleus=true&relevant-gene-shorthand=11000011&boss=true&pre-alleles=11111111&pre-target-color=charcoal&num-stars=13
+  -->
+
 <html>
   <head>
     <script type="text/javascript" src="../../organelle.js" charset="utf-8"></script>
@@ -194,8 +239,12 @@
           gameType = "size", // "gate", "nucleus"
           missionId,
           isNucleusGame = false,
+          boss=false,
           nucleusGenes,
+          preAlleles,
+          preTargetColor,
           challenge,
+          fvInitialState,
           gameUrl = "https://www.fablevision.com/geniverse_proteins/index.html?allele-shorthand=10111111&initial-state=size&target-color=lava",
           parentPhone,
           phone,
@@ -221,11 +270,15 @@
           numStars = urlParams.numStars
 
           gameType = urlParams.game || "size"
+          fvInitialState = urlParams.fvInitialState || gameType
 
           missionId = urlParams.missionId || null
 
           nucleusGenes = urlParams.nucleusGenes || null
           isNucleusGame = !!nucleusGenes
+          boss = urlParams.boss || false
+          preAlleles = urlParams.preAlleles || null
+          preTargetColor = urlParams.preTargetColor || null
 
           challenge = urlParams.chal;
           skip = urlParams.skip || false;
@@ -515,6 +568,9 @@
             setCellPhenotype(content.resultingGeneticColor)
             setGameUrl(content.resultingGeneticColor, finalDrakeColor, true)
             setTimeout(exitProteinGame, 500)
+            console.log(">>>> ", content.resultingGeneticColor)
+            console.log(">>>> ", finalDrakeColor)
+            console.log(content.resultingGeneticColor === finalDrakeColor)
             if (content.resultingGeneticColor === finalDrakeColor) {
               model.setTimeout( () => {console.log("win!!!"); parentPhone.post('challengeWin')}, 4000)
             }
@@ -621,6 +677,9 @@
         let alleleShorthand, stars
 
         let missionQuery = missionId ? "mission=" + missionId + "&" : ""
+        let bossQuery = boss ? "boss=true&" : ""
+        let preAllelesQuery = preAlleles ? "pre-alleles=" + preAlleles + "&" : ""
+        let preTargetColorQuery = preTargetColor ? "pre-target-color=" + preTargetColor + "&" : ""
 
         if (alleles && !forceNewShorthand) {
           alleleShorthand = alleles
@@ -649,7 +708,7 @@
         // fvDev only used locally for testing, won't work with portal since it does not support https
         let urlBase = staging ? fvStaging : fvLive
 
-        gameUrl = urlBase+missionQuery+"allele-shorthand="+alleleShorthand+"&initial-state="+gameType+"&target-color="+final+stars+nucleusString
+        gameUrl = urlBase+missionQuery+bossQuery+preAllelesQuery+preTargetColorQuery+"allele-shorthand="+alleleShorthand+"&initial-state="+fvInitialState+"&target-color="+final+stars+nucleusString
       }
       parentPhone = iframePhone.getIFrameEndpoint()
       parentPhone.initialize()
