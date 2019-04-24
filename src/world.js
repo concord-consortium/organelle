@@ -2,7 +2,7 @@ var Snap = require("snapsvg")
 require("./lib/snap-plugins")
 import Agent from "./agent"
 
-module.exports = class World {
+export default class World {
   constructor({element, background, properties, species}) {
     this.snap = Snap("#"+element)
 

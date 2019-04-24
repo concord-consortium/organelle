@@ -63,7 +63,7 @@ class Model {
 }
 
 
-module.exports = {
+export default {
 
   createModel({element, background, properties, species, stepsPerSecond, autoplay}) {
     return new Model({element, background, properties, species, stepsPerSecond, autoplay})
