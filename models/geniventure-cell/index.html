@@ -26,6 +26,8 @@
     Sets `pre-alleles` in FV_URL
   preTargetColor
     Sets pre-target-color in FV_URL
+  gameBase=url
+    Specifies the url to use for launching the protein games. Overrides `staging` if present.
   staging=true
     Whether to use FV Staging url
   video=charcoal&skip=true
@@ -264,6 +266,7 @@
           while (match = search.exec(query))
               urlParams[decode(match[1])] = decode(match[2])
 
+          gameBase = urlParams.gameBase
           staging = urlParams.staging
 
           alleles = urlParams.alleles
@@ -707,7 +710,7 @@
         let fvLive = "//geniventure.concord.org/resources/proteingame/index.html?"
         let fvDev = "http://geniverse2.fablevision-dev.com/protein_game_2/index.html?"
         // fvDev only used locally for testing, won't work with portal since it does not support https
-        let urlBase = staging ? fvStaging : fvLive
+        let urlBase = gameBase ? gameBase + "?" : (staging ? fvStaging : fvLive)
 
         gameUrl = urlBase+missionQuery+bossQuery+preAllelesQuery+preTargetColorQuery+"allele-shorthand="+alleleShorthand+"&initial-state="+fvInitialState+"&target-color="+final+stars+nucleusString
       }
