@@ -14,7 +14,8 @@ module.exports = function(env, argv) {
     },
     devtool: isDevMode ? 'eval-source-map' : 'source-map',
     devServer: {
-      contentBase: './dist'
+      contentBase: './dist',
+      port: 9000
     },
     performance: { hints: false },
     module: {
