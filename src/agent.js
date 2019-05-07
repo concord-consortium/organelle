@@ -1,39 +1,49 @@
-import AgentView from "./agent-view";
-import runRules from './rules'
+import PropertiesHolder from "./properties-holder"
+import AgentView from "./agent-view"
+import { runRules } from './rules'
 
-export default class Agent {
+export default class Agent extends PropertiesHolder {
   /**
    * image       image to load, if any
    * selector    selector in image
    */
   constructor(species, world) {
+    let properties = species.properties || {},
+
+        defaultProperties = {
+          x: 0,
+          y: 0,
+          size: 1,
+          speed: 1
+        }
+
+    super({ properties, defaultProperties })
+
     this.species = species
-    this.props = {}
     this.world = world
 
     this.references = {}
+    this.taggedFacts = {}
 
     // default true for now
-    this.dieWhenExitingWorld = true
+    this.dieWhenExitingWorld = species.dieWhenExitingWorld !== undefined ? species.dieWhenExitingWorld : true
 
-    let [x, y] = [0, 0]
-    if (species.spawn.on) {
-      ({x, y} = this.world.getLocation(species.spawn.on, this.props))
+    if (species.spawn && species.spawn.on) {
+      let {x, y} = this.world.getLocation(species.spawn.on, this.props)
+
+      this.props.x = x
+      this.props.y = y
     }
 
-    this.props.x = x
-    this.props.y = y
-    this.props.size = 1
+    this.state = species.initialState || "initialization"
 
-    this.state = "initialization"
+    this.view = new AgentView(this, this.world)
 
     this.step()
-
-    this.view = new AgentView(this, this.world.snap)
   }
 
   step() {
-    const tasks = runRules(this, this.world)
+    const tasks = runRules(this.world, this)
     for (let task of tasks) {
       this.doTask(task)
     }
