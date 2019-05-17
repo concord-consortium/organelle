@@ -1,9 +1,14 @@
 var Snap = require("snapsvg")
 require("./lib/snap-plugins")
+import PropertiesHolder from "./properties-holder"
 import Agent from "./agent"
 
-module.exports = class World {
-  constructor({element, background, properties, species}) {
+export default class World extends PropertiesHolder {
+  constructor(options) {
+    super(options)
+
+    let {element, background, species, clickHandlers} = options
+
     this.snap = Snap("#"+element)
 
     let vb = this.snap.node.viewBox.baseVal
@@ -16,26 +21,34 @@ module.exports = class World {
     this.species = species
     this.agents = []
 
-    this.props = {}
 
-    for (let prop in properties) {
-      this.setProperty(prop, properties[prop])
-    }
 
     this.creationTimes = {}
 
-    if (background) {
-      Snap.load(background, (img) => {
-        this.snap.append(img)
+    if (background && background.file) {
+      Snap.load(background.file, (img) => {
+        window.snapAppend(this.snap, img, background.selector)
 
         // refactor this into a spawning helper
         for (let kind of species) {
           if (kind.spawn.every) {
             this.creationTimes[kind.name] = {}
             this.creationTimes[kind.name].nextCreation = kind.spawn.every
+          } else if (kind.spawn.start) {
+            this.creationTimes[kind.name] = {}
+            this.creationTimes[kind.name].nextCreation = 0
           }
         }
 
+        for (let handler of clickHandlers) {
+          this.snap.selectAll(handler.selector).forEach( (sel) => {sel.click( () => {
+            handler.action(Snap, this.snap, sel)
+          })})
+        }
+
+        for (let i=0; i<1500; i++) {
+          this.step()
+        }
       });
     }
   }
@@ -46,8 +59,7 @@ module.exports = class World {
     for (let kind of this.species) {
       if (this.creationTimes[kind.name] && this.creationTimes[kind.name].nextCreation < this.tick) {
         this.creationTimes[kind.name].nextCreation = this.tick + kind.spawn.every
-        let agent = new Agent(kind, this)
-        this.agents.push(agent)
+        this.createAgent(kind)
       }
     }
 
@@ -61,6 +73,10 @@ module.exports = class World {
       }
     }
 
+    if (this.tick % 10 === 0) {
+      this.updateCalculatedProperties()
+    }
+
     this.agents = this.agents.filter( (a) => !a.dead)
   }
 
@@ -70,12 +86,14 @@ module.exports = class World {
     }
   }
 
-  setProperty(prop, value) {
-    this.props[prop] = value
+  createAgent(kind) {
+    let agent = new Agent(kind, this)
+    this.agents.push(agent)
+    return agent
   }
 
-  getProperty(prop) {
-    return this.props[prop]
+  append(img, selector, fromCache) {
+    return window.snapAppend(this.snap, img, selector, fromCache)
   }
 
   isInWorld({x, y}) {
@@ -86,11 +104,14 @@ module.exports = class World {
   getPath(props, {x: agent_x, y: agent_y}) {
     let matches = this.snap.selectAll(props.selector),
         selection;
-    if (props.which === "random") {
+    if (typeof props.which === "number") {
+      selection = matches[props.which]
+    } else if (props.which === "random") {
       selection = matches[Math.floor(Math.random() * matches.length)]
-    } else if (props.which === "nearest" || (props.which && props.which.any_of_nearest)) {
-      let numNearest = props.which.any_of_nearest | 1,
-          leastSqDistance = Array(numNearest).fill({dist: Infinity});
+    } else if (props.which === "nearest" || (props.which && props.which.any_of_nearest) || props.within) {
+      let numNearest = (props.which && props.which.any_of_nearest) ? props.which.any_of_nearest : 1,
+          leastSqDistance = Array(numNearest).fill({dist: Infinity}),
+          withinSq = (props.within * props.within) || Infinity
 
       matches.forEach( m => {
         let {x, y} = this.getPercentAlongPath(m.node, props.at)
@@ -98,7 +119,7 @@ module.exports = class World {
             dy = agent_y - y,
             sqDistance = dx * dx + dy * dy
         // bump furthest
-        if (sqDistance < leastSqDistance[numNearest-1].dist) {
+        if (sqDistance < withinSq && sqDistance < leastSqDistance[numNearest-1].dist) {
           leastSqDistance[numNearest-1] = {path: m, dist: sqDistance}
           // re-sort array from nearest to furthest
           leastSqDistance.sort(function(a, b) {
@@ -110,7 +131,12 @@ module.exports = class World {
     } else {
       selection = matches[0]
     }
-    return { path: selection, length: selection.getTotalLength() }
+    if (!selection) {
+      return null
+    } else {
+      let length = selection.getTotalLength ? selection.getTotalLength() : 0
+      return { path: selection, length: length }
+    }
   }
 
   getLocation(props, {x, y}) {
@@ -125,6 +151,10 @@ module.exports = class World {
     if (typeof props.y === "number") {
       loc.y = props.y
     }
+    if (props.random_offset) {
+      loc.x += (Math.random() * (props.random_offset * 2)) - props.random_offset
+      loc.y += (Math.random() * (props.random_offset * 2)) - props.random_offset
+    }
     return loc
   }
 
@@ -134,12 +164,16 @@ module.exports = class World {
     } else if (typeof perc !== "number") {
       perc = 0
     }
-    let distanceAlong = perc ? path.getTotalLength() * perc : 0
-    return path.getPointAtLength(distanceAlong)
+    let distanceAlong = (perc && path.getTotalLength) ? path.getTotalLength() * perc : 0
+    return this.getPointAlongPath(path, distanceAlong)
   }
 
   getPointAlongPath(path, dist) {
-    dist = Math.max(0, dist)
-    return path.getPointAtLength(dist)
+    if (path.getPointAtLength) {
+      dist = Math.max(0, dist)
+      return path.getPointAtLength(dist)
+    } else {
+      return path.getBBox()
+    }
   }
 }
