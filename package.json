@@ -1,7 +1,8 @@
 {
   "name": "organelle",
-  "version": "0.0.1",
+  "version": "0.1.0-gv.1",
   "description": "An agent-based modeling library based on SVG and declarative rules.",
+  "repository": "github:concord-consortium/organelle",
   "license": "MIT",
   "scripts": {
     "build": "npm-run-all clean build:production",
