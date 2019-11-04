@@ -25,18 +25,30 @@ export default {
   _pathCacheIdIndex: 0,
   _cachedPathPoints: {},
 
-  parseSVG(svgString) {
-    let doc
-    if (typeof DOMParser !== 'undefined') {
-      var parser = new DOMParser()
-      doc = parser.parseFromString(svgString, 'text/xml')
-    } else if (fabric.window.ActiveXObject) {
-      doc = new ActiveXObject('Microsoft.XMLDOM')
-      doc.async = 'false'
-      // IE chokes on DOCTYPE
-      doc.loadXML(svgString.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''))
-    }
-    return doc.documentElement
+  // seems to be obsolete, as getTotalLength and getPointAtLength no longer work on
+  // non-rendered SVG elements
+  // parseSVG(svgString) {
+  //   let doc
+  //   if (typeof DOMParser !== 'undefined') {
+  //     var parser = new DOMParser()
+  //     doc = parser.parseFromString(svgString, 'text/xml')
+  //   } else if (fabric.window.ActiveXObject) {
+  //     doc = new ActiveXObject('Microsoft.XMLDOM')
+  //     doc.async = 'false'
+  //     // IE chokes on DOCTYPE
+  //     doc.loadXML(svgString.replace(/<!DOCTYPE[\s\S]*?(\[[\s\S]*\])*?>/i, ''))
+  //   }
+  //   return doc.documentElement
+  // },
+
+  appendHiddenSVG(svgString) {
+    const fragment = document.createDocumentFragment();
+    const div = document.createElement("div");
+    div.innerHTML = svgString;
+    const svgEl = div.getElementsByTagName("svg")[0];
+    div.style.visibility = "hidden";
+    document.body.append(div);
+    return svgEl;
   },
 
   parseViewbox(svgDoc) {
@@ -244,7 +256,12 @@ export default {
     if (pathEl._length) {
       return pathEl._length
     }
-    pathEl._length = pathEl.getTotalLength()
+    try {
+      pathEl._length = pathEl.getTotalLength();
+    } catch (e) {
+      debugger;
+    }
+
     return pathEl._length
   },
 

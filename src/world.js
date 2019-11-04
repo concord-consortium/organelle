@@ -6,7 +6,7 @@ export default class World extends PropertiesHolder {
   constructor(options) {
     super(options)
 
-    this.worldSvgModel = util.parseSVG(options.worldSvgString)
+    this.worldSvgModel = util.appendHiddenSVG(options.worldSvgString)
 
     this.bounds = options.bounds || util.parseViewbox(this.worldSvgModel)
     this.bounds.right = this.bounds.left + this.bounds.width
