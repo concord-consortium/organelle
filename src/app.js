@@ -326,6 +326,7 @@ class Model {
     delete this._onViewClick;
     delete this.creationPromise;
     delete this.world.notify;
+    this.world.worldSvgModel.parentElement.remove();
     delete this.world;
     delete this._onWorldEvent;
   }
