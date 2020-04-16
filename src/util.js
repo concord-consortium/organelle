@@ -259,7 +259,8 @@ export default {
     try {
       pathEl._length = pathEl.getTotalLength();
     } catch (e) {
-      debugger;
+      // Element is not rendered, and Chrome has started to error on getting length
+      // of non-rendered components
     }
 
     return pathEl._length
