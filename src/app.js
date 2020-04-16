@@ -320,6 +320,7 @@ class Model {
     delete this.view.onLoaded;
     delete this.view.onHover;
     delete this.view.onClick;
+    this.view.destroy();
     delete this.view;
     delete this._onViewLoaded;
     delete this._onViewHover;

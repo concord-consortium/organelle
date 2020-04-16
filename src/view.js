@@ -298,4 +298,9 @@ export default class View {
 
     this.canvas.renderAll()
   }
+
+  destroy() {
+    this.canvas.off("mouse:up", this.handleClick)
+    this.canvas.off("mouse:move", this.handleHover)
+  }
 }
