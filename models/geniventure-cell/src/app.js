@@ -81,7 +81,7 @@ var model,
       "organelles/zoomed-melanosome.yml",
       "organelles/dots.yml"
     ],
-    hotStart: 10,
+    hotStart: 1000,
     clickHandlers: [
       {
         selector: "#golgi_x5F_apparatus",
@@ -99,6 +99,8 @@ var model,
   }).then(function(m) {
     window.model = m
     model = m;
+
+    model.setSpeed(1);
 
     var urlParams
     (window.onpopstate = function () {

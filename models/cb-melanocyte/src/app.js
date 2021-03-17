@@ -77,8 +77,10 @@ Organelle.createModel({
   ],
   hotStart: 1500
 }).then(function(m) {
-  window.model = m
+  window.model = m;
   model = m;
+
+  model.setSpeed(1);
 
   model.on("model.step", () => {
     let saturation = Math.min(model.world.getProperty("saturation"), 1) || 0,
