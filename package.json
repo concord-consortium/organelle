@@ -32,7 +32,7 @@
   "homepage": "https://github.com/concord-consortium/organelle#readme",
   "dependencies": {
     "babel-polyfill": "^6.16.0",
-    "fabric": "2.0.0-rc.4",
+    "fabric": "^4.3.1",
     "js-yaml": "^3.14.1",
     "whatwg-fetch": "^2.0.3"
   },
