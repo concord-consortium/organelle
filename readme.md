@@ -39,7 +39,7 @@ Organelle.createModel({...})
 
 ## Developer setup
 
-    yarn
+    npm install
     npm start
 
     // view the contents of /lib in your browser.
