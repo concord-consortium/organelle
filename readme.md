@@ -39,13 +39,8 @@ Organelle.createModel({...})
 
 ## Developer setup
 
-    npm install
-    npm start
-
-    // view the contents of /lib in your browser.
-    // e.g. using live-server, in another tab:
-    npm install -g live-server
-    live-server lib
+2. Run `npm install` to pull dependencies
+3. Run `npm start` to run `webpack-dev-server` in development mode with hot module replacement
 
 ## Goals for 1.0 release:
 

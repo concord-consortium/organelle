@@ -1,32 +1,29 @@
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 
-module.exports = {
-  entry: {
-    'app': './src/app.js',
-  },
+const path = require('path');
+
+module.exports = [
+  'source-map'
+].map(devtool => ({
+  mode: 'development',
+  entry: './src/index.js',
   output: {
-    path: __dirname + "/lib",
-    filename: "organelle.js",
-    libraryTarget: "umd",
-    library: 'Organelle'
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'organelle.js',
+    library: "Organelle",
+    libraryTarget: "umd"
   },
-  module: {
-    loaders: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: {
-          presets: ['es2015'],
-          plugins: ["transform-object-rest-spread"]
-        }
-      }
-    ]
-  },
+  devtool,
   plugins: [
-    new CopyWebpackPlugin([
-      {from: __dirname + '/public'},
-      {from: __dirname + '/models', to: 'models'}
-    ])
-  ]
-};
+    new CopyWebpackPlugin({
+      patterns: [
+        {from: __dirname + '/public'},
+        {from: __dirname + '/models', to: 'models'}
+      ]
+    })
+  ],
+  node: {
+    Buffer: false,
+    process: false
+  }
+}));
