@@ -100,8 +100,6 @@ var model,
     window.model = m
     model = m;
 
-    model.setSpeed(1);
-
     var urlParams
     (window.onpopstate = function () {
         var match,
@@ -161,12 +159,12 @@ var model,
 
       const cellFill = model.view.getModelSvgObjectById("cellshape_0_Layer0_0_FILL")
       if (cellFill) {
-        cellFill.setColor(colorStr)
+        cellFill.set('fill', colorStr)
         cellFill.set({opacity: saturation})
 
         if (model.world.getProperty("open_gates") && !model.world.getProperty("albino")) {
           const backgroundFill = model.view.getModelSvgObjectById("backcell_x5F_color")
-          backgroundFill.setColor(colorStr)
+          backgroundFill.set('fill', colorStr)
           backgroundFill.set({opacity: Math.max(0.5, saturation)})
         }
       }

@@ -18,8 +18,8 @@ export default class View {
 
     this.loadingText = new fabric.Text('loading...', { left: width/2, top: height/2, fill: "white", fontFamily: "sans-serif" })
     this.canvas.add(this.loadingText)
-    this.loadingText.set("left", this.loadingText.left - (this.loadingText.width/2))
-    this.loadingText.set("top", this.loadingText.top - (this.loadingText.height/2))
+    this.loadingText.set("left", this.loadingText.left - (width/2))
+    this.loadingText.set("top", this.loadingText.top - (height/2))
 
     this.loaded = false
 
