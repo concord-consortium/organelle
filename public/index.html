@@ -1,13 +1,48 @@
 <html>
+  <head>
+    <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+  </head>
   <body>
-    <h1>Organelle</h1>
-    <h2>Models</h2>
-    <ul>
-      <li><a href="models/geniventure-cell/">Geniventure Cell</a></li>
-      <li><a href="models/cb-melanocyte/">ConnectedBio: Melanocyte</a></li>
-      <li><a href="models/cb-melanocyte-receptor/">ConnectedBio: Melanocyte &mdash; Zoomed on receptor</a></li>
-      <li><a href="models/cb-melanocyte-golgi/">ConnectedBio: Melanocyte &mdash; Zoomed on golgi</a></li>
-      <li><a href="models/demos/">Demos</a></li>
-    </ul>
+    <header>
+      <div class="header-content">
+        <h1>Organelle</h1>
+        <div class="right">
+          <a href="https://concord.org"><img src="concord-consortium-logo.svg" height="20px" /></a>
+          <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-0093b0.svg" /></a>
+          <a href="https://github.com/concord-consortium/organelle/"><img src="github-mark-32px.png" height="20px" /></a>
+        </div>
+      </div>
+    </header>
+    <div class="content">
+      <div>
+        Organelle is an agent-based modelling engine that allows for portable rules and semantically-defined environments
+        using SVG. The initial work for Organelle was developed under the <a href="https://learn.concord.org/geniventure">
+        Geniventure</a> and <a href="https://concord.org/our-work/research-projects/connected-biology/">Connected Biology</a>
+        projects at <a href="https://concord.org">The Concord Consortium</a>.
+      </div>
+      <div>
+        <b>Portable rules</b> means that agents can be defined once and used in many models, though the presense of
+        environmental features or other agents may cause them to behave differently.<br/>
+      </div>
+      <div>
+        <b>Semantically-defined environments</b> means that we can author a world for the model using SVG, either drawn
+        using an image editor or coded by hand, and tag the various elements, allowing the agents to use those elements
+        as references in their rules, such as following a path. The elements need not be visible, and the actual view
+        runs in a Canvas element for speed.
+      </div>
+      <div>
+        <h2>Models</h2>
+        <ul>
+          <li><a href="models/geniventure-cell/">Geniventure Cell</a></li>
+          <li><a href="models/cb-melanocyte/">ConnectedBio: Melanocyte</a></li>
+          <li><a href="models/cb-melanocyte-receptor/">ConnectedBio: Melanocyte &mdash; Zoomed on receptor</a></li>
+          <li><a href="models/cb-melanocyte-golgi/">ConnectedBio: Melanocyte &mdash; Zoomed on golgi</a></li>
+          <li><a href="models/demos/">Demos</a></li>
+        </ul>
+      </div>
+    </div>
   </body>
 </html>
